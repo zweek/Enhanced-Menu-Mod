@@ -26,9 +26,9 @@ void function InitControlsMenu()
 	file.itemDescriptionBox = Hud_GetChild( menu, "LblMenuItemDescription" )
 
 #if PC_PROG
-	button = Hud_GetChild( menu, "ExtrasMenu" )
-	SetupButton( button, "Extras", "Enable and control hidden features" )
-	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ExtrasMenu" ) ) )
+	button = Hud_GetChild( menu, "SRMenu" )
+	SetupButton( button, "Speedrunning", "Speedrunning related settings" )
+	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "SRMenu" ) ) )
 
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton( button, "#KEY_BINDINGS", "#MOUSE_KEYBOARD_MENU_CONTROLS_DESC" )
@@ -81,7 +81,6 @@ void function InitControlsMenu()
 	SetupButton( file.autoSprintSetting, "#MENU_AUTOMATIC_SPRINT", "#OPTIONS_MENU_AUTOSPRINT_DESC" )
 
 	SetupButton( Hud_GetChild( menu, "SwchHoldToRodeo" ), "#MENU_HOLD_TO_RODEO", "#MENU_HOLD_TO_RODEO_DESC" )
-	SetupButton( Hud_GetChild( menu, "SwchEnableCheats" ), "Enable Cheats", "Enables extra options not usually available such as:\n\n- `1sv_gravity`0\n\n- `1host_timescale`0\n\n- `1thirdperson`0" )
 
 	file.advanceControlsVisibleItems.append( Hud_GetChild( menu, "SwchLookSensitivity_AdvLabel" ) )
 	file.advanceControlsVisibleItems.append( Hud_GetChild( menu, "SwchLookSensitivityADS_AdvLabel" ) )
