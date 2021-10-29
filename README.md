@@ -3,27 +3,19 @@
 ![VPK Build Status](https://github.com/taskinoz/Enhanced-Menu-Mod/actions/workflows/buildvpks.yml/badge.svg)
 
 
-# Enhanced Menu Mod
-Adds more options to the settings menu, such as extra keybinds, cheats, hud enhancements and cleaner interface
+# Enhanced Menu Mod (Minimal Build)
+Adds more options to the settings menu, such as extra keybinds, hud enhancements and cleaner interface
+All custom settings added by this mod are added into a separate 'Speedrunning' Menu, accessible either through the ingame pause menu or the controls menu
 
 # Features
 * Removed **Spotlight** and **Whats New** from the main menu
-* Added `sv_cheats` to the contols menu
-* Added HUD Options
-  * Bloom - `mat_disable_bloom`
-  * Show FPS - `cl_showfps`
-  * Show FPS Big - `showfps_enabled`
-  * Show Player Position - `cl_showpos`
-* Added new Keybinds
-  * Speedrunning
-    * Save/Load Quicksave 1
-    * Save/Load Quicksave 2
-    * Save/Load Quicksave 3
-    * Slow the game to 25%
-    * Speed the game up to 500%
-    * Reset all helmets
-    * Give yourself an EVA Shotgun
-    * Give yourself an EPG
+* Keybinds
+  * Save/Load 3 Quicksaves
+  * Individual Level & Full game resets
+  * No Cutscene Saves
+    * Load save 1-9 with 3 alternate saves
+  * No Cutscene Helmet Saves
+    * Load save 1 and 2
   * Demos
     * Record Demo incrementally
     * Record Demo
@@ -31,41 +23,24 @@ Adds more options to the settings menu, such as extra keybinds, cheats, hud enha
     * Pause Demo
     * Resume Demo
     * Toggle Play/Pause Demo
-  * Extras
-    * Toggle low gravity
-    * Set camera to First Person
-    * Set camera to Third Person
-    * Move Third Person camera in
-    * Move Third Person camera out
-    * Hide/Show weapon
-  * No Cutscene Saves
-    * Load save 1-9 with 3 alternate saves
-  * No Cutscene Helmet Saves
-    * Load save 1 and 2
-* Added Extras Menu
+* Speedrunning options
+  * Enable/Disable Bloom
+  * HUD Options
+    * Bloom - `mat_disable_bloom`
+    * Show FPS - `cl_showfps`
+    * Show FPS Big - `showfps_enabled`
+    * Show Player Position - `cl_showpos`
+    * Speedometer (KPH & MPH)
   * Demos
     * Enable Demos
     * Save Demos
     * Interpolate Playback
     * Demo record rate Single Player
     * Demo record rate Multiplayer
-    * Key Bindings (shortcut)
-  * Gameplay
-    * Enable Wallrunning (sp)
-    * Enable Automantle (sp)
-    * Enable Vertical Dodge (sp)
-    * Player Control Debounce
-    * Command Que
-    * Speedometer Settings (Works with the MP mod)
-  * Community
-    * Communities toggle for MP
-* Audio
-  * Loading Fade Time
-  * Loading Silence Time
+  * Reset Helmets
 * Replaced Chinese subtitles with English
 * Replaced Chinese UI text with English
 * Removed crashes from Dev launch arguments `-dev +developer 1`
-* Added Speedometer
 
 ## Installation
 
