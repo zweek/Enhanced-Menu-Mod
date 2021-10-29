@@ -1,4 +1,3 @@
-
 global function InitSRMenu
 
 struct
@@ -38,12 +37,24 @@ void function InitSRMenu()
 
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton( button, "Reset Helmets", "Reset every helmet collectible to be uncollected" )
-	AddButtonEventHandler( button, UIE_CLICK, ResetHelmets )
+	AddButtonEventHandler( button, UIE_CLICK, ResetHelmetsDialog )
 	
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
 
 	AddMenuFooterOption( menu, BUTTON_A, "#A_BUTTON_SELECT" )
 	AddMenuFooterOption( menu, BUTTON_B, "#B_BUTTON_BACK", "#BACK" )
+}
+
+void function ResetHelmetsDialog( var button )
+{
+	DialogData dialogData
+	dialogData.header = "Reset Helmets"
+	dialogData.message = "Are you sure you want to reset all helmets?"
+
+	AddDialogButton( dialogData, "#YES", ResetCollectiblesProgress_All )
+	AddDialogButton( dialogData, "#NO" )
+
+	OpenDialog( dialogData )
 }
 
 void function ResetHelmets( var button )
