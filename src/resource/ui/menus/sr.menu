@@ -59,13 +59,158 @@ resource/ui/menus/sr.menu
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		// Video
+		ImgVideoSubheaderBackground
+		{
+			ControlName				ImagePanel
+			InheritProperties		SubheaderBackground
+			xpos					96
+			ypos					160
+		}
+		LblVideoSubheaderText
+		{
+			ControlName				Label
+			InheritProperties		SubheaderText
+			pin_to_sibling			ImgVideoSubheaderBackground
+			pin_corner_to_sibling	LEFT
+			pin_to_sibling_corner	LEFT
+			labelText				"Video"
+		}
+
+		SwitchBloomEnable
+		{
+			ControlName				RuiButton
+			InheritProperties		ControlsSwitchButton
+			xpos					-22
+			tabPosition				1
+			style					DialogListButton
+			navUp					BtnResetHelmets
+			navDown					SwitchEnableSpeedometer
+			ConVar					"mat_disable_bloom"
+			list
+			{
+				"Enabled"	0
+				"Disabled" 1
+			}
+
+			pin_to_sibling			ImgVideoSubheaderBackground
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		// HUD Options
+		ImgHudSubheaderBackground
+		{
+			ControlName				ImagePanel
+			InheritProperties		SubheaderBackground
+			xpos					96
+			ypos					260
+		}
+		LblHudSubheaderText
+		{
+			ControlName				Label
+			InheritProperties		SubheaderText
+			pin_to_sibling			ImgHudSubheaderBackground
+			pin_corner_to_sibling	LEFT
+			pin_to_sibling_corner	LEFT
+			labelText				"HUD"
+		}
+
+		SwitchEnableSpeedometer
+		{
+			ControlName				RuiButton
+			InheritProperties		SwitchButton
+			xpos					-22
+			tabPosition				1
+			style					DialogListButton
+			navUp					SwitchBloomEnable
+			navDown					SwitchShowFps
+			ConVar					"password"
+			list
+			{
+				"#SETTING_OFF"	""
+				"Metric"	"metric"
+				"Imperial"	"imperial"
+			}
+
+			pin_to_sibling			ImgHudSubheaderBackground
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+
+		SwitchShowFps
+		{
+			ControlName				RuiButton
+			InheritProperties		SwitchButton
+			style					DialogListButton
+			navUp					SwitchEnableSpeedometer
+			navDown					SwitchShowFpsBig
+			ConVar					"cl_showfps"
+			list
+			{
+				"#SETTING_OFF"	0
+				"Top-right"	    1
+				"Top-left"      2
+				"Server"  			3
+				"Minimal"  			4
+			}
+
+			pin_to_sibling			SwitchEnableSpeedometer
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+
+		SwitchShowFpsBig
+		{
+			ControlName				RuiButton
+			InheritProperties		SwitchButton
+			style					DialogListButton
+			navUp					SwitchShowFps
+			navDown					SwitchShowPos
+			ConVar					"showfps_enabled"
+			list
+			{
+				"#SETTING_OFF"	0
+				"FPS"	    			1
+				"FPS/Graph"     2
+			}
+
+			pin_to_sibling			SwitchShowFps
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+		
+		SwitchShowPos
+		{
+			ControlName				RuiButton
+			InheritProperties		SwitchButton
+			style					DialogListButton
+			navUp					SwitchShowFpsBig
+			navDown					SwitchEnableDemos
+			ConVar					"cl_showpos"
+			list
+			{
+				"#SETTING_OFF"	0
+				"Player Position"	1
+				"Camera Position"	2
+			}
+
+			pin_to_sibling			SwitchShowFpsBig
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		// Demo subheader
 		ImgGeneralSubheaderBackground
 		{
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
 			xpos					96
-			ypos					160
+			ypos					480
 		}
 		LblGeneralSubheaderText
 		{
@@ -84,7 +229,7 @@ resource/ui/menus/sr.menu
 			xpos					-22
 			tabPosition				1
 			style					DialogListButton
-			navUp					BtnResetHelmets
+			navUp					SwitchShowPos
 			navDown					SwitchDemosWrite
 			ConVar					"demo_enabledemos"
 			list
@@ -176,7 +321,7 @@ resource/ui/menus/sr.menu
 			InheritProperties		SwitchButton
 			style					DialogListButton
 			navUp					SwitchDemosUpdateRateMp
-			navDown					SwitchBloomEnable
+			navDown					BtnMouseKeyboardBindings
 			ConVar					"demo_autoRecord"
 			list
 			{
@@ -185,151 +330,6 @@ resource/ui/menus/sr.menu
 			}
 
 			pin_to_sibling			SwitchDemosUpdateRateMp
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// Video
-		ImgVideoSubheaderBackground
-		{
-			ControlName				ImagePanel
-			InheritProperties		SubheaderBackground
-			xpos					96
-			ypos					480
-		}
-		LblVideoSubheaderText
-		{
-			ControlName				Label
-			InheritProperties		SubheaderText
-			pin_to_sibling			ImgVideoSubheaderBackground
-			pin_corner_to_sibling	LEFT
-			pin_to_sibling_corner	LEFT
-			labelText				"Video"
-		}
-
-		SwitchBloomEnable
-		{
-			ControlName				RuiButton
-			InheritProperties		ControlsSwitchButton
-			xpos					-22
-			tabPosition				1
-			style					DialogListButton
-			navUp					SwitchDemosAutorecord
-			navDown					SwitchEnableSpeedometer
-			ConVar					"mat_disable_bloom"
-			list
-			{
-				"Enabled"	0
-				"Disabled" 1
-			}
-
-			pin_to_sibling			ImgVideoSubheaderBackground
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// HUD Options
-		ImgHudSubheaderBackground
-		{
-			ControlName				ImagePanel
-			InheritProperties		SubheaderBackground
-			xpos					96
-			ypos					580
-		}
-		LblHudSubheaderText
-		{
-			ControlName				Label
-			InheritProperties		SubheaderText
-			pin_to_sibling			ImgHudSubheaderBackground
-			pin_corner_to_sibling	LEFT
-			pin_to_sibling_corner	LEFT
-			labelText				"HUD"
-		}
-
-		SwitchEnableSpeedometer
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			xpos					-22
-			tabPosition				1
-			style					DialogListButton
-			navUp					SwitchBloomEnable
-			navDown					SwitchShowFps
-			ConVar					"password"
-			list
-			{
-				"#SETTING_OFF"	""
-				"Metric"	"metric"
-				"Imperial"	"imperial"
-			}
-
-			pin_to_sibling			ImgHudSubheaderBackground
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-
-		SwitchShowFps
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchEnableSpeedometer
-			navDown					SwitchShowFpsBig
-			ConVar					"cl_showfps"
-			list
-			{
-				"#SETTING_OFF"	0
-				"Top-right"	    1
-				"Top-left"      2
-				"Server"  			3
-				"Minimal"  			4
-			}
-
-			pin_to_sibling			SwitchEnableSpeedometer
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-
-		SwitchShowFpsBig
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchShowFps
-			navDown					SwitchShowPos
-			ConVar					"showfps_enabled"
-			list
-			{
-				"#SETTING_OFF"	0
-				"FPS"	    			1
-				"FPS/Graph"     2
-			}
-
-			pin_to_sibling			SwitchShowFps
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		
-		SwitchShowPos
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchShowFpsBig
-			navDown					BtnMouseKeyboardBindings
-			ConVar					"cl_showpos"
-			list
-			{
-				"#SETTING_OFF"	0
-				"Player Position"	1
-				"Camera Position"	2
-			}
-
-			pin_to_sibling			SwitchShowFpsBig
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 		}
@@ -367,7 +367,7 @@ resource/ui/menus/sr.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnMouseKeyboardBindings
-			navDown					SwitchEnableDemos
+			navDown					SwitchBloomEnable
 		}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
