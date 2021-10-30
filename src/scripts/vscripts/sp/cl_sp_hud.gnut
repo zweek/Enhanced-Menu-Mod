@@ -85,7 +85,6 @@ void function ClSpHud_Init()
 
 	level.indexedFaceIcons <- [ null, null, null, null ]
 	level.oldObjectiveIndex <- 0
-
 }
 
 void function CallbackUpdatePlayerStatusCounts( entity player, int oldLifeState, int newLifeState )
@@ -142,6 +141,16 @@ void function SpCockpit( entity cockpit, entity player )
 	Assert( cockpit.e.mainVGUI )
 	entity vgui = cockpit.e.mainVGUI
 	// entity panel = vgui.GetPanel()
+	
+	while (true)
+    {
+		// checking only twice per second because im scared
+		wait 0.5;
+        if (player == null || !IsValid(player)) {
+            continue;
+        }
+        SvCheatsDisplay();
+    }
 }
 
 void function ServerCallback_WhereIsTitan()
@@ -252,4 +261,17 @@ void function BeginIntroSequence_Internal()
 bool function IntroInProgress()
 {
 	return file.introInProgress
+}
+
+void function SvCheatsDisplay()
+{
+	string msg
+
+	if ( GetConVarInt( "sv_cheats" ) > 0 ) {
+		msg = "SV_CHEATS ENABLED"
+	} else msg = ""
+
+	var reminder = HudElement( "Dev_Reminder" )
+	Hud_Show( reminder )
+	Hud_SetText( reminder, msg )
 }
