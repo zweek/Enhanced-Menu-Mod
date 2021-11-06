@@ -122,6 +122,15 @@ void function UpdatePlayerStatusCountsOnWaveSpawnFinished( entity player, int ol
 \************************************************************************************************/
 void function SpMainHud( var mainVGUI, entity player )
 {
+	while (true)
+    {
+		// checking only twice per second because im scared
+		wait 0.5;
+        if (player == null || !IsValid(player)) {
+            continue;
+        }
+        SvCheatsDisplay();
+    }
 }
 
 /************************************************************************************************\
@@ -141,16 +150,6 @@ void function SpCockpit( entity cockpit, entity player )
 	Assert( cockpit.e.mainVGUI )
 	entity vgui = cockpit.e.mainVGUI
 	// entity panel = vgui.GetPanel()
-	
-	while (true)
-    {
-		// checking only twice per second because im scared
-		wait 0.5;
-        if (player == null || !IsValid(player)) {
-            continue;
-        }
-        SvCheatsDisplay();
-    }
 }
 
 void function ServerCallback_WhereIsTitan()
