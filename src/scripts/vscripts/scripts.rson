@@ -970,7 +970,7 @@ Scripts:
 	ui/menu_mouse_keyboard_bindings.nut
 	ui/menu_audio_settings.nut
 	ui/menu_video_settings.nut
-	ui/menu_sr_settings.nut
+	ui/menu_extra_settings.nut
 ]
 
 When: "UI && CONSOLE_PROG"

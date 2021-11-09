@@ -109,7 +109,7 @@ resource/ui/menus/controls.menu
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 			navUp					SwchAutoSprint
-			navDown					SRMenu
+			navDown					ExtrasMenu
 			ConVar					"cl_hold_to_rodeo_enable"
 			list
 			{
@@ -118,7 +118,7 @@ resource/ui/menus/controls.menu
 				"#SETTING_FRIENDLY"		2
 			}
 		}
-		SRMenu
+		ExtrasMenu
 		{
 			ControlName				RuiButton
 			InheritProperties		WideButton
@@ -331,7 +331,7 @@ resource/ui/menus/controls.menu
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 			xpos					-22
-			navUp					SRMenu
+			navUp					ExtrasMenu
 			navDown					SwchHoldToCrouch
 			tabPosition				2
 		}

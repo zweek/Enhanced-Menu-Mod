@@ -257,7 +257,7 @@ void function InitInGameSPMenu()
 		Hud_AddEventHandler( videoButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "VideoMenu" ) ) )
 	#endif
 	var srButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "Speedrunning")
-	AddButtonEventHandler( srButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "SRMenu" ) ) )
+	AddButtonEventHandler( srButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ExtrasMenu" ) ) )
 
 	array<var> orderedButtons
 

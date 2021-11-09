@@ -1,4 +1,4 @@
-resource/ui/menus/sr.menu
+resource/ui/menus/extras.menu
 {
 	menu
 	{
@@ -193,8 +193,8 @@ resource/ui/menus/sr.menu
 			list
 			{
 				"#SETTING_OFF"	0
-				"Player Position"	1
-				"Camera Position"	2
+				"Camera Position"	1
+				"Player Position"	2
 			}
 
 			pin_to_sibling			SwitchShowFpsBig
@@ -205,18 +205,18 @@ resource/ui/menus/sr.menu
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Demo subheader
-		ImgGeneralSubheaderBackground
+		ImgDemoSubheaderBackground
 		{
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
 			xpos					96
 			ypos					480
 		}
-		LblGeneralSubheaderText
+		LblDemoSubheaderText
 		{
 			ControlName				Label
 			InheritProperties		SubheaderText
-			pin_to_sibling			ImgGeneralSubheaderBackground
+			pin_to_sibling			ImgDemoSubheaderBackground
 			pin_corner_to_sibling	LEFT
 			pin_to_sibling_corner	LEFT
 			labelText				"Demos"
@@ -237,7 +237,7 @@ resource/ui/menus/sr.menu
 				"#SETTING_OFF"	0
 				"#SETTING_ON"	1
 			}
-			pin_to_sibling			ImgGeneralSubheaderBackground
+			pin_to_sibling			ImgDemoSubheaderBackground
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 		}
@@ -336,13 +336,22 @@ resource/ui/menus/sr.menu
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		// 
+		// Misc subheader
 		ImgMiscSubheaderBackground
 		{
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
-			xpos					96
-			ypos					760
+			xpos					950
+			ypos					480
+		}
+		LblMiscSubheaderText
+		{
+			ControlName				Label
+			InheritProperties		SubheaderText
+			pin_to_sibling			ImgMiscSubheaderBackground
+			pin_corner_to_sibling	LEFT
+			pin_to_sibling_corner	LEFT
+			labelText				"Miscellaneous"
 		}
 
 		SwitchEnableCheats
@@ -386,6 +395,18 @@ resource/ui/menus/sr.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnMouseKeyboardBindings
+			navDown					BtnUnlockLevels
+		}
+
+		BtnUnlockLevels
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnResetHelmets
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnResetHelmets
 			navDown					SwitchBloomEnable
 		}
 

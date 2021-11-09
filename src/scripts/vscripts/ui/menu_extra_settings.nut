@@ -1,4 +1,4 @@
-global function InitSRMenu
+global function InitExtrasMenu
 
 struct
 {
@@ -7,22 +7,22 @@ struct
 	var classicMusicSwitch
 } file
 
-void function InitSRMenu()
+void function InitExtrasMenu()
 {
-	var menu = GetMenu( "SRMenu" )
+	var menu = GetMenu( "ExtrasMenu" )
 	file.menu = menu
 
-	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, OnOpenSRMenu )
-	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, OnCloseSRMenu )
+	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, OnOpenExtrasMenu )
+	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, OnCloseExtrasMenu )
 
 	var button
 	
 	SetupButton( Hud_GetChild( menu, "SwitchBloomEnable" ), "Bloom", "Toggles the bloom to reduce brightness and glare" )
 	
 	SetupButton( Hud_GetChild( menu, "SwitchEnableSpeedometer" ), "Speedometer", "Enables a speedometer in single player." )
-	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\n`1Top-right`0: Displays the FPS and server tickrate in the `1Top-right`0 hand side of the screen\n\n`1Top-left`0: Displays the FPS and server tickrate in the `1Top-left`0 hand side of the screen\n\n`1Server`0: Displays only the server tickrate\n\n`1Minimal`0: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
-	SetupButton( Hud_GetChild( menu, "SwitchShowFpsBig" ), "Show Large FPS", "`1FPS`0: Shows a large overlay with FPS and server tickrate\n\n`1FPS/Graph`0: Shows a large FPS overlay and performance graph" )
-	SetupButton( Hud_GetChild( menu, "SwitchShowPos" ), "Show Positional Information", "`1Player Position`0: Shows the speed, velocity and position of the player\n\n`1Camera Position`0: Shows the camera angle and player position" )
+	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\nTop-right: Displays the FPS and server tickrate in the Top-right hand side of the screen\n\nTop-left: Displays the FPS and server tickrate in the Top-left hand side of the screen\n\nServer: Displays only the server tickrate\n\nMinimal: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
+	SetupButton( Hud_GetChild( menu, "SwitchShowFpsBig" ), "Show Large FPS", "FPS: Shows a large overlay with FPS and server tickrate\n\nFPS/Graph: Shows a large FPS overlay and performance graph" )
+	SetupButton( Hud_GetChild( menu, "SwitchShowPos" ), "Show Positional Information", "Player Position: Shows position, angle and velocity from the player model\n\nCamera Position: Shows position, angle and velocity from the player camera" )
 
 	SetupButton( Hud_GetChild( menu, "SwitchEnableDemos" ), "Enable Demos", "Enable recording demos (must be set true before loading a map)." )
 	SetupButton( Hud_GetChild( menu, "SwitchDemosWrite" ), "Save Demos", "Demos write to a local file when recording a demo." )
@@ -40,6 +40,10 @@ void function InitSRMenu()
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton( button, "Reset Helmets", "Reset every helmet collectible to be uncollected" )
 	AddButtonEventHandler( button, UIE_CLICK, ResetHelmetsDialog )
+
+	button = Hud_GetChild( menu, "BtnUnlockLevels" )
+	SetupButton( button, "Unlock all Levels", "Unlocks all levels to be selectable from the menu" )
+	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 	
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
 
@@ -59,18 +63,29 @@ void function ResetHelmetsDialog( var button )
 	OpenDialog( dialogData )
 }
 
-void function ResetHelmets( var button )
+void function UnlockLevelsDialog( var button )
 {
-	ResetCollectiblesProgress_All()
+	DialogData dialogData
+	dialogData.header = "Unlock Levels"
+	dialogData.message = "Are you sure you want to unlock all levels?"
+
+	AddDialogButton( dialogData, "#YES", UnlockAllLevels )
+	AddDialogButton( dialogData, "#NO" )
+
+	OpenDialog( dialogData )
 }
 
-void function OnOpenSRMenu()
+void function UnlockAllLevels() {
+	SetConVarInt("sp_unlockedMission", 9)
+}
+
+void function OnOpenExtrasMenu()
 {
 	UI_SetPresentationType( ePresentationType.NO_MODELS )
 
 }
 
-void function OnCloseSRMenu()
+void function OnCloseExtrasMenu()
 {
 	SavePlayerSettings()
 }

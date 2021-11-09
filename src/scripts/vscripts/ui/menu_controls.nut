@@ -26,9 +26,9 @@ void function InitControlsMenu()
 	file.itemDescriptionBox = Hud_GetChild( menu, "LblMenuItemDescription" )
 
 #if PC_PROG
-	button = Hud_GetChild( menu, "SRMenu" )
+	button = Hud_GetChild( menu, "ExtrasMenu" )
 	SetupButton( button, "Speedrunning", "Speedrunning related settings" )
-	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "SRMenu" ) ) )
+	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ExtrasMenu" ) ) )
 
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton( button, "#KEY_BINDINGS", "#MOUSE_KEYBOARD_MENU_CONTROLS_DESC" )
