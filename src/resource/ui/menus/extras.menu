@@ -84,7 +84,7 @@ resource/ui/menus/extras.menu
 			xpos					-22
 			tabPosition				1
 			style					DialogListButton
-			navUp					BtnResetHelmets
+			navUp					BtnUnlockLevels
 			navDown					SwitchEnableSpeedometer
 			ConVar					"mat_disable_bloom"
 			list

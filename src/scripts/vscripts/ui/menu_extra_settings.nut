@@ -31,7 +31,7 @@ void function InitExtrasMenu()
 	SetupButton( Hud_GetChild( menu, "SwitchDemosUpdateRateMp" ), "Demo record rate Multiplayer", "Change the tick recording rate in Multiplayer." )
 	SetupButton( Hud_GetChild( menu, "SwitchDemosAutorecord" ), "Auto Record", "Automatically record multiplayer matches as demos." )
 
-	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "Sets the sv_cheats console variable.\nEnables use of host_timescale and velocity saves" )
+	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "Sets the sv_cheats console variable.\nEnables use of host_timescale console command" )
 	
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton( button, "Key Bindings", "Key bindings for speedrun related actions" )
