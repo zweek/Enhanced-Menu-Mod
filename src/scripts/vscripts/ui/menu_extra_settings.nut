@@ -32,6 +32,7 @@ void function InitExtrasMenu()
 	SetupButton( Hud_GetChild( menu, "SwitchDemosAutorecord" ), "Auto Record", "Automatically record multiplayer matches as demos." )
 
 	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "Sets the sv_cheats console variable.\nEnables use of host_timescale console command" )
+	SetupButton( Hud_GetChild( menu, "SwitchEnableMP" ), "Allow Multiplayer", "Enables or disables the multiplayer buttons in the main menu" )
 	
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton( button, "Key Bindings", "Key bindings for speedrun related actions" )

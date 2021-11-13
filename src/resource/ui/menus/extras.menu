@@ -371,6 +371,25 @@ resource/ui/menus/extras.menu
 			xpos					-22
 			ypos					1
 			navUp					SwitchDemosAutorecord
+			navDown					SwitchEnableMP
+		}
+
+		SwitchEnableMP
+		{
+			ControlName				RuiButton
+			InheritProperties		SwitchButton
+			style					DialogListButton
+			pin_to_sibling			SwitchEnableCheats
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ConVar					"voice_enabled"
+			list
+			{
+				"#SETTING_OFF"	0
+				"#SETTING_ON"	1
+			}
+			ypos					1
+			navUp					SwitchEnableCheats
 			navDown					BtnMouseKeyboardBindings
 		}
 
@@ -378,11 +397,11 @@ resource/ui/menus/extras.menu
 		{
 			ControlName				RuiButton
 			InheritProperties		WideButton
-			pin_to_sibling			SwitchEnableCheats
+			pin_to_sibling			SwitchEnableMP
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
-			navUp					SwitchEnableCheats
+			navUp					SwitchEnableMP
 			navDown					BtnResetHelmets
 		}
 
