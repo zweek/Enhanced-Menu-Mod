@@ -1,0 +1,86 @@
+globalize_all_functions
+
+global struct InfoDisplay
+{
+    var infoTitle
+}
+
+struct
+{
+    array<InfoDisplay> infoDisplays
+    table<string, string> infoNames = {}
+    array<string> displayInfos = []
+} file
+
+void function SRInfoHUD_Init()
+{
+    RegisterInfo("sv_cheats")
+    RegisterInfo("host_timescale")
+
+    for (int i = 0; i < 3; i++)
+    {
+        file.infoDisplays.append(CreateInfoDisplay(i))
+    }
+    thread InfoHud_Thread()
+}
+
+void function InfoHud_Thread()
+{
+    while (true)
+    {
+        WaitFrame()
+        array<string> moddedVars = GetModdedVars()
+        int slot = 0
+        foreach(string m in moddedVars){
+            if (!file.displayInfos.contains(m) || slot >= 3) {
+                continue;
+            }
+            SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
+            slot++
+        }
+        for (int i = 2; i >= slot; i--)
+        {
+            SetInfoName(file.infoDisplays[i], "")
+        }
+    }
+}
+
+void function SetInfoName(InfoDisplay display, string name)
+{
+    RuiSetString( display.infoTitle, "msgText", name )
+}
+
+InfoDisplay function CreateInfoDisplay(int line)
+{
+    InfoDisplay display
+    var rui
+    rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
+    RuiSetInt( rui, "maxLines", 1 )
+    RuiSetInt( rui, "lineNum", 1 )
+    RuiSetFloat2( rui, "msgPos", <0.05, 0.1 + 0.05 * line, 0.0> )
+  // Mod Name
+    RuiSetString( rui, "msgText", "" )
+    RuiSetFloat( rui, "msgFontSize", 40.0 )
+    RuiSetFloat( rui, "msgAlpha", 0.7 )
+    RuiSetFloat( rui, "thicken", 0.0 )
+    RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
+    display.infoTitle = rui
+
+    return display
+}
+
+void function RegisterInfo( string infoName )
+{
+    file.infoNames[infoName] <- infoName
+    file.displayInfos.append(infoName)
+}
+
+array<string> function GetModdedVars()
+{
+    array<string> moddedVars = []
+
+    if(GetConVarInt("sv_cheats") > 0) moddedVars.append("sv_cheats")
+    if(GetConVarFloat("host_timescale") != 1) moddedVars.append("host_timescale")
+
+    return moddedVars
+}

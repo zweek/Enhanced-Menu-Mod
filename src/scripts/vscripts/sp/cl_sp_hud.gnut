@@ -73,7 +73,7 @@ void function ClSpHud_Init()
 	if ( IsLobby() )
 		return
 
-	thread RUITimerInit()
+	thread SRInfoHUD_Init()
 	thread ClPilotSpeedometer_Init()
 	AddCallback_OnPlayerLifeStateChanged( CallbackUpdatePlayerStatusCounts )
 
@@ -122,15 +122,7 @@ void function UpdatePlayerStatusCountsOnWaveSpawnFinished( entity player, int ol
 \************************************************************************************************/
 void function SpMainHud( var mainVGUI, entity player )
 {
-	while (true)
-    {
-		// checking only twice per second because im scared
-		wait 0.5;
-        if (player == null || !IsValid(player)) {
-            continue;
-        }
-        SvCheatsDisplay();
-    }
+
 }
 
 /************************************************************************************************\
@@ -260,17 +252,4 @@ void function BeginIntroSequence_Internal()
 bool function IntroInProgress()
 {
 	return file.introInProgress
-}
-
-void function SvCheatsDisplay()
-{
-	string msg
-
-	if ( GetConVarInt( "sv_cheats" ) > 0 ) {
-		msg = "SV_CHEATS ENABLED"
-	} else msg = ""
-
-	var reminder = HudElement( "Dev_Reminder" )
-	Hud_Show( reminder )
-	Hud_SetText( reminder, msg )
 }

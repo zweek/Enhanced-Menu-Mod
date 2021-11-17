@@ -666,6 +666,7 @@ When: "CLIENT && SP"
 Scripts:
 [
 	ai/cl_ai_boss_titan.gnut
+	client/cl_sr_infohud.gnut
 	client/cl_utility_sp.gnut
 	client/cl_sp_obituary.gnut
 	client/cl_announcement.gnut
