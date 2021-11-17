@@ -57,7 +57,7 @@ InfoDisplay function CreateInfoDisplay(int line)
     rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
-    RuiSetFloat2( rui, "msgPos", <0.05, 0.1 + 0.05 * line, 0.0> )
+    RuiSetFloat2( rui, "msgPos", <0.0, 0.05 * line, 0.0> )
   // Mod Name
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
