@@ -31,8 +31,8 @@ void function InitExtrasMenu()
 	SetupButton( Hud_GetChild( menu, "SwitchDemosUpdateRateMp" ), "Demo record rate Multiplayer", "Change the tick recording rate in Multiplayer." )
 	SetupButton( Hud_GetChild( menu, "SwitchDemosAutorecord" ), "Auto Record", "Automatically record multiplayer matches as demos." )
 
-	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "Sets the sv_cheats console variable.\nEnables use of host_timescale console command" )
-	SetupButton( Hud_GetChild( menu, "SwitchEnableMP" ), "Allow Multiplayer", "Enables or disables the multiplayer buttons in the main menu" )
+	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "NOT LEADERBOARD LEGAL!\n\nSets the sv_cheats console variable.\nEnables use of host_timescale console command" )
+	SetupButton( Hud_GetChild( menu, "SwitchEnableMP" ), "Enable Multiplayer", "Enables or disables the multiplayer buttons in the main menu" )
 	
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton( button, "Key Bindings", "Key bindings for speedrun related actions" )
@@ -45,7 +45,11 @@ void function InitExtrasMenu()
 	button = Hud_GetChild( menu, "BtnUnlockLevels" )
 	SetupButton( button, "Unlock all Levels", "Unlocks all levels to be selectable from the menu" )
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
-	
+
+	button = Hud_GetChild( menu, "BtnTASMode" )
+	SetupButton( button, "TAS Mode", "NOT LEADERBOARD LEGAL!\n\nChanges your game settings to be TAS compatible\n- Disables load audio fade\n- Changes your binds to be TAS compatible (check the Key Bindings Menu to see what changed)" )
+	AddButtonEventHandler( button, UIE_CLICK, TASModeDialog )
+
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
 
 	AddMenuFooterOption( menu, BUTTON_A, "#A_BUTTON_SELECT" )
@@ -78,6 +82,38 @@ void function UnlockLevelsDialog( var button )
 
 void function UnlockAllLevels() {
 	SetConVarInt("sp_unlockedMission", 9)
+}
+
+void function TASModeDialog( var button )
+{
+	DialogData dialogData
+	dialogData.header = "TAS Mode"
+	dialogData.message = "Do you want to enable or disable TAS Mode?"
+
+	AddDialogButton( dialogData, "Enable", EnableTASMode )
+	AddDialogButton( dialogData, "Disable", DisableTASMode )
+
+	OpenDialog( dialogData )
+}
+
+void function EnableTASMode() {
+	// arbitrary convar to identify tas mode
+	SetConVarInt("voice_forcemicrecord", 1)
+	// audio fade
+	SetConVarFloat("miles_map_begin_fade_time", 0)
+	SetConVarFloat("miles_map_begin_silence_time", 0)
+
+	SetConVarInt("sv_cheats", 1)
+}
+
+void function DisableTASMode() {
+	// arbitrary convar to identify tas mode
+	SetConVarInt("voice_forcemicrecord", 0)
+	// audio fade
+	SetConVarFloat("miles_map_begin_fade_time", 1.5)
+	SetConVarFloat("miles_map_begin_silence_time", 0.5)
+	
+	SetConVarInt("sv_cheats", 0)
 }
 
 void function OnOpenExtrasMenu()

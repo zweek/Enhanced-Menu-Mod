@@ -5,6 +5,9 @@ global struct InfoDisplay
     var infoTitle
 }
 
+
+int displayLines = 3 // maximum number of lines that can be displayed
+
 struct
 {
     array<InfoDisplay> infoDisplays
@@ -17,7 +20,7 @@ void function SRInfoHUD_Init()
     RegisterInfo("sv_cheats")
     RegisterInfo("host_timescale")
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < displayLines; i++)
     {
         file.infoDisplays.append(CreateInfoDisplay(i))
     }
@@ -29,19 +32,31 @@ void function InfoHud_Thread()
     while (true)
     {
         WaitFrame()
-        array<string> moddedVars = GetModdedVars()
-        int slot = 0
-        foreach(string m in moddedVars){
-            if (!file.displayInfos.contains(m) || slot >= 3) {
-                continue;
-            }
-            SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
-            slot++
-        }
-        for (int i = 2; i >= slot; i--)
+        // check for TAS mode & clear info display
+        if (GetConVarInt("voice_forcemicrecord") > 0)
         {
-            SetInfoName(file.infoDisplays[i], "")
+            for (int i = 1; i < displayLines; i++) {
+                SetInfoName(file.infoDisplays[0], "TAS")
+                SetInfoName(file.infoDisplays[i], "")
+            }
         }
+        else 
+        {
+            array<string> moddedVars = GetModdedVars()
+            int slot = 0
+            foreach(string m in moddedVars){
+                if (!file.displayInfos.contains(m) || slot >= displayLines) {
+                    continue;
+                }
+                // display names and values of modded ConVars
+                SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
+                slot++
+            }
+            for (int i = displayLines - 1; i >= slot; i--)
+            {
+                SetInfoName(file.infoDisplays[i], "")
+            }
+        }    
     }
 }
 
@@ -58,7 +73,6 @@ InfoDisplay function CreateInfoDisplay(int line)
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
     RuiSetFloat2( rui, "msgPos", <0.0, 0.05 * line, 0.0> )
-  // Mod Name
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
@@ -79,8 +93,8 @@ array<string> function GetModdedVars()
 {
     array<string> moddedVars = []
 
-    if(GetConVarInt("sv_cheats") > 0) moddedVars.append("sv_cheats")
-    if(GetConVarFloat("host_timescale") != 1) moddedVars.append("host_timescale")
+    if (GetConVarInt("sv_cheats") > 0) moddedVars.append("sv_cheats")
+    if (GetConVarFloat("host_timescale") != 1) moddedVars.append("host_timescale")
 
     return moddedVars
 }

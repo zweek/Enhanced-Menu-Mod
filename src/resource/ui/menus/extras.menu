@@ -84,7 +84,7 @@ resource/ui/menus/extras.menu
 			xpos					-22
 			tabPosition				1
 			style					DialogListButton
-			navUp					BtnUnlockLevels
+			navUp					SwitchTASMode
 			navDown					SwitchEnableSpeedometer
 			ConVar					"mat_disable_bloom"
 			list
@@ -426,6 +426,18 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnResetHelmets
+			navDown					SwitchTASMode
+		}
+
+		BtnTASMode
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnUnlockLevels
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnUnlockLevels
 			navDown					SwitchBloomEnable
 		}
 
