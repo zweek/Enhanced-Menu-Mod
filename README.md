@@ -10,6 +10,7 @@ This is a much more stripped down version of taskinoz's Enhanced Menu Mod. Most 
 * Button to unlock all levels
 * Toggle to enable/disable multiplayer
 * Warning to remind you if `sv_cheats` is enabled
+* Dedicated TAS mode
 
 **Features kept from taskinoz's version:**
 * Removal of clutter from the main menu
