@@ -99,9 +99,11 @@ void function TASModeDialog( var button )
 void function EnableTASMode() {
 	// arbitrary convar to identify tas mode
 	SetConVarInt("voice_forcemicrecord", 1)
-	// audio fade
+	// audio fade on load
 	SetConVarFloat("miles_map_begin_fade_time", 0)
 	SetConVarFloat("miles_map_begin_silence_time", 0)
+	// input prevention on load
+	SetConVarFloat("player_respawnInputDebounceDuration", 0)
 
 	SetConVarInt("sv_cheats", 1)
 }
@@ -109,10 +111,10 @@ void function EnableTASMode() {
 void function DisableTASMode() {
 	// arbitrary convar to identify tas mode
 	SetConVarInt("voice_forcemicrecord", 0)
-	// audio fade
+	// revert to default values
 	SetConVarFloat("miles_map_begin_fade_time", 1.5)
 	SetConVarFloat("miles_map_begin_silence_time", 0.5)
-	
+	SetConVarFloat("player_respawnInputDebounceDuration", 0.5)
 	SetConVarInt("sv_cheats", 0)
 }
 
