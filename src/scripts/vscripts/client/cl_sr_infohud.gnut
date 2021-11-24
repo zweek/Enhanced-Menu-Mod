@@ -13,6 +13,7 @@ struct
     array<InfoDisplay> infoDisplays
     table<string, string> infoNames = {}
     array<string> displayInfos = []
+    array<string> moddedVars = []
 } file
 
 void function SRInfoHUD_Init()
@@ -43,9 +44,9 @@ void function InfoHud_Thread()
         }
         else 
         {
-            array<string> moddedVars = GetModdedVars()
+            GetModdedVars()
             int slot = 0
-            foreach(string m in moddedVars){
+            foreach(string m in file.moddedVars){
                 if (!file.displayInfos.contains(m) || slot >= displayLines) {
                     continue;
                 }
@@ -90,13 +91,15 @@ void function RegisterInfo( string infoName )
     file.displayInfos.append(infoName)
 }
 
-array<string> function GetModdedVars()
+void function GetModdedVars()
 {
-    array<string> moddedVars = []
+    file.moddedVars = []
 
-    if (GetConVarInt("sv_cheats") > 0) moddedVars.append("sv_cheats")
-    if (GetConVarFloat("host_timescale") != 1) moddedVars.append("host_timescale")
-    if (GetConVarFloat("player_respawnInputDebounceDuration") != 0.5) moddedVars.append("player_respawnInputDebounceDuration")
+    AddVarIfModded("sv_cheats", 0)
+    AddVarIfModded("host_timescale", 1)
+    AddVarIfModded("player_respawnInputDebounceDuration", 0.5)
+}
 
-    return moddedVars
+void function AddVarIfModded(string ConVar, float defautValue) {
+    if (GetConVarFloat(ConVar) != defautValue) file.moddedVars.append(ConVar)
 }
