@@ -1,4 +1,4 @@
-globalize_all_functions
+global function SRInfoHUD_Init
 
 global struct InfoDisplay
 {
@@ -37,8 +37,8 @@ void function InfoHud_Thread()
         // check for TAS mode & clear info display
         if (GetConVarInt("voice_forcemicrecord") > 0)
         {
+            SetInfoName(file.infoDisplays[0], "TAS")
             for (int i = 1; i < displayLines; i++) {
-                SetInfoName(file.infoDisplays[0], "TAS")
                 SetInfoName(file.infoDisplays[i], "")
             }
         }
@@ -58,13 +58,24 @@ void function InfoHud_Thread()
             {
                 SetInfoName(file.infoDisplays[i], "")
             }
-        }    
+        }
+        for (int i = 0; i < displayLines; i++)
+        {
+            SetHudPos(file.infoDisplays[i], i)
+        }
     }
 }
 
 void function SetInfoName(InfoDisplay display, string name)
 {
     RuiSetString( display.infoTitle, "msgText", name )
+}
+
+void function SetHudPos(InfoDisplay display, int line) {
+    float pos = 0
+    if (GetConVarInt("cl_showpos") > 0) pos += 0.1
+    if (GetConVarInt("cl_showfps") > 1) pos += 0.02
+    RuiSetFloat2( display.infoTitle, "msgPos", <0.0, 0.05 * line + pos, 0.0> )
 }
 
 InfoDisplay function CreateInfoDisplay(int line)

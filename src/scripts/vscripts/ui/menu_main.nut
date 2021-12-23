@@ -74,7 +74,7 @@ void function OnMainMenu_Open()
 	TryUnlockCollectiblesAchievement()
 	TryUnlockCompletedGameAchievements()
 
-	Hud_SetText( file.versionDisplay, "EMM minimal v1.5.1\nBuild "+GetPublicGameVersion() )
+	Hud_SetText( file.versionDisplay, "EMM minimal v1.5.2\nBuild "+GetPublicGameVersion() )
 	Hud_Show( file.versionDisplay )
 
 	thread UpdateTrialLabel()
