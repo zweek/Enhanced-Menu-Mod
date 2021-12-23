@@ -15,7 +15,7 @@ This is a much more stripped down version of taskinoz's Enhanced Menu Mod. Most 
 **Features kept from taskinoz's version:**
 * Removal of clutter from the main menu
 * Save/Load 3 Quicksaves
-* NCS Saves 1-3
+* NCS Saves 1-9
 * NCS Helmet Saves 2 & 5
 * Demos
 * Bloom - `mat_disable_bloom`
