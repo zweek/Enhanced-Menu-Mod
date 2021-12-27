@@ -18,6 +18,7 @@ This is a much more stripped down version of taskinoz's Enhanced Menu Mod. Most 
 * NCS Saves 1-9
 * NCS Helmet Saves 2 & 5
 * Demos
+* `host_timescale` binds for 5, 0.2 & 0.05
 * Bloom - `mat_disable_bloom`
 * Show FPS - `cl_showfps`
 * Show FPS (large display) - `showfps_enabled`
