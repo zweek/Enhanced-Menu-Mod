@@ -1,7 +1,7 @@
 <p align="center" style="text-align:center"><img width="125" height="122" src="https://raw.githubusercontent.com/taskinoz/Enhanced-Menu-Mod/master/assets/icon.png" alt="Titanfall 2 - Enhanced Menu Mod" /></p>
 
 # Enhanced Menu Mod (Minimal Build)
-This is a much more stripped down version of taskinoz's Enhanced Menu Mod. Most features that are not directly useful for speedrunning are not in this version, but there are a few extra features specifically for speedrunning to make runner's lives a bit easier.
+This is a more simplified version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. Most features that are not directly useful for speedrunning are not in this version, but there are a few extra features specifically for speedrunning to make runner's lives a bit easier.
 
 # Features
 **New in this fork:**
