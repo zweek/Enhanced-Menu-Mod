@@ -35,7 +35,7 @@ void function InfoHud_Thread()
     {
         WaitFrame()
         // check for TAS mode & clear info display
-        if (GetConVarInt("voice_forcemicrecord") > 0)
+        if (GetConVarInt("tasEnabled"))
         {
             SetInfoName(file.infoDisplays[0], "TAS")
             for (int i = 1; i < displayLines; i++) {

@@ -309,7 +309,7 @@ void function CodeCallback_OnLoadSaveGame()
 	if ( !IsAlive( player ) )
 		return
 	// TAS mode velocity saves only
-	if (GetConVarInt( "voice_forcemicrecord" ) == 0) {
+	if (GetConVarInt("tasEnabled") == 0) {
 		ClearPlayerVelocityOnContext( player )
 	}
 

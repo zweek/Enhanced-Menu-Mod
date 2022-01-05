@@ -21,6 +21,9 @@ struct
 
 void function InitMainMenu()
 {
+	ClientCommand("setinfo srmmVersion \"SRMM v1.5.4\"")
+	ClientCommand("setinfo tasEnabled 0")
+
 	RegisterSignal( "EndOnMainMenu_Open" )
 
 	var menu = GetMenu( "MainMenu" )
@@ -74,7 +77,7 @@ void function OnMainMenu_Open()
 	TryUnlockCollectiblesAchievement()
 	TryUnlockCompletedGameAchievements()
 
-	Hud_SetText( file.versionDisplay, "SRMM v1.5.3\nBuild "+GetPublicGameVersion() )
+	Hud_SetText( file.versionDisplay, GetConVarString("srmmVersion")+"\nBuild "+GetPublicGameVersion() )
 	Hud_Show( file.versionDisplay )
 
 	thread UpdateTrialLabel()
