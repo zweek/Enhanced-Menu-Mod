@@ -11,6 +11,7 @@ This is a more simplified version of taskinoz's Enhanced Menu Mod geared specifi
 * Toggle to enable/disable multiplayer
 * Warning to remind you if `sv_cheats` is enabled
 * Dedicated TAS mode
+* Separate releases for ENG and CHI text for the chinese version of the game
 
 **Features kept from taskinoz's version:**
 * Removal of clutter from the main menu
@@ -26,8 +27,6 @@ This is a more simplified version of taskinoz's Enhanced Menu Mod geared specifi
 * Cheats toggle - `sv_cheats`
 * Speedometer (KPH & MPH)
 * Reset Helmets
-* Replaced Chinese subtitles with English
-* Replaced Chinese UI text with English
 * Removed crashes from Dev launch arguments `-dev +developer 1`
 
 
