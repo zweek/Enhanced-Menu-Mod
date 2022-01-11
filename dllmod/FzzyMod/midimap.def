@@ -1,0 +1,5 @@
+LIBRARY midimap
+EXPORTS
+	DriverProc=fDriverProc @1
+	modMessage=fmodMessage @2
+	modmCallback=fmodmCallback @3

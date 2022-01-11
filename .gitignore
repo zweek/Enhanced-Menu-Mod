@@ -1,5 +1,9 @@
-dir
-RSPNVPK
-*.vpk
+dir/
 englishclient_frontend.bsp.pak000_dir
+*.vpk
 *.zip
+# visual studio garbage
+x64/
+x86/
+.vs/
+*.user

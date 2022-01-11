@@ -19,7 +19,7 @@ void function InitExtrasMenu()
 	
 	SetupButton( Hud_GetChild( menu, "SwitchBloomEnable" ), "Bloom", "Toggles the bloom to reduce brightness and glare" )
 	
-	SetupButton( Hud_GetChild( menu, "SwitchEnableSpeedometer" ), "Speedometer", "Enables a speedometer in single player." )
+	SetupButton( Hud_GetChild( menu, "SwitchEnableSpeedometer" ), "Speedometer", "Enables a speedometer in single player.\nRequires a reload if changed" )
 	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\nTop-right: Displays the FPS and server tickrate in the Top-right hand side of the screen\n\nTop-left: Displays the FPS and server tickrate in the Top-left hand side of the screen\n\nServer: Displays only the server tickrate\n\nMinimal: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
 	SetupButton( Hud_GetChild( menu, "SwitchShowFpsBig" ), "Show Large FPS", "FPS: Shows a large overlay with FPS and server tickrate\n\nFPS/Graph: Shows a large FPS overlay and performance graph" )
 	SetupButton( Hud_GetChild( menu, "SwitchShowPos" ), "Show Positional Information", "Player Position: Shows position, angle and velocity from the player model\n\nCamera Position: Shows position, angle and velocity from the player camera" )
