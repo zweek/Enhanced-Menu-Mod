@@ -144,7 +144,6 @@ resource/ui/menus/extras.menu
 			{
 				"Metric"	"metric"
 				"Imperial"	"imperial"
-				"Units"		"units"
 			}
 
 			pin_to_sibling			BtnSpeedometerEnable
