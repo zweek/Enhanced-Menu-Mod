@@ -6,6 +6,8 @@
 
 This is a forked version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. I cut a few features that were not relevant for runners, and added a bunch more specifically for speedrunning to make runner's lives a bit easier.
 
+[contribute? :\]](https://github.com/zweek/TF2SR-Menu-Mod/blob/main/contribute.md)
+
 # Features
 **Settings**
 * Bloom - `mat_disable_bloom`
@@ -41,6 +43,13 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 1) Download the latest release from the releases page
 2) (Optional, but recommended) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk`
 3) Drag all contents of the downloaded .zip into your `Titanfall2` folder
+
+## Uninstalling
+
+1) Delete `midimap.dll` in the main `Titanfall2` folder
+2) Delete `client_frontend.bsp.pak000_228.vpk` in `Titanfall2/vpk`
+3) Replace `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk` with the backup file you've (hopefully) made previously
+4) If not, you'll have to verify the game files through Origin/Steam or reinstall the game
 
 ## Screenshots
 
