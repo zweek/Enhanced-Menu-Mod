@@ -8,7 +8,7 @@ struct
 
 void function ClPilotSpeedometer_Init()
 {
-	if ( GetConVarString( "password" ) == "metric" )
+	if ( GetConVarString( "password" ) == "metric" || GetConVarString( "password" ) == "units" )
 	{
 		file.useMetric = true
 	}
@@ -16,12 +16,10 @@ void function ClPilotSpeedometer_Init()
 	{
 		file.useMetric = false
 	}
-	else
-	{
-		return
-	}
 
-	AddCreatePilotCockpitCallback( CreatePilotSpeedometer )
+	if (getSRMMsetting(0) == 1) {
+		AddCreatePilotCockpitCallback( CreatePilotSpeedometer )
+	} else return
 }
 
 void function CreatePilotSpeedometer( entity cockpit, entity player )

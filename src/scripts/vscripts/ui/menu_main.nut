@@ -22,7 +22,6 @@ struct
 void function InitMainMenu()
 {
 	ClientCommand("setinfo srmmVersion \"SRMM v1.6\"")
-	ClientCommand("setinfo tasEnabled 0")
 
 	RegisterSignal( "EndOnMainMenu_Open" )
 

@@ -84,8 +84,8 @@ resource/ui/menus/extras.menu
 			xpos					-22
 			tabPosition				1
 			style					DialogListButton
-			navUp					SwitchTASMode
-			navDown					SwitchEnableSpeedometer
+			navUp					BtnTASMode
+			navDown					BtnSpeedometerEnable
 			ConVar					"mat_disable_bloom"
 			list
 			{
@@ -118,26 +118,62 @@ resource/ui/menus/extras.menu
 			labelText				"HUD"
 		}
 
-		SwitchEnableSpeedometer
+		BtnSpeedometerEnable
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			ImgHudSubheaderBackground
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					SwitchBloomEnable
+			navDown					SwitchSpeedometerMode
+		}
+
+		SwitchSpeedometerMode
 		{
 			ControlName				RuiButton
 			InheritProperties		SwitchButton
 			xpos					-22
 			tabPosition				1
 			style					DialogListButton
-			navUp					SwitchBloomEnable
-			navDown					SwitchShowFps
+			navUp					BtnSpeedometerEnable
+			navDown					BtnSpeedometerIncludeZ
 			ConVar					"password"
 			list
 			{
-				"#SETTING_OFF"	""
 				"Metric"	"metric"
 				"Imperial"	"imperial"
+				"Units"		"units"
 			}
 
-			pin_to_sibling			ImgHudSubheaderBackground
+			pin_to_sibling			BtnSpeedometerEnable
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
+		}
+
+		BtnSpeedometerIncludeZ
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			SwitchSpeedometerMode
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					SwitchSpeedometerMode
+			navDown					BtnSpeedometerEnableFadeout
+		}
+
+		BtnSpeedometerEnableFadeout
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnSpeedometerIncludeZ
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnSpeedometerIncludeZ
+			navDown					SwitchShowFps
 		}
 
 		SwitchShowFps
@@ -145,19 +181,20 @@ resource/ui/menus/extras.menu
 			ControlName				RuiButton
 			InheritProperties		SwitchButton
 			style					DialogListButton
-			navUp					SwitchEnableSpeedometer
+			navUp					BtnSpeedometerEnableFadeout
 			navDown					SwitchShowFpsBig
+			ypos					20
 			ConVar					"cl_showfps"
 			list
 			{
 				"#SETTING_OFF"	0
 				"Top-right"	    1
 				"Top-left"      2
-				"Server"  			3
-				"Minimal"  			4
+				"Server"  		3
+				"Minimal"  		4
 			}
 
-			pin_to_sibling			SwitchEnableSpeedometer
+			pin_to_sibling			BtnSpeedometerEnableFadeout
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 		}
@@ -173,7 +210,7 @@ resource/ui/menus/extras.menu
 			list
 			{
 				"#SETTING_OFF"	0
-				"FPS"	    			1
+				"FPS"	    	1
 				"FPS/Graph"     2
 			}
 
@@ -192,7 +229,7 @@ resource/ui/menus/extras.menu
 			ConVar					"cl_showpos"
 			list
 			{
-				"#SETTING_OFF"	0
+				"#SETTING_OFF"		0
 				"Camera Position"	1
 				"Player Position"	2
 			}
@@ -210,7 +247,7 @@ resource/ui/menus/extras.menu
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
 			xpos					96
-			ypos					480
+			ypos					630
 		}
 		LblDemoSubheaderText
 		{
@@ -426,7 +463,7 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnResetHelmets
-			navDown					SwitchTASMode
+			navDown					BtnTASMode
 		}
 
 		BtnTASMode

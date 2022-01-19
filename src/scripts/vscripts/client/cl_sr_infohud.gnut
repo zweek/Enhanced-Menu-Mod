@@ -5,7 +5,6 @@ global struct InfoDisplay
     var infoTitle
 }
 
-
 int displayLines = 3 // maximum number of lines that can be displayed
 
 struct
@@ -35,7 +34,7 @@ void function InfoHud_Thread()
     {
         WaitFrame()
         // check for TAS mode & clear info display
-        if (GetConVarInt("tasEnabled"))
+        if (getSRMMsetting(3) == 1)
         {
             SetInfoName(file.infoDisplays[0], "TAS")
             for (int i = 1; i < displayLines; i++) {

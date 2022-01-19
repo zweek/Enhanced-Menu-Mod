@@ -1,4 +1,6 @@
 #include <Windows.h>
+#include <vector>
+//#include <iostream>
 
 #pragma region Proxy
 struct midimap_dll {
@@ -32,19 +34,56 @@ void WriteBytes(void* ptr, int byte, int size) {
 	VirtualProtect(ptr, size, curProtection, &temp);
 }
 
+uintptr_t FindAddress(uintptr_t ptr, std::vector<unsigned int> offsets)
+{
+	uintptr_t addr = ptr;
+	// runs through every offset of a pointer to get the address
+	for (unsigned int i = 0; i < offsets.size(); ++i) {
+		addr = *(uintptr_t*)addr;
+		addr += offsets[i];
+	}
+	return addr;
+}
+
 void ModSpeedometer() {
-	// tasEnabled: "engine.dll"+14C7A700, "vstdlib.dll"+000720D0
+	
+	uintptr_t engineBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x14C7A700;
+	uintptr_t tasEnabled = *(uintptr_t*)FindAddress(engineBase, { 0x5C });
+	
+	// voice_forcemicrecord ConVar
+	uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
+	uintptr_t srmmSetting = *(uintptr_t*)srmmSettingBase;
 
 	uintptr_t base = (uintptr_t)GetModuleHandle("ui(11).dll");
 	uintptr_t speedometer = base + 0x6AA50;
-
+	// fadeout when moving slowly
 	uintptr_t alwaysShow = speedometer + 0x12F;
-	WriteBytes((void*)alwaysShow, 0x90, 2);
-	
+	// player positions on current and previous frame
 	uintptr_t position1 = speedometer + 0x7A;
-	WriteBytes((void*)position1, 0x12, 1);
 	uintptr_t position2 = speedometer + 0x8C;
-	WriteBytes((void*)position2, 0x12, 1);
+
+	// check if bit at pos 1 is 0
+	if ((srmmSetting & (int)pow(2, 2)) == 0) {
+		// disable fadeout
+		WriteBytes((void*)alwaysShow, 0x90, 2);
+	}
+	else {
+		// overwrite back to default values
+		WriteBytes((void*)alwaysShow, 0x72, 1);
+		WriteBytes((void*)(alwaysShow + 0x1), 0x2C, 1);
+	}
+	
+	// check if bit at pos 2 is 0
+	if ((srmmSetting & (int)pow(2, 1)) == 0) {
+		// overwrite to only include x&y axis
+		WriteBytes((void*)position1, 0x12, 1);
+		WriteBytes((void*)position2, 0x12, 1);
+	}
+	else {
+		// overwrite back to default values
+		WriteBytes((void*)position1, 0x10, 1);
+		WriteBytes((void*)position2, 0x10, 1);
+	}
 }
 
 //void ModAltTab() {
@@ -56,7 +95,14 @@ void ModSpeedometer() {
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(10000);
-	ModSpeedometer();
+	// set up debug console
+	//AllocConsole();
+	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	// run once every second
+	while (true) {
+		Sleep(1000);
+		ModSpeedometer();
+	}
 	return 0;
 }
 

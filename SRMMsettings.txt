@@ -1,0 +1,6 @@
+(not part of the functioning code, just a note to help remember where the settings are stored)
+voice_forcemicrecord bit positions (from right to left) and settings:
+0 - speedometer enable
+1 - speedometer include z axis
+2 - speedometer fadeout
+3 - tas mode

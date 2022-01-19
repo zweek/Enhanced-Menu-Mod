@@ -1,4 +1,7 @@
 global function InitExtrasMenu
+global function getSRMMsetting
+global function setSRMMsetting
+global function toggleSRMMsetting
 
 struct
 {
@@ -19,7 +22,20 @@ void function InitExtrasMenu()
 	
 	SetupButton( Hud_GetChild( menu, "SwitchBloomEnable" ), "Bloom", "Toggles the bloom to reduce brightness and glare" )
 	
-	SetupButton( Hud_GetChild( menu, "SwitchEnableSpeedometer" ), "Speedometer", "Enables a speedometer in single player.\nRequires a reload if changed" )
+	button = Hud_GetChild( menu, "BtnSpeedometerEnable" )
+	SetupButton( button, "Enable/Disable Speedometer", "Enables a speedometer in single player.\nRequires a reload for changes to take effect" )
+	AddButtonEventHandler( button, UIE_CLICK, SpeedometerEnableDialog )
+	
+	SetupButton( Hud_GetChild( menu, "SwitchSpeedometerMode" ), "Speedometer Mode", "Sets which unit the speedometer measures\nRequires a reload for changes to take effect" )
+	
+	button = Hud_GetChild( menu, "BtnSpeedometerIncludeZ" )
+	SetupButton( button, "Include Z axis", "Include vertical axis in the speedometer display" )
+	AddButtonEventHandler( button, UIE_CLICK, SpeedometerIncludeZDialog )
+	
+	button = Hud_GetChild( menu, "BtnSpeedometerEnableFadeout" )
+	SetupButton( button, "Enable/Disable Fadeout", "Fade out the speedometer display when moving slowly" )
+	AddButtonEventHandler( button, UIE_CLICK, SpeedometerFadeoutDialog )
+	
 	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\nTop-right: Displays the FPS and server tickrate in the Top-right hand side of the screen\n\nTop-left: Displays the FPS and server tickrate in the Top-left hand side of the screen\n\nServer: Displays only the server tickrate\n\nMinimal: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
 	SetupButton( Hud_GetChild( menu, "SwitchShowFpsBig" ), "Show Large FPS", "FPS: Shows a large overlay with FPS and server tickrate\n\nFPS/Graph: Shows a large FPS overlay and performance graph" )
 	SetupButton( Hud_GetChild( menu, "SwitchShowPos" ), "Show Positional Information", "Player Position: Shows position, angle and velocity from the player model\n\nCamera Position: Shows position, angle and velocity from the player camera" )
@@ -56,7 +72,46 @@ void function InitExtrasMenu()
 	AddMenuFooterOption( menu, BUTTON_B, "#B_BUTTON_BACK", "#BACK" )
 }
 
-void function ResetHelmetsDialog( var button )
+void function SRMMenableSpeedo() {setSRMMsetting(0, 1)}
+void function SRMMdisableSpeedo() {setSRMMsetting(0, 0)}
+void function SpeedometerEnableDialog(var button) {
+	DialogData dialogData
+	dialogData.header = "Speedometer"
+	dialogData.message = "Do you want to enable or disable the speedometer?"
+
+	AddDialogButton( dialogData, "Enable", SRMMenableSpeedo )
+	AddDialogButton( dialogData, "Disable", SRMMdisableSpeedo )
+
+	OpenDialog( dialogData )
+}
+
+void function SRMMspeedoIncludeZ() {setSRMMsetting(1, 1)}
+void function SRMMspeedoExcludeZ() {setSRMMsetting(1, 0)}
+void function SpeedometerIncludeZDialog(var button) {
+	DialogData dialogData
+	dialogData.header = "Include Z Axis"
+	dialogData.message = "Do you want the speedometer to include the vertical axis?"
+
+	AddDialogButton( dialogData, "Include", SRMMspeedoIncludeZ )
+	AddDialogButton( dialogData, "Don't Include", SRMMspeedoExcludeZ )
+
+	OpenDialog( dialogData )
+}
+
+void function SRMMspeedoEnableFadeout() {setSRMMsetting(2, 1)}
+void function SRMMspeedoDisableFadeout() {setSRMMsetting(2, 0)}
+void function SpeedometerFadeoutDialog(var button) {
+	DialogData dialogData
+	dialogData.header = "Fadeout"
+	dialogData.message = "Do you want to enable or disable the speedometer fadeout?"
+
+	AddDialogButton( dialogData, "Enable", SRMMspeedoEnableFadeout )
+	AddDialogButton( dialogData, "Disable", SRMMspeedoDisableFadeout )
+
+	OpenDialog( dialogData )
+}
+
+void function ResetHelmetsDialog(var button)
 {
 	DialogData dialogData
 	dialogData.header = "Reset Helmets"
@@ -68,7 +123,8 @@ void function ResetHelmetsDialog( var button )
 	OpenDialog( dialogData )
 }
 
-void function UnlockLevelsDialog( var button )
+void function UnlockAllLevels() {SetConVarInt("sp_unlockedMission", 9)}
+void function UnlockLevelsDialog(var button)
 {
 	DialogData dialogData
 	dialogData.header = "Unlock Levels"
@@ -80,11 +136,7 @@ void function UnlockLevelsDialog( var button )
 	OpenDialog( dialogData )
 }
 
-void function UnlockAllLevels() {
-	SetConVarInt("sp_unlockedMission", 9)
-}
-
-void function TASModeDialog( var button )
+void function TASModeDialog(var button)
 {
 	DialogData dialogData
 	dialogData.header = "TAS Mode"
@@ -97,7 +149,7 @@ void function TASModeDialog( var button )
 }
 
 void function EnableTASMode() {
-	SetConVarInt("tasEnabled", 1)
+	setSRMMsetting(3, 1)
 	// audio fade on load
 	SetConVarFloat("miles_map_begin_fade_time", 0)
 	SetConVarFloat("miles_map_begin_silence_time", 0)
@@ -108,7 +160,7 @@ void function EnableTASMode() {
 }
 
 void function DisableTASMode() {
-	SetConVarInt("tasEnabled", 0)
+	setSRMMsetting(3, 0)
 	// revert to default values
 	SetConVarFloat("miles_map_begin_fade_time", 1.5)
 	SetConVarFloat("miles_map_begin_silence_time", 0.5)
@@ -143,4 +195,26 @@ void function Button_Focused( var button )
 void function FooterButton_Focused( var button )
 {
 	SetElementsTextByClassname( file.menu, "MenuItemDescriptionClass", "" )
+}
+
+int function getSRMMsetting(int i) {
+	int setting = GetConVarInt("voice_forcemicrecord") & pow(2, i).tointeger()
+	if (setting > 0) setting /= setting
+	return setting
+}
+
+void function setSRMMsetting(int i, int value) {
+	int settings = GetConVarInt("voice_forcemicrecord")
+	if (value == 1) {
+		// set bit at position i to 1
+		SetConVarInt("voice_forcemicrecord", settings | pow(2, i).tointeger())
+	} else if (value == 0) {
+		// set bit at position i to 0
+		SetConVarInt("voice_forcemicrecord", settings & ~pow(2, i).tointeger())
+	} else return
+}
+
+void function toggleSRMMsetting(int i) {
+	int settings = GetConVarInt("voice_forcemicrecord")
+	SetConVarInt("voice_forcemicrecord", settings ^ pow(2, i).tointeger())
 }

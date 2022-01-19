@@ -10,6 +10,7 @@ global function BeginIntroSequence
 global function IntroInProgress
 
 global function RUITimerInit
+global function getSRMMsetting
 var rui
 
 struct
@@ -106,6 +107,12 @@ void function UpdatePlayerStatusCountsOnWaveSpawnFinished( entity player, int ol
 		wait 1.0
 
 	UpdatePlayerStatusCounts()
+}
+
+int function getSRMMsetting(int i) {
+	int setting = GetConVarInt("voice_forcemicrecord") & pow(2, i).tointeger()
+	if (setting > 0) setting /= setting
+	return setting
 }
 
 

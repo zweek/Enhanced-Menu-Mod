@@ -389,7 +389,7 @@ void function UpdatePlayButton( var button )
 			isOriginConnected = Origin_IsEnabled() ? Origin_IsOnline() : true
 			isStryderAuthenticated = IsStryderAuthenticated()
 			isMPAllowed = IsStryderAllowingMP()
-			isMPEnabled = IsMPEnabledSR()
+			isMPEnabled = SRMM_isMPEnabled()
 
 			if ( DEBUG_PERMISSIONS )
 			{
@@ -715,9 +715,9 @@ void function TrackInstallProgress()
 	RuiSetFloat( rui, "installProgress", 1.0 )
 }
 
-bool function IsMPEnabledSR()
+bool function SRMM_isMPEnabled()
 {
-	return GetConVarInt( "voice_enabled" ) == 1
+	return (GetConVarInt("voice_enabled") > 0)
 }
 
 bool function IsStryderAuthenticated()
