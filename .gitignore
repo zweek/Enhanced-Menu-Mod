@@ -3,6 +3,7 @@ export/
 englishclient_frontend.bsp.pak000_dir
 *.vpk
 *.zip
+*.psd
 # visual studio garbage
 x64/
 x86/

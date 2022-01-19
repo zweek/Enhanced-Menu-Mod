@@ -21,7 +21,7 @@ struct
 
 void function InitMainMenu()
 {
-	ClientCommand("setinfo srmmVersion \"SRMM v1.6\"")
+	ClientCommand("setinfo srmmVersion \"SRMM v1.7\"")
 
 	RegisterSignal( "EndOnMainMenu_Open" )
 
