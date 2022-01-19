@@ -1,36 +1,53 @@
-<p align="center" style="text-align:center"><img width="125" height="122" src="https://raw.githubusercontent.com/taskinoz/Enhanced-Menu-Mod/master/assets/icon.png" alt="Titanfall 2 - Enhanced Menu Mod" /></p>
+<p align="left"><img src="https://raw.githubusercontent.com/zweek/TF2SR-Menu-Mod/main/assets/logo.png" alt="Titanfall 2 - Enhanced Menu Mod" /></p>
 
-# TF2SR Menu Mod
-This is a more simplified version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. Most features that are not directly useful for speedrunning are not in this version, but there are a few extra features specifically for speedrunning to make runner's lives a bit easier.
+[![current release](https://img.shields.io/github/v/release/zweek/TF2SR-Menu-Mod?color=34ffcd&style=flat-square)](https://github.com/zweek/TF2SR-Menu-Mod/releases)
+[![EMM](https://img.shields.io/badge/taskinoz-Enhanced--Menu--Mod-00a080?style=flat-square&logo=github)](https://github.com/taskinoz/Enhanced-Menu-Mod)
+[![FzzyMod](https://img.shields.io/badge/Fzzy2j-FzzyMod-00a080?style=flat-square&logo=github)](https://github.com/Fzzy2j/FzzyMod)
+
+This is a forked version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. I cut a few features that were not relevant for runners, and added a bunch more specifically for speedrunning to make runner's lives a bit easier.
 
 # Features
-**New in this fork:**
-* Moved all new settings into its own dedicated Speedrunning menu
-* Binds for Individual Level & Full Game Resets
-* Button to unlock all levels
-* Toggle to enable/disable multiplayer
-* Warning to remind you if `sv_cheats` is enabled
-* Dedicated TAS mode
-* Separate releases for ENG and CHI text for the chinese version of the game
-
-**Features kept from taskinoz's version:**
-* Removal of clutter from the main menu
-* Save/Load 3 Quicksaves
-* NCS Saves 1-9
-* NCS Helmet Saves 2 & 5
-* Demos
-* `host_timescale` binds for 5, 0.2 & 0.05
+**Settings**
 * Bloom - `mat_disable_bloom`
+* Speedometer (KPH & MPH)
+  * Enable/Disable Fadeout
+  * Enable/Disable Vertical Axis
 * Show FPS - `cl_showfps`
 * Show FPS (large display) - `showfps_enabled`
 * Show Player Position - `cl_showpos`
 * Cheats toggle - `sv_cheats`
-* Speedometer (KPH & MPH)
-* Reset Helmets
+* Toggle to enable/disable multiplayer
+* Button to Reset Helmets
+* Button to unlock all levels
+* Dedicated TAS mode
+* Demos
+
+**Bindings**
+* Binds for Individual Level & Full Game Resets
+* Save/Load 3 Quicksaves
+* NCS Saves 1-9
+* NCS Helmet Saves 2 & 5
+* Demo Binds
+* `host_timescale` `5`, `0.2` & `0.05`
+
+**Other features**
+* Remove clutter from the main menu
+* Info Hud that shows `sv_cheats` and other ConVars or `TAS`
+* Separate releases for ENG and CHI text for the chinese version of the game
 * Removed crashes from Dev launch arguments `-dev +developer 1`
 
-
-## Installation
+# Installation
 
 1) Download the latest release from the releases page
-2) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` and copy the 2 `.vpk` files from the downloaded zip to your `Titanfall2/vpk` folder
+2) (Optional, but recommended) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk`
+3) Drag all contents of the downloaded .zip into your `Titanfall2` folder
+
+## Screenshots
+
+**Main Menu**
+
+![image](https://raw.githubusercontent.com/zweek/TF2SR-Menu-Mod/main/assets/screenshot_mainmenu.png)
+
+**Settings Menu**
+
+![image](https://raw.githubusercontent.com/zweek/TF2SR-Menu-Mod/main/assets/screenshot_settings.png)
