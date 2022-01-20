@@ -16,6 +16,8 @@ global function SafeToSpawnAtOrigin
 global function JustLoadedFromCheckpoint
 global function GetFirstPlayer
 
+global function getSRMMsetting
+
 const float LAST_SAVE_DEBOUNCE = 4.0
 const float TITAN_SAFE_DIST = 1200
 const SAVE_DEBUG = true
@@ -52,6 +54,12 @@ struct
 	bool saveRestoreResetsPlayer
 
 } file
+
+int function getSRMMsetting(int i) {
+	int setting = GetConVarInt("voice_forcemicrecord") & pow(2, i).tointeger()
+	if (setting > 0) setting /= setting
+	return setting
+}
 
 void function InitSaveGame()
 {
@@ -309,7 +317,7 @@ void function CodeCallback_OnLoadSaveGame()
 	if ( !IsAlive( player ) )
 		return
 	// TAS mode velocity saves only
-	if (GetConVarInt("tasEnabled") == 0) {
+	if (getSRMMsetting(3) == 0) {
 		ClearPlayerVelocityOnContext( player )
 	}
 
@@ -340,7 +348,7 @@ void function DelayedOnLoadSetup( entity player )
 		printt( "SAVEGAME: Restoring player to safe location " + file.saveOrigin )
 		player.SetOrigin( file.saveOrigin )
 		player.SetAngles( file.saveAngles )
-		if (GetConVarInt( "sv_cheats" ) == 1) {
+		if (getSRMMsetting(3) == 1) {
 			player.SetVelocity( file.saveVelocity )
 		}
 		else {
