@@ -48,7 +48,6 @@ uintptr_t FindAddress(uintptr_t ptr, std::vector<unsigned int> offsets)
 void ModSpeedometer() {
 	
 	uintptr_t engineBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x14C7A700;
-	uintptr_t tasEnabled = *(uintptr_t*)FindAddress(engineBase, { 0x5C });
 	
 	// voice_forcemicrecord ConVar
 	uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
@@ -61,20 +60,10 @@ void ModSpeedometer() {
 	// player positions on current and previous frame
 	uintptr_t position1 = speedometer + 0x7A;
 	uintptr_t position2 = speedometer + 0x8C;
-
-	// check if bit at pos 1 is 0
-	if ((srmmSetting & (int)pow(2, 2)) == 0) {
-		// disable fadeout
-		WriteBytes((void*)alwaysShow, 0x90, 2);
-	}
-	else {
-		// overwrite back to default values
-		WriteBytes((void*)alwaysShow, 0x72, 1);
-		WriteBytes((void*)(alwaysShow + 0x1), 0x2C, 1);
-	}
 	
-	// check if bit at pos 2 is 0
-	if ((srmmSetting & (int)pow(2, 1)) == 0) {
+	// Include/Exclude Z Axis
+	// check if bit at pos 1 is 1
+	if ((srmmSetting & (1 << 1)) > 0) {
 		// overwrite to only include x&y axis
 		WriteBytes((void*)position1, 0x12, 1);
 		WriteBytes((void*)position2, 0x12, 1);
@@ -83,6 +72,18 @@ void ModSpeedometer() {
 		// overwrite back to default values
 		WriteBytes((void*)position1, 0x10, 1);
 		WriteBytes((void*)position2, 0x10, 1);
+	}
+
+	// Enable/Disable Fadeout
+	// check if bit at pos 2 is 1
+	if ((srmmSetting & (1 << 2)) > 0) {
+		// disable fadeout
+		WriteBytes((void*)alwaysShow, 0x90, 2);
+	}
+	else {
+		// overwrite back to default values
+		WriteBytes((void*)alwaysShow, 0x72, 1);
+		WriteBytes((void*)(alwaysShow + 0x1), 0x2C, 1);
 	}
 }
 

@@ -56,7 +56,7 @@ struct
 } file
 
 int function getSRMMsetting(int i) {
-	int setting = GetConVarInt("voice_forcemicrecord") & pow(2, i).tointeger()
+	int setting = GetConVarInt("voice_forcemicrecord") & (1 << i)
 	if (setting > 0) setting /= setting
 	return setting
 }

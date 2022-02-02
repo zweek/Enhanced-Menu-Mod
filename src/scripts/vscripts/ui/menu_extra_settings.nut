@@ -62,6 +62,10 @@ void function InitExtrasMenu()
 	SetupButton( button, "Unlock all Levels", "Unlocks all levels to be selectable from the menu" )
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
+	button = Hud_GetChild( menu, "BtnCKassist" )
+	SetupButton( button, "Crouch Kick Assist", "Adds a {x}ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to {x}ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input" )
+	AddButtonEventHandler( button, UIE_CLICK, CKassistDialog )
+
 	button = Hud_GetChild( menu, "BtnTASMode" )
 	SetupButton( button, "TAS Mode", "NOT LEADERBOARD LEGAL!\n\nChanges your game settings to be TAS compatible\n- Disables load audio fade\n- Changes your binds to be TAS compatible (check the Key Bindings Menu to see what changed)" )
 	AddButtonEventHandler( button, UIE_CLICK, TASModeDialog )
@@ -74,7 +78,8 @@ void function InitExtrasMenu()
 
 void function SRMMenableSpeedo() {setSRMMsetting(0, 1)}
 void function SRMMdisableSpeedo() {setSRMMsetting(0, 0)}
-void function SpeedometerEnableDialog(var button) {
+void function SpeedometerEnableDialog(var button)
+{
 	DialogData dialogData
 	dialogData.header = "Speedometer"
 	dialogData.message = "Do you want to enable or disable the speedometer?"
@@ -85,9 +90,10 @@ void function SpeedometerEnableDialog(var button) {
 	OpenDialog( dialogData )
 }
 
-void function SRMMspeedoIncludeZ() {setSRMMsetting(1, 1)}
-void function SRMMspeedoExcludeZ() {setSRMMsetting(1, 0)}
-void function SpeedometerIncludeZDialog(var button) {
+void function SRMMspeedoIncludeZ() {setSRMMsetting(1, 0)}
+void function SRMMspeedoExcludeZ() {setSRMMsetting(1, 1)}
+void function SpeedometerIncludeZDialog(var button)
+{
 	DialogData dialogData
 	dialogData.header = "Include Z Axis"
 	dialogData.message = "Do you want the speedometer to include the vertical axis?"
@@ -98,9 +104,10 @@ void function SpeedometerIncludeZDialog(var button) {
 	OpenDialog( dialogData )
 }
 
-void function SRMMspeedoEnableFadeout() {setSRMMsetting(2, 1)}
-void function SRMMspeedoDisableFadeout() {setSRMMsetting(2, 0)}
-void function SpeedometerFadeoutDialog(var button) {
+void function SRMMspeedoEnableFadeout() {setSRMMsetting(2, 0)}
+void function SRMMspeedoDisableFadeout() {setSRMMsetting(2, 1)}
+void function SpeedometerFadeoutDialog(var button)
+{
 	DialogData dialogData
 	dialogData.header = "Fadeout"
 	dialogData.message = "Do you want to enable or disable the speedometer fadeout?"
@@ -136,6 +143,20 @@ void function UnlockLevelsDialog(var button)
 	OpenDialog( dialogData )
 }
 
+void function EnableCKassist() {setSRMMsetting(4, 1)}
+void function DisableCKassist() {setSRMMsetting(4, 0)}
+void function CKassistDialog(var button)
+{
+	DialogData dialogData
+	dialogData.header = "Crouch Kick Assist"
+	dialogData.message = "Do you want to enable or disable Crouch Kick Assist?"
+
+	AddDialogButton( dialogData, "Enable", EnableCKassist )
+	AddDialogButton( dialogData, "Disable", DisableCKassist )
+
+	OpenDialog( dialogData )
+}
+
 void function TASModeDialog(var button)
 {
 	DialogData dialogData
@@ -148,7 +169,8 @@ void function TASModeDialog(var button)
 	OpenDialog( dialogData )
 }
 
-void function EnableTASMode() {
+void function EnableTASMode()
+{
 	setSRMMsetting(3, 1)
 	// audio fade on load
 	SetConVarFloat("miles_map_begin_fade_time", 0)
@@ -159,7 +181,8 @@ void function EnableTASMode() {
 	SetConVarInt("sv_cheats", 1)
 }
 
-void function DisableTASMode() {
+void function DisableTASMode()
+{
 	setSRMMsetting(3, 0)
 	// revert to default values
 	SetConVarFloat("miles_map_begin_fade_time", 1.5)
@@ -198,7 +221,7 @@ void function FooterButton_Focused( var button )
 }
 
 int function getSRMMsetting(int i) {
-	int setting = GetConVarInt("voice_forcemicrecord") & pow(2, i).tointeger()
+	int setting = GetConVarInt("voice_forcemicrecord") & (1 << i)
 	if (setting > 0) setting /= setting
 	return setting
 }
@@ -207,10 +230,10 @@ void function setSRMMsetting(int i, int value) {
 	int settings = GetConVarInt("voice_forcemicrecord")
 	if (value == 1) {
 		// set bit at position i to 1
-		SetConVarInt("voice_forcemicrecord", settings | pow(2, i).tointeger())
+		SetConVarInt("voice_forcemicrecord", settings | (1 << i))
 	} else if (value == 0) {
 		// set bit at position i to 0
-		SetConVarInt("voice_forcemicrecord", settings & ~pow(2, i).tointeger())
+		SetConVarInt("voice_forcemicrecord", settings & ~(1 << i))
 	} else return
 }
 
