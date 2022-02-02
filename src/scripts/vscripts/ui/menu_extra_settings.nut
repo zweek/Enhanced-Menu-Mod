@@ -222,7 +222,7 @@ void function FooterButton_Focused( var button )
 
 int function getSRMMsetting(int i) {
 	int setting = GetConVarInt("voice_forcemicrecord") & (1 << i)
-	if (setting > 0) setting /= setting
+	if (setting > 0) setting = 1
 	return setting
 }
 
