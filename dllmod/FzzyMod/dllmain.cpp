@@ -119,15 +119,17 @@ DWORD WINAPI Thread(HMODULE hModule) {
 			
 		if (sincePeriodic > 5000 * 1000) {
 			periodic = std::chrono::high_resolution_clock::now();
+			if (GetSRMMsetting(0)) ModSpeedometer();
+
 			findBinds();
-			ModSpeedometer();
+			if (GetSRMMsetting(4)) {
+				enableInputHooks();
+			} else {
+				disableInputHooks();
+			}
 		}
 
-		long long buffering;
-		if (GetSRMMsetting(4)) {
-			buffering = 8 * 1000;
-		}
-		else buffering = 1 * 1000;
+		long long buffering = 8 * 1000;
 
 		if (jumpInputHolder.waitingToPress) {
 			auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpInputHolder.timestamp;

@@ -153,3 +153,5 @@ void hookedInputProc(__int64, HWND, UINT, WPARAM, LPARAM);
 
 void findBinds();
 void setInputHooks();
+void enableInputHooks();
+void disableInputHooks();

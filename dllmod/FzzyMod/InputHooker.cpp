@@ -329,9 +329,15 @@ void setInputHooks() {
 	if (MH_CreateHookEx(updateMouseButtonState, &detourUpdateMouseButtonState, &hookedUpdateMouseButtonState) != MH_OK) {
 		cout << "hook updateMouseButtonState failed" << endl;
 	}
+}
 
+void enableInputHooks() {
 	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
 	{
 		std::cout << "enabling hooks failed" << std::endl;
 	}
+}
+
+void disableInputHooks() {
+	MH_DisableHook(MH_ALL_HOOKS);
 }

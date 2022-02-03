@@ -21,7 +21,7 @@ struct
 
 void function InitMainMenu()
 {
-	ClientCommand("setinfo srmmVersion \"SRMM v2.0 - UCKF PRE-RELEASE\"")
+	ClientCommand("setinfo srmmVersion \"SRMM UCKF v1.0pre\"")
 
 	RegisterSignal( "EndOnMainMenu_Open" )
 
