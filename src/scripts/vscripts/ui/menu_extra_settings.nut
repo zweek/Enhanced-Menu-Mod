@@ -63,7 +63,7 @@ void function InitExtrasMenu()
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
 	button = Hud_GetChild( menu, "BtnCKassist" )
-	SetupButton( button, "Crouch Kick Assist", "Adds a {x}ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to {x}ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input" )
+	SetupButton( button, "Crouch Kick Assist", "Adds an 8 ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input" )
 	AddButtonEventHandler( button, UIE_CLICK, CKassistDialog )
 
 	button = Hud_GetChild( menu, "BtnTASMode" )
@@ -220,10 +220,11 @@ void function FooterButton_Focused( var button )
 	SetElementsTextByClassname( file.menu, "MenuItemDescriptionClass", "" )
 }
 
-int function getSRMMsetting(int i) {
-	int setting = GetConVarInt("voice_forcemicrecord") & (1 << i)
-	if (setting > 0) setting = 1
-	return setting
+bool function getSRMMsetting(int i) {
+	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {
+		return true
+	}
+	return false
 }
 
 void function setSRMMsetting(int i, int value) {
@@ -239,5 +240,5 @@ void function setSRMMsetting(int i, int value) {
 
 void function toggleSRMMsetting(int i) {
 	int settings = GetConVarInt("voice_forcemicrecord")
-	SetConVarInt("voice_forcemicrecord", settings ^ pow(2, i).tointeger())
+	SetConVarInt("voice_forcemicrecord", settings ^ (1 << i))
 }

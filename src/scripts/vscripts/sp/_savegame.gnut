@@ -55,10 +55,11 @@ struct
 
 } file
 
-int function getSRMMsetting(int i) {
-	int setting = GetConVarInt("voice_forcemicrecord") & (1 << i)
-	if (setting > 0) setting = 1
-	return setting
+bool function getSRMMsetting(int i) {
+	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {
+		return true
+	}
+	return false
 }
 
 void function InitSaveGame()
@@ -317,7 +318,7 @@ void function CodeCallback_OnLoadSaveGame()
 	if ( !IsAlive( player ) )
 		return
 	// TAS mode velocity saves only
-	if (getSRMMsetting(3) == 0) {
+	if (!getSRMMsetting(3)) {
 		ClearPlayerVelocityOnContext( player )
 	}
 
@@ -348,7 +349,7 @@ void function DelayedOnLoadSetup( entity player )
 		printt( "SAVEGAME: Restoring player to safe location " + file.saveOrigin )
 		player.SetOrigin( file.saveOrigin )
 		player.SetAngles( file.saveAngles )
-		if (getSRMMsetting(3) == 1) {
+		if (getSRMMsetting(3)) {
 			player.SetVelocity( file.saveVelocity )
 		}
 		else {
