@@ -1,6 +1,10 @@
 #include <Windows.h>
+#include <chrono>
+#include <thread>
+#include <iostream>
 #include <vector>
-//#include <iostream>
+#include "InputHooker.h"
+#include "include/MinHook.h"
 
 #pragma region Proxy
 struct midimap_dll {
@@ -45,13 +49,17 @@ uintptr_t FindAddress(uintptr_t ptr, std::vector<unsigned int> offsets)
 	return addr;
 }
 
-void ModSpeedometer() {
-	
-	uintptr_t engineBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x14C7A700;
-	
-	// voice_forcemicrecord ConVar
+bool GetSRMMsetting(int pos) {
+	// voice_forcemicrecord convar
 	uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
 	uintptr_t srmmSetting = *(uintptr_t*)srmmSettingBase;
+	// check for a 1 in the binary of srmmSetting at pos
+	return (srmmSetting & ((unsigned long long)1 << pos)) > 0;
+}
+
+void ModSpeedometer() {
+
+	uintptr_t engineBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x14C7A700;
 
 	uintptr_t base = (uintptr_t)GetModuleHandle("ui(11).dll");
 	uintptr_t speedometer = base + 0x6AA50;
@@ -60,10 +68,10 @@ void ModSpeedometer() {
 	// player positions on current and previous frame
 	uintptr_t position1 = speedometer + 0x7A;
 	uintptr_t position2 = speedometer + 0x8C;
-	
+
 	// Include/Exclude Z Axis
 	// check if bit at pos 1 is 1
-	if ((srmmSetting & (1 << 1)) > 0) {
+	if (GetSRMMsetting(1)) {
 		// overwrite to only include x&y axis
 		WriteBytes((void*)position1, 0x12, 1);
 		WriteBytes((void*)position2, 0x12, 1);
@@ -76,7 +84,7 @@ void ModSpeedometer() {
 
 	// Enable/Disable Fadeout
 	// check if bit at pos 2 is 1
-	if ((srmmSetting & (1 << 2)) > 0) {
+	if (GetSRMMsetting(2)) {
 		// disable fadeout
 		WriteBytes((void*)alwaysShow, 0x90, 2);
 	}
@@ -96,35 +104,70 @@ void ModSpeedometer() {
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(10000);
-	// set up debug console
 	//AllocConsole();
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-	// run once every second
+
+	MH_Initialize();
+	setInputHooks();
+
+	auto periodic = std::chrono::high_resolution_clock::now();
+
 	while (true) {
-		Sleep(1000);
-		ModSpeedometer();
+		Sleep(1);
+
+		long long sincePeriodic = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - periodic).count();
+			
+		if (sincePeriodic > 5000 * 1000) {
+			periodic = std::chrono::high_resolution_clock::now();
+			findBinds();
+			ModSpeedometer();
+		}
+
+		long long buffering;
+		if (GetSRMMsetting(4)) {
+			buffering = 8 * 1000;
+		}
+		else buffering = 1 * 1000;
+
+		if (jumpInputHolder.waitingToPress) {
+			auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpInputHolder.timestamp;
+			long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+
+			if (sinceJump > buffering) {
+				jumpInputHolder.waitingToPress = false;
+				hookedInputProc(jumpInputHolder.a, jumpInputHolder.hWnd, jumpInputHolder.uMsg, jumpInputHolder.wParam, jumpInputHolder.lParam);
+			}
+		}
+
+		if (crouchInputHolder.waitingToPress) {
+			auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchInputHolder.timestamp;
+			long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
+
+			if (sinceCrouch > buffering && crouchInputHolder.waitingToPress) {
+				crouchInputHolder.waitingToPress = false;
+				hookedInputProc(crouchInputHolder.a, crouchInputHolder.hWnd, crouchInputHolder.uMsg, crouchInputHolder.wParam, crouchInputHolder.lParam);
+			}
+		}
 	}
 	return 0;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	switch (ul_reason_for_call) {
-		case DLL_PROCESS_ATTACH:
-			// get path to midimap.dll file
-			char path[MAX_PATH];
-			GetWindowsDirectory(path, sizeof(path));
-			strcat_s(path, "\\System32\\midimap.dll");
+	case DLL_PROCESS_ATTACH:
+		char path[MAX_PATH];
+		GetWindowsDirectory(path, sizeof(path));
 
-			midimap.dll = LoadLibrary(path);
-			setupFunctions();
+		strcat_s(path, "\\System32\\midimap.dll");
+		midimap.dll = LoadLibrary(path);
+		setupFunctions();
 
-			CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Thread, hModule, 0, nullptr));
+		CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Thread, hModule, 0, nullptr));
 
-			break;
-
-		case DLL_PROCESS_DETACH:
-			FreeLibrary(midimap.dll);
-			break;
+		break;
+	case DLL_PROCESS_DETACH:
+		FreeLibrary(midimap.dll);
+		break;
 	}
 	return 1;
 }
