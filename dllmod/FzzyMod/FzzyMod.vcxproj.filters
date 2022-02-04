@@ -14,13 +14,19 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Source Files\src">
-      <UniqueIdentifier>{1f65155d-93e5-4412-ac7a-011f5e719f2c}</UniqueIdentifier>
+      <UniqueIdentifier>{c3802305-75be-45ce-9d61-e148c57e4962}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\src\hde">
-      <UniqueIdentifier>{425237aa-7bb2-4a86-884b-d0763a0f1b00}</UniqueIdentifier>
+      <UniqueIdentifier>{2b4349c5-2222-444c-8fae-3198d44faa80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\MinHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHooker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\buffer.h">
       <Filter>Source Files\src</Filter>
     </ClInclude>
@@ -42,15 +48,12 @@
     <ClInclude Include="src\hde\table64.h">
       <Filter>Source Files\src\hde</Filter>
     </ClInclude>
-    <ClInclude Include="include\MinHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHooker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InputHooker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\buffer.c">
@@ -67,9 +70,6 @@
     </ClCompile>
     <ClCompile Include="src\hde\hde64.c">
       <Filter>Source Files\src\hde</Filter>
-    </ClCompile>
-    <ClCompile Include="InputHooker.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

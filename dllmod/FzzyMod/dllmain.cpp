@@ -61,6 +61,10 @@ void ModSpeedometer() {
 
 	uintptr_t engineBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x14C7A700;
 
+	// voice_forcemicrecord ConVar
+	uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
+	uintptr_t srmmSetting = *(uintptr_t*)srmmSettingBase;
+
 	uintptr_t base = (uintptr_t)GetModuleHandle("ui(11).dll");
 	uintptr_t speedometer = base + 0x6AA50;
 	// fadeout when moving slowly
@@ -95,12 +99,12 @@ void ModSpeedometer() {
 	}
 }
 
-//void ModAltTab() {
-//	uintptr_t base = (uintptr_t)GetModuleHandle("engine.dll");
-//	uintptr_t target = base + 0x1C8C17;
-//
-//	WriteBytes((void*)target, 0x75, 1);
-//}
+void ModAltTab() {
+	uintptr_t base = (uintptr_t)GetModuleHandle("engine.dll");
+	uintptr_t target = base + 0x1C8C17;
+
+	WriteBytes((void*)target, 0x75, 1);
+}
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(10000);
@@ -116,26 +120,25 @@ DWORD WINAPI Thread(HMODULE hModule) {
 		Sleep(1);
 
 		long long sincePeriodic = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - periodic).count();
-			
-		if (sincePeriodic > 5000 * 1000) {
+		if (sincePeriodic > 1000 * 1000) {
 			periodic = std::chrono::high_resolution_clock::now();
-			if (GetSRMMsetting(0)) ModSpeedometer();
 
-			findBinds();
-			if (GetSRMMsetting(4)) {
+			if (!hooksEnabled && GetSRMMsetting(4)) {
 				enableInputHooks();
-			} else {
+			}
+			if (hooksEnabled && !GetSRMMsetting(4)) {
 				disableInputHooks();
 			}
-		}
 
-		long long buffering = 8 * 1000;
+			ModSpeedometer();
+			findBinds();
+		}
 
 		if (jumpInputHolder.waitingToPress) {
 			auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpInputHolder.timestamp;
 			long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
 
-			if (sinceJump > buffering) {
+			if (sinceJump > CROUCHKICK_BUFFERING) {
 				jumpInputHolder.waitingToPress = false;
 				hookedInputProc(jumpInputHolder.a, jumpInputHolder.hWnd, jumpInputHolder.uMsg, jumpInputHolder.wParam, jumpInputHolder.lParam);
 			}
@@ -145,7 +148,7 @@ DWORD WINAPI Thread(HMODULE hModule) {
 			auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchInputHolder.timestamp;
 			long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
 
-			if (sinceCrouch > buffering && crouchInputHolder.waitingToPress) {
+			if (sinceCrouch > CROUCHKICK_BUFFERING) {
 				crouchInputHolder.waitingToPress = false;
 				hookedInputProc(crouchInputHolder.a, crouchInputHolder.hWnd, crouchInputHolder.uMsg, crouchInputHolder.wParam, crouchInputHolder.lParam);
 			}

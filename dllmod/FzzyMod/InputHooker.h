@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <chrono>
+#include <Xinput.h>
 
 struct InputHolder {
 	__int64 a;
@@ -11,6 +12,65 @@ struct InputHolder {
 
 	bool waitingToPress;
 	std::chrono::steady_clock::time_point timestamp;
+};
+
+struct ControllerInputHolder {
+	int buttonIndex;
+
+	bool isPressed;
+	bool waitingToPress;
+	std::chrono::steady_clock::time_point timestamp;
+};
+
+enum
+{
+	MAX_JOYSTICKS = 1,
+	MOUSE_BUTTON_COUNT = 5,
+	MAX_NOVINT_DEVICES = 2,
+};
+
+enum JoystickAxis_t
+{
+	JOY_AXIS_X = 0,
+	JOY_AXIS_Y,
+	JOY_AXIS_Z,
+	JOY_AXIS_R,
+	JOY_AXIS_U,
+	JOY_AXIS_V,
+	MAX_JOYSTICK_AXES,
+};
+
+#define JOYSTICK_AXIS_INTERNAL( _joystick, _axis ) ( JOYSTICK_FIRST_AXIS + ((_joystick) * MAX_JOYSTICK_AXES) + (_axis) )
+#define JOYSTICK_AXIS( _joystick, _axis ) ( (AnalogCode_t)JOYSTICK_AXIS_INTERNAL( _joystick, _axis ) )
+
+enum
+{
+	JOYSTICK_MAX_BUTTON_COUNT = 32,
+	JOYSTICK_POV_BUTTON_COUNT = 4,
+	JOYSTICK_AXIS_BUTTON_COUNT = MAX_JOYSTICK_AXES * 2,
+};
+
+#define JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_BUTTON + ((_joystick) * JOYSTICK_MAX_BUTTON_COUNT) + (_button) )
+#define JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_POV_BUTTON + ((_joystick) * JOYSTICK_POV_BUTTON_COUNT) + (_button) )
+#define JOYSTICK_AXIS_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_AXIS_BUTTON + ((_joystick) * JOYSTICK_AXIS_BUTTON_COUNT) + (_button) )
+
+#define JOYSTICK_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) )
+#define JOYSTICK_POV_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) )
+#define JOYSTICK_AXIS_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_AXIS_BUTTON_INTERNAL( _joystick, _button ) )
+
+
+enum AnalogCode_t
+{
+	ANALOG_CODE_INVALID = -1,
+	MOUSE_X = 0,
+	MOUSE_Y,
+	MOUSE_XY,		// Invoked when either x or y changes
+	MOUSE_WHEEL,
+
+	JOYSTICK_FIRST_AXIS,
+	JOYSTICK_LAST_AXIS = JOYSTICK_AXIS_INTERNAL(MAX_JOYSTICKS - 1, MAX_JOYSTICK_AXES - 1),
+
+	ANALOG_CODE_LAST,
 };
 
 enum ButtonCode_t
@@ -144,14 +204,81 @@ enum ButtonCode_t
 
 	MOUSE_LAST = MOUSE_WHEEL_DOWN,
 	MOUSE_COUNT = MOUSE_LAST - MOUSE_FIRST + 1,
+
+
+	// Joystick
+	JOYSTICK_FIRST = MOUSE_LAST + 1,
+
+	JOYSTICK_FIRST_BUTTON = JOYSTICK_FIRST,
+	JOYSTICK_LAST_BUTTON = JOYSTICK_BUTTON_INTERNAL(MAX_JOYSTICKS - 1, JOYSTICK_MAX_BUTTON_COUNT - 1),
+	JOYSTICK_FIRST_POV_BUTTON,
+	JOYSTICK_LAST_POV_BUTTON = JOYSTICK_POV_BUTTON_INTERNAL(MAX_JOYSTICKS - 1, JOYSTICK_POV_BUTTON_COUNT - 1),
+	JOYSTICK_FIRST_AXIS_BUTTON,
+	JOYSTICK_LAST_AXIS_BUTTON = JOYSTICK_AXIS_BUTTON_INTERNAL(MAX_JOYSTICKS - 1, JOYSTICK_AXIS_BUTTON_COUNT - 1),
+
+	JOYSTICK_LAST = JOYSTICK_LAST_AXIS_BUTTON,
+
+#if !defined ( _X360 )
+	NOVINT_FIRST = JOYSTICK_LAST + 2, // plus 1 missing key. +1 seems to cause issues on the first button.
+
+	NOVINT_LOGO_0 = NOVINT_FIRST,
+	NOVINT_TRIANGLE_0,
+	NOVINT_BOLT_0,
+	NOVINT_PLUS_0,
+	NOVINT_LOGO_1,
+	NOVINT_TRIANGLE_1,
+	NOVINT_BOLT_1,
+	NOVINT_PLUS_1,
+
+	NOVINT_LAST = NOVINT_PLUS_1,
+#endif
+
+	BUTTON_CODE_LAST,
+	BUTTON_CODE_COUNT = BUTTON_CODE_LAST - KEY_FIRST + 1,
+
+	// Helpers for XBox 360
+	KEY_XBUTTON_UP = JOYSTICK_FIRST_POV_BUTTON,	// POV buttons
+	KEY_XBUTTON_RIGHT,
+	KEY_XBUTTON_DOWN,
+	KEY_XBUTTON_LEFT,
+
+	KEY_XBUTTON_A = JOYSTICK_FIRST_BUTTON,		// Buttons
+	KEY_XBUTTON_B,
+	KEY_XBUTTON_X,
+	KEY_XBUTTON_Y,
+	KEY_XBUTTON_LEFT_SHOULDER,
+	KEY_XBUTTON_RIGHT_SHOULDER,
+	KEY_XBUTTON_BACK,
+	KEY_XBUTTON_START,
+	KEY_XBUTTON_STICK1,
+	KEY_XBUTTON_STICK2,
+
+	KEY_XSTICK1_RIGHT = JOYSTICK_FIRST_AXIS_BUTTON,	// XAXIS POSITIVE
+	KEY_XSTICK1_LEFT,							// XAXIS NEGATIVE
+	KEY_XSTICK1_DOWN,							// YAXIS POSITIVE
+	KEY_XSTICK1_UP,								// YAXIS NEGATIVE
+	KEY_XBUTTON_LTRIGGER,						// ZAXIS POSITIVE
+	KEY_XBUTTON_RTRIGGER,						// ZAXIS NEGATIVE
+	KEY_XSTICK2_RIGHT,							// UAXIS POSITIVE
+	KEY_XSTICK2_LEFT,							// UAXIS NEGATIVE
+	KEY_XSTICK2_DOWN,							// VAXIS POSITIVE
+	KEY_XSTICK2_UP,								// VAXIS NEGATIVE
 };
+
+const long long CROUCHKICK_BUFFERING = 8 * 1000;
 
 extern InputHolder jumpInputHolder;
 extern InputHolder crouchInputHolder;
 
+extern ControllerInputHolder controllerJumpInputHolder;
+extern ControllerInputHolder controllerCrouchInputHolder;
+
 void hookedInputProc(__int64, HWND, UINT, WPARAM, LPARAM);
 
 void findBinds();
+
+extern bool hooksEnabled;
+
 void setInputHooks();
 void enableInputHooks();
 void disableInputHooks();
