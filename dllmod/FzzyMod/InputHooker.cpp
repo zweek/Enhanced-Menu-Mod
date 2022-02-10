@@ -112,13 +112,13 @@ void findBinds() {
 	}
 }
 
-void playSound() {
-	struct stat buffer;
-	std::string name = "crouchkick.wav";
-	if (stat(name.c_str(), &buffer) == 0) {
-		PlaySound("crouchkick.wav", NULL, SND_ASYNC);
-	}
-}
+//void playSound() {
+//	struct stat buffer;
+//	std::string name = "crouchkick.wav";
+//	if (stat(name.c_str(), &buffer) == 0) {
+//		PlaySound("crouchkick.wav", NULL, SND_ASYNC);
+//	}
+//}
 
 LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	WPARAM key = wParam;
@@ -150,7 +150,7 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 					long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
 					cout << "crouchkick: " << sinceCrouch / 1000.0 << endl;
 
-					playSound();
+					//playSound();
 					hookedInputProc(crouchInputHolder.a, crouchInputHolder.hWnd, crouchInputHolder.uMsg, crouchInputHolder.wParam, crouchInputHolder.lParam);
 				}
 				else {
@@ -173,7 +173,7 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 					long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
 					cout << "crouchkick: " << sinceJump / 1000.0 << endl;
 
-					playSound();
+					//playSound();
 					hookedInputProc(jumpInputHolder.a, jumpInputHolder.hWnd, jumpInputHolder.uMsg, jumpInputHolder.wParam, jumpInputHolder.lParam);
 				}
 				else {
@@ -246,7 +246,7 @@ void processXInput(XINPUT_STATE* pState, int i, bool jump, bool* restore) {
 			if (controllerCrouchInputHolder.waitingToPress) {
 				controllerCrouchInputHolder.waitingToPress = false;
 				*restore = true;
-				playSound();
+				//playSound();
 			}
 			else {
 				controllerJumpInputHolder.waitingToPress = true;
@@ -272,7 +272,7 @@ void processXInput(XINPUT_STATE* pState, int i, bool jump, bool* restore) {
 			if (controllerJumpInputHolder.waitingToPress) {
 				controllerJumpInputHolder.waitingToPress = false;
 				*restore = true;
-				playSound();
+				//playSound();
 			}
 			else {
 				controllerCrouchInputHolder.waitingToPress = true;

@@ -21,7 +21,7 @@ struct
 
 void function InitMainMenu()
 {
-	ClientCommand("setinfo srmmVersion \"SRMM UCKF v1.0pre\"")
+	ClientCommand("setinfo srmmVersion \"SRMM v2.0\"")
 
 	RegisterSignal( "EndOnMainMenu_Open" )
 
@@ -586,22 +586,25 @@ void function DoGameNeedsToInstallDialog()
 
 void function UpdateTrialLabel()
 {
-	bool isTrialVersion
-	bool lastIsTrialVersion = Script_IsRunningTrialVersion()
+	Hud_SetText( file.trialLabel, GetConVarString("srmmVersion") )
+	Hud_SetVisible( file.trialLabel, true )
 
-	Hud_SetVisible( file.trialLabel, lastIsTrialVersion )
-
-	while ( GetTopNonDialogMenu() == file.menu )
-	{
-		isTrialVersion = Script_IsRunningTrialVersion()
-
-		if ( isTrialVersion != lastIsTrialVersion )
-			Hud_SetVisible( file.trialLabel, isTrialVersion )
-
-		lastIsTrialVersion = isTrialVersion
-
-		WaitFrame()
-	}
+//	bool isTrialVersion
+//	bool lastIsTrialVersion = Script_IsRunningTrialVersion()
+//
+//	Hud_SetVisible( file.trialLabel, lastIsTrialVersion )
+//
+//	while ( GetTopNonDialogMenu() == file.menu )
+//	{
+//		isTrialVersion = Script_IsRunningTrialVersion()
+//
+//		if ( isTrialVersion != lastIsTrialVersion )
+//			Hud_SetVisible( file.trialLabel, isTrialVersion )
+//
+//		lastIsTrialVersion = isTrialVersion
+//
+//		WaitFrame()
+//	}
 }
 
 void function OpenSinglePlayerDevMenu( var button )

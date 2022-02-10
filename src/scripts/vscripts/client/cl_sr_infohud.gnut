@@ -34,7 +34,6 @@ void function InfoHud_Thread()
     {
         WaitFrame()
         // check for TAS mode & clear info display
-        /*
         if (getSRMMsetting(3))
         {
             SetInfoName(file.infoDisplays[0], "TAS")
@@ -63,11 +62,6 @@ void function InfoHud_Thread()
         {
             SetHudPos(file.infoDisplays[i], i)
         }
-        */
-        SetInfoName(file.infoDisplays[0], "UCKF PRE-RELEASE");
-        if (getSRMMsetting(4)) {
-            SetInfoName(file.infoDisplays[1], "enabled");
-        } else SetInfoName(file.infoDisplays[1], "");
     }
 }
 
