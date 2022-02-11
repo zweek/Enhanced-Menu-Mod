@@ -81,7 +81,6 @@ resource/ui/menus/extras.menu
 		{
 			ControlName				RuiButton
 			InheritProperties		ControlsSwitchButton
-			xpos					-22
 			tabPosition				1
 			style					DialogListButton
 			navUp					BtnTASMode
@@ -182,6 +181,7 @@ resource/ui/menus/extras.menu
 			style					DialogListButton
 			navUp					BtnSpeedometerEnableFadeout
 			navDown					SwitchShowFpsBig
+			xpos					22
 			ypos					20
 			ConVar					"cl_showfps"
 			list
@@ -245,8 +245,8 @@ resource/ui/menus/extras.menu
 		{
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
-			xpos					950
-			ypos					480
+			xpos					96
+			ypos					620
 		}
 		LblMiscSubheaderText
 		{
@@ -272,7 +272,7 @@ resource/ui/menus/extras.menu
 				"#SETTING_OFF"	0
 				"#SETTING_ON"	1
 			}
-			xpos					-22
+			tabPosition				1
 			ypos					1
 			navUp					SwitchShowPos
 			navDown					SwitchEnableMP
@@ -294,10 +294,10 @@ resource/ui/menus/extras.menu
 			}
 			ypos					1
 			navUp					SwitchEnableCheats
-			navDown					BtnResetHelmets
+			navDown					BtnCKfix
 		}
 
-		BtnResetHelmets
+		BtnCKfix
 		{
 			ControlName				RuiButton
 			InheritProperties		WideButton
@@ -306,6 +306,50 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					SwitchEnableMP
+			navDown					BtnTASMode
+		}
+
+		BtnTASMode
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnCKfix
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnCKfix
+			navDown					BtnResetHelmets
+		}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		// Actions subheader
+		ImgActionsSubheaderBackground
+		{
+			ControlName				ImagePanel
+			InheritProperties		SubheaderBackground
+			xpos					950
+			ypos					480
+		}
+		LblActionsSubheaderText
+		{
+			ControlName				Label
+			InheritProperties		SubheaderText
+			pin_to_sibling			ImgActionsSubheaderBackground
+			pin_corner_to_sibling	LEFT
+			pin_to_sibling_corner	LEFT
+			labelText				"Actions"
+		}
+
+		BtnResetHelmets
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			LblActionsSubheaderText
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnTASMode
 			navDown					BtnUnlockLevels
 		}
 
@@ -318,30 +362,6 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnResetHelmets
-			navDown					BtnCKassist
-		}
-
-		BtnCKassist
-		{
-			ControlName				RuiButton
-			InheritProperties		WideButton
-			pin_to_sibling			BtnUnlockLevels
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-			ypos					1
-			navUp					BtnUnlockLevels
-			navDown					BtnTASMode
-		}
-
-		BtnTASMode
-		{
-			ControlName				RuiButton
-			InheritProperties		WideButton
-			pin_to_sibling			BtnCKassist
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-			ypos					1
-			navUp					BtnCKassist
 			navDown					SwitchBloomEnable
 		}
 
@@ -354,3 +374,5 @@ resource/ui/menus/extras.menu
 		}
 	}
 }
+
+

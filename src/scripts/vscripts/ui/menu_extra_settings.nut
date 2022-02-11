@@ -51,7 +51,7 @@ void function InitExtrasMenu()
 	SetupButton( button, "Unlock all Levels", "Unlocks all levels to be selectable from the menu" )
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
-	button = Hud_GetChild( menu, "BtnCKassist" )
+	button = Hud_GetChild( menu, "BtnCKfix" )
 	SRMM_SetupButton(button, "Crouch Kick Fix: ", "Adds an 8 ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input", getSRMMsetting(4) )
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
 
