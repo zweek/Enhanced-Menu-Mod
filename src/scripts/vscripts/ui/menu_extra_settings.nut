@@ -1,7 +1,4 @@
 global function InitExtrasMenu
-global function getSRMMsetting
-global function setSRMMsetting
-global function toggleSRMMsetting
 
 struct
 {
@@ -23,17 +20,17 @@ void function InitExtrasMenu()
 	SetupButton( Hud_GetChild( menu, "SwitchBloomEnable" ), "Bloom", "Toggles the bloom to reduce brightness and glare" )
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerEnable" )
-	SRMM_SetupButton( button, "Speedometer: ", "Enables a speedometer in single player.\nRequires a reload for changes to take effect", getSRMMsetting(0) )
+	SRMM_SetupButton( button, "Speedometer: ", "Enables a speedometer in single player.\nRequires a reload for changes to take effect", getSRMMsetting(SRMM_settings.enableSpeedometer) )
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerEnableToggle )
 	
 	SetupButton( Hud_GetChild( menu, "SwitchSpeedometerMode" ), "Speedometer Mode", "Sets which unit the speedometer measures\nRequires a reload for changes to take effect" )
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerIncludeZ" )
-	SRMM_SetupButton( button, "Include Z Axis: ", "Include vertical axis in the speedometer display", getSRMMsetting(1) )
+	SRMM_SetupButton( button, "Include Z Axis: ", "Include vertical axis in the speedometer display", getSRMMsetting(SRMM_settings.speedometerIncludeZ) )
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerIncludeZToggle )
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerEnableFadeout" )
-	SRMM_SetupButton( button, "Fadeout: ", "Fade out the speedometer display when moving slowly", getSRMMsetting(2) )
+	SRMM_SetupButton( button, "Fadeout: ", "Fade out the speedometer display when moving slowly", getSRMMsetting(SRMM_settings.speedometerFadeout) )
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerFadeoutToggle )
 	
 	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\nTop-right: Displays the FPS and server tickrate in the Top-right hand side of the screen\n\nTop-left: Displays the FPS and server tickrate in the Top-left hand side of the screen\n\nServer: Displays only the server tickrate\n\nMinimal: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
@@ -52,11 +49,11 @@ void function InitExtrasMenu()
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
 	button = Hud_GetChild( menu, "BtnCKfix" )
-	SRMM_SetupButton(button, "Crouch Kick Fix: ", "Adds an 8 ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input", getSRMMsetting(4) )
+	SRMM_SetupButton(button, "Crouch Kick Fix: ", "Adds an 8 ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input", getSRMMsetting(SRMM_settings.CKfix) )
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
 
 	button = Hud_GetChild( menu, "BtnTASMode" )
-	SRMM_SetupButton( button, "TAS Mode: ", "NOT LEADERBOARD LEGAL!\n\nChanges your game settings to be TAS compatible\n- Disables load audio fade\n- Changes your binds to be TAS compatible (check the Key Bindings Menu to see what changed)", getSRMMsetting(3) )
+	SRMM_SetupButton( button, "TAS Mode: ", "NOT LEADERBOARD LEGAL!\n\nChanges your game settings to be TAS compatible\n- Disables load audio fade\n- Enables use of host_timescale", getSRMMsetting(SRMM_settings.TASmode) )
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
@@ -79,17 +76,17 @@ void function SRMM_buttonToggle(var button, int setting, string buttonLabel) {
 
 void function SpeedometerEnableToggle(var button)
 {
-	SRMM_buttonToggle(button, 0, "Speedometer")
+	SRMM_buttonToggle(button, SRMM_settings.enableSpeedometer, "Speedometer")
 }
 
 void function SpeedometerIncludeZToggle(var button)
 {
-	SRMM_buttonToggle(button, 1, "Include Z Axis")
+	SRMM_buttonToggle(button, SRMM_settings.speedometerIncludeZ, "Include Z Axis")
 }
 
 void function SpeedometerFadeoutToggle(var button)
 {
-	SRMM_buttonToggle(button, 2, "Fadeout")
+	SRMM_buttonToggle(button, SRMM_settings.speedometerFadeout, "Fadeout")
 }
 
 void function ResetHelmetsDialog(var button)
@@ -119,14 +116,14 @@ void function UnlockLevelsDialog(var button)
 
 void function CKfixToggle(var button)
 {
-	SRMM_buttonToggle(button, 4, "Crouch Kick Fix")
+	SRMM_buttonToggle(button, SRMM_settings.CKfix, "Crouch Kick Fix")
 }
 
 void function TASModeToggle(var button)
 {
-	toggleSRMMsetting(3)
+	toggleSRMMsetting(SRMM_settings.TASmode)
 	string settingLabel
-	if (getSRMMsetting(3)) {
+	if (getSRMMsetting(SRMM_settings.TASmode)) {
 		EnableTASMode()
 		settingLabel = "Enabled"
 	} else {
@@ -196,27 +193,4 @@ void function Button_Focused( var button )
 void function FooterButton_Focused( var button )
 {
 	SetElementsTextByClassname( file.menu, "MenuItemDescriptionClass", "" )
-}
-
-bool function getSRMMsetting(int i) {
-	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {
-		return true
-	}
-	return false
-}
-
-void function setSRMMsetting(int i, int value) {
-	int settings = GetConVarInt("voice_forcemicrecord")
-	if (value == 1) {
-		// set bit at position i to 1
-		SetConVarInt("voice_forcemicrecord", settings | (1 << i))
-	} else if (value == 0) {
-		// set bit at position i to 0
-		SetConVarInt("voice_forcemicrecord", settings & ~(1 << i))
-	} else return
-}
-
-void function toggleSRMMsetting(int i) {
-	int settings = GetConVarInt("voice_forcemicrecord")
-	SetConVarInt("voice_forcemicrecord", settings ^ (1 << i))
 }

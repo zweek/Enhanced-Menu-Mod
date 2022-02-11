@@ -54,6 +54,7 @@ Scripts:
 When: "SERVER || CLIENT || UI"
 Scripts:
 [
+	srmm_h.nut
 	_scripttest.gnut
 	sh_consts.gnut
 	sh_common_models.gnut
