@@ -74,8 +74,8 @@ void ModSpeedometer() {
 	uintptr_t position2 = speedometer + 0x8C;
 
 	// Include/Exclude Z Axis
-	// check if bit at pos 1 is 1
-	if (GetSRMMsetting(1)) {
+	// check if bit at pos 1 is 0
+	if (!GetSRMMsetting(1)) {
 		// overwrite to only include x&y axis
 		WriteBytes((void*)position1, 0x12, 1);
 		WriteBytes((void*)position2, 0x12, 1);
@@ -87,8 +87,8 @@ void ModSpeedometer() {
 	}
 
 	// Enable/Disable Fadeout
-	// check if bit at pos 2 is 1
-	if (GetSRMMsetting(2)) {
+	// check if bit at pos 2 is 0
+	if (!GetSRMMsetting(2)) {
 		// disable fadeout
 		WriteBytes((void*)alwaysShow, 0x90, 2);
 	}

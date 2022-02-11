@@ -224,7 +224,7 @@ resource/ui/menus/extras.menu
 			InheritProperties		SwitchButton
 			style					DialogListButton
 			navUp					SwitchShowFpsBig
-			navDown					SwitchEnableDemos
+			navDown					SwitchEnableCheats
 			ConVar					"cl_showpos"
 			list
 			{
@@ -234,138 +234,6 @@ resource/ui/menus/extras.menu
 			}
 
 			pin_to_sibling			SwitchShowFpsBig
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// Demo subheader
-		ImgDemoSubheaderBackground
-		{
-			ControlName				ImagePanel
-			InheritProperties		SubheaderBackground
-			xpos					96
-			ypos					630
-		}
-		LblDemoSubheaderText
-		{
-			ControlName				Label
-			InheritProperties		SubheaderText
-			pin_to_sibling			ImgDemoSubheaderBackground
-			pin_corner_to_sibling	LEFT
-			pin_to_sibling_corner	LEFT
-			labelText				"Demos"
-		}
-
-		SwitchEnableDemos
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			xpos					-22
-			tabPosition				1
-			style					DialogListButton
-			navUp					SwitchShowPos
-			navDown					SwitchDemosWrite
-			ConVar					"demo_enabledemos"
-			list
-			{
-				"#SETTING_OFF"	0
-				"#SETTING_ON"	1
-			}
-			pin_to_sibling			ImgDemoSubheaderBackground
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		SwitchDemosWrite
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchEnableDemos
-			navDown					SwitchDemosInterpolate
-			ConVar					"demo_writeLocalFile"
-			list
-			{
-				"#SETTING_OFF"	0
-				"#SETTING_ON"	1
-			}
-
-			pin_to_sibling			SwitchEnableDemos
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		SwitchDemosInterpolate
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchDemosWrite
-			navDown					SwitchDemosUpdateRateSp
-			ConVar					"demo_interpolateview"
-			list
-			{
-				"#SETTING_OFF"	0
-				"#SETTING_ON"	1
-			}
-
-			pin_to_sibling			SwitchDemosWrite
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		SwitchDemosUpdateRateSp
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchDemosInterpolate
-			navDown					SwitchDemosUpdateRateMp
-			ConVar					"base_tickinterval_sp"
-			list
-			{
-				"20 FPS"	0.05
-				"60 FPS"	0.016666667
-				"100 FPS"	0.010000
-			}
-
-			pin_to_sibling			SwitchDemosInterpolate
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		SwitchDemosUpdateRateMp
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchDemosUpdateRateSp
-			navDown					SwitchDemosAutorecord
-			ConVar					"base_tickinterval_mp"
-			list
-			{
-				"20 FPS"	0.05
-				"60 FPS"	0.016666667
-				"100 FPS"	0.010000
-			}
-
-			pin_to_sibling			SwitchDemosUpdateRateSp
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-		}
-		SwitchDemosAutorecord
-		{
-			ControlName				RuiButton
-			InheritProperties		SwitchButton
-			style					DialogListButton
-			navUp					SwitchDemosUpdateRateMp
-			navDown					SwitchEnableCheats
-			ConVar					"demo_autoRecord"
-			list
-			{
-				"#SETTING_OFF"	0
-				"#SETTING_ON"	1
-			}
-
-			pin_to_sibling			SwitchDemosUpdateRateMp
 			pin_corner_to_sibling	TOP_LEFT
 			pin_to_sibling_corner	BOTTOM_LEFT
 		}
@@ -406,7 +274,7 @@ resource/ui/menus/extras.menu
 			}
 			xpos					-22
 			ypos					1
-			navUp					SwitchDemosAutorecord
+			navUp					SwitchShowPos
 			navDown					SwitchEnableMP
 		}
 
@@ -426,10 +294,10 @@ resource/ui/menus/extras.menu
 			}
 			ypos					1
 			navUp					SwitchEnableCheats
-			navDown					BtnMouseKeyboardBindings
+			navDown					BtnResetHelmets
 		}
 
-		BtnMouseKeyboardBindings [!$GAMECONSOLE]
+		BtnResetHelmets
 		{
 			ControlName				RuiButton
 			InheritProperties		WideButton
@@ -438,18 +306,6 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					SwitchEnableMP
-			navDown					BtnResetHelmets
-		}
-
-		BtnResetHelmets
-		{
-			ControlName				RuiButton
-			InheritProperties		WideButton
-			pin_to_sibling			BtnMouseKeyboardBindings
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-			ypos					1
-			navUp					BtnMouseKeyboardBindings
 			navDown					BtnUnlockLevels
 		}
 
