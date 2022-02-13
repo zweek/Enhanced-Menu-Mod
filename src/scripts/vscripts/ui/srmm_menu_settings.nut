@@ -19,12 +19,14 @@ void function SRMM_InitSettingsMenu()
 
 	var button
 	
+	// Video
 	SetupButton(
 		Hud_GetChild( menu, "SwitchBloomEnable" ),
 		"Bloom",
 		"Toggles the bloom to reduce brightness and glare"
 	)
 	
+	// HUD
 	button = Hud_GetChild( menu, "BtnSpeedometerEnable" )
 	SRMM_SetupButton(
 		button,
@@ -74,6 +76,7 @@ void function SRMM_InitSettingsMenu()
 		"`1Player Position: `0Shows position, angle and velocity from the player model\n\n`1Camera Position: `0Shows position, angle and velocity from the player camera"
 	)
 
+	// Misc
 	SetupButton(
 		Hud_GetChild( menu, "SwitchEnableCheats" ),
 		"Enable Cheats",
@@ -84,22 +87,6 @@ void function SRMM_InitSettingsMenu()
 		"Enable Multiplayer",
 		"Enables or disables the multiplayer buttons in the main menu"
 	)
-	
-	button = Hud_GetChild( menu, "BtnResetHelmets" )
-	SetupButton(
-		button,
-		"Reset Helmets",
-		"Reset every helmet collectible to be uncollected"
-	)
-	AddButtonEventHandler( button, UIE_CLICK, ResetHelmetsDialog )
-
-	button = Hud_GetChild( menu, "BtnUnlockLevels" )
-	SetupButton(
-		button,
-		"Unlock all Levels",
-		"Unlocks all levels to be selectable from the menu"
-	)
-	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
 	button = Hud_GetChild( menu, "BtnCKfix" )
 	SRMM_SetupButton(button,
@@ -118,23 +105,38 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
-	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
+	// Actions
+	button = Hud_GetChild( menu, "BtnResetHelmets" )
+	SetupButton(
+		button,
+		"Reset Helmets",
+		"Reset every helmet collectible to be uncollected"
+	)
+	AddButtonEventHandler( button, UIE_CLICK, ResetHelmetsDialog )
 
+	button = Hud_GetChild( menu, "BtnUnlockLevels" )
+	SetupButton(
+		button,
+		"Unlock all Levels",
+		"Unlocks all levels to be selectable from the menu"
+	)
+	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
+
+	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
+	SetupButton(
+		button,
+		"#KEY_BINDINGS",
+		"#MOUSE_KEYBOARD_MENU_CONTROLS_DESC"
+	)
+	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "MouseKeyboardBindingsMenu" ) ) )
+
+	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
+	
 	AddMenuFooterOption( menu, BUTTON_A, "#A_BUTTON_SELECT" )
 	AddMenuFooterOption( menu, BUTTON_B, "#B_BUTTON_BACK", "#BACK" )
 }
 
-void function SRMM_buttonToggle(var button, int setting, string buttonLabel) {
-	SRMM_toggleSetting(setting)
-	string settingLabel
-	if (SRMM_getSetting(setting)) {
-		settingLabel = "Enabled"
-	} else {
-		settingLabel = "Disabled"
-	}
-	buttonLabel += ": "
-	SetButtonRuiText(button, buttonLabel + settingLabel)
-}
+
 
 void function SpeedometerEnableToggle(var button)
 {
@@ -151,30 +153,30 @@ void function SpeedometerFadeoutToggle(var button)
 	SRMM_buttonToggle(button, SRMM_settings.speedometerFadeout, "Fadeout")
 }
 
-void function ResetHelmetsDialog(var button)
+
+void function AreYouSureDialog(string header, string message, void functionref() confirmFunc = null)
 {
 	DialogData dialogData
-	dialogData.header = "Reset Helmets"
-	dialogData.message = "Are you sure you want to reset all helmets?"
+	dialogData.header = header
+	dialogData.message = message
 
-	AddDialogButton( dialogData, "#YES", ResetCollectiblesProgress_All )
-	AddDialogButton( dialogData, "#NO" )
+	AddDialogButton(dialogData, "#YES", confirmFunc)
+	AddDialogButton(dialogData, "#NO")
 
-	OpenDialog( dialogData )
+	OpenDialog(dialogData)
+}
+
+void function ResetHelmetsDialog(var button)
+{
+	AreYouSureDialog("Reset Helmets", "Are you sure you want to reset all helmets?", ResetCollectiblesProgress_All)
 }
 
 void function UnlockAllLevels() {SetConVarInt("sp_unlockedMission", 9)}
 void function UnlockLevelsDialog(var button)
 {
-	DialogData dialogData
-	dialogData.header = "Unlock Levels"
-	dialogData.message = "Are you sure you want to unlock all levels?"
-
-	AddDialogButton( dialogData, "#YES", UnlockAllLevels )
-	AddDialogButton( dialogData, "#NO" )
-
-	OpenDialog( dialogData )
+	AreYouSureDialog("Unlock Levels", "Are you sure you want to unlock all levels?", UnlockAllLevels)
 }
+
 
 void function CKfixToggle(var button)
 {
@@ -215,6 +217,7 @@ void function DisableTASMode()
 	SetConVarInt("sv_cheats", 0)
 }
 
+
 void function SRMM_OnOpenSettingsMenu()
 {
 	UI_SetPresentationType( ePresentationType.NO_MODELS )
@@ -226,6 +229,7 @@ void function SRMM_OnCloseSettingsMenu()
 	SavePlayerSettings()
 }
 
+
 void function SetupButton( var button, string buttonText, string description )
 {
 	SetButtonRuiText( button, buttonText )
@@ -233,7 +237,8 @@ void function SetupButton( var button, string buttonText, string description )
 	AddButtonEventHandler( button, UIE_GET_FOCUS, Button_Focused )
 }
 
-void function SRMM_SetupButton(var button, string buttonLabel, string description, bool setting) {
+void function SRMM_SetupButton(var button, string buttonLabel, string description, bool setting)
+{
 	string settingLabel
 	if (setting) {
 		settingLabel = "Enabled"
@@ -247,6 +252,19 @@ void function SRMM_SetupButton(var button, string buttonLabel, string descriptio
 	AddButtonEventHandler( button, UIE_GET_FOCUS, Button_Focused )
 }
 
+void function SRMM_buttonToggle(var button, int setting, string buttonLabel)
+{
+	SRMM_toggleSetting(setting)
+	string settingLabel
+	if (SRMM_getSetting(setting)) {
+		settingLabel = "Enabled"
+	} else {
+		settingLabel = "Disabled"
+	}
+	buttonLabel += ": "
+	SetButtonRuiText(button, buttonLabel + settingLabel)
+}
+
 void function Button_Focused( var button )
 {
 	string description = file.buttonDescriptions[ button ]
@@ -255,5 +273,5 @@ void function Button_Focused( var button )
 
 void function FooterButton_Focused( var button )
 {
-	SetElementsTextByClassname( file.menu, "MenuItemDescriptionClass", "" )
+	RuiSetString( Hud_GetRui( file.itemDescriptionBox ), "description", "" )
 }
