@@ -309,7 +309,7 @@ void function CodeCallback_OnLoadSaveGame()
 	if ( !IsAlive( player ) )
 		return
 	// TAS mode velocity saves only
-	if (!getSRMMsetting(SRMM_settings.TASmode)) {
+	if (!SRMM_getSetting(SRMM_settings.TASmode)) {
 		ClearPlayerVelocityOnContext( player )
 	}
 
@@ -340,7 +340,7 @@ void function DelayedOnLoadSetup( entity player )
 		printt( "SAVEGAME: Restoring player to safe location " + file.saveOrigin )
 		player.SetOrigin( file.saveOrigin )
 		player.SetAngles( file.saveAngles )
-		if (getSRMMsetting(SRMM_settings.TASmode)) {
+		if (SRMM_getSetting(SRMM_settings.TASmode)) {
 			player.SetVelocity( file.saveVelocity )
 		}
 		else {

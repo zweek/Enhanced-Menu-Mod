@@ -667,7 +667,7 @@ When: "CLIENT && SP"
 Scripts:
 [
 	ai/cl_ai_boss_titan.gnut
-	client/cl_sr_infohud.gnut
+	client/srmm_infohud.nut
 	client/cl_utility_sp.gnut
 	client/cl_sp_obituary.gnut
 	client/cl_announcement.gnut
@@ -972,7 +972,7 @@ Scripts:
 	ui/menu_mouse_keyboard_bindings.nut
 	ui/menu_audio_settings.nut
 	ui/menu_video_settings.nut
-	ui/menu_extra_settings.nut
+	ui/srmm_menu_settings.nut
 ]
 
 When: "UI && CONSOLE_PROG"

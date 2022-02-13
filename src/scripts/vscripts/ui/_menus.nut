@@ -987,7 +987,7 @@ void function InitMenus()
 #endif
 
 	AddMenu( "AdvancedHudMenu", $"resource/ui/menus/advanced_hud.menu", InitAdvancedHudMenu, "#ADVANCED_HUD" )
-	AddMenu( "ExtrasMenu", $"resource/ui/menus/extras.menu", InitExtrasMenu, "Speedrunning")
+	AddMenu( "SRMM_SettingsMenu", $"resource/ui/menus/srmm_settings.menu", SRMM_InitSettingsMenu, "Speedrunning")
 
 	AddMenu( "PilotLoadoutsMenu", $"resource/ui/menus/pilotloadouts.menu", InitPilotLoadoutsMenu )
 	AddMenu( "TitanLoadoutsMenu", $"resource/ui/menus/titanloadouts.menu", InitTitanLoadoutsMenu )

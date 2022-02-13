@@ -1,59 +1,121 @@
-global function InitExtrasMenu
+global function SRMM_InitSettingsMenu
 
 struct
 {
 	var menu
 	table<var,string> buttonDescriptions
-	var classicMusicSwitch
+	var itemDescriptionBox
 } file
 
-void function InitExtrasMenu()
+void function SRMM_InitSettingsMenu()
 {
-	var menu = GetMenu( "ExtrasMenu" )
+	var menu = GetMenu( "SRMM_SettingsMenu" )
 	file.menu = menu
 
-	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, OnOpenExtrasMenu )
-	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, OnCloseExtrasMenu )
+	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, SRMM_OnOpenSettingsMenu )
+	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, SRMM_OnCloseSettingsMenu )
+
+	file.itemDescriptionBox = Hud_GetChild( menu, "LblMenuItemDescription" )
 
 	var button
 	
-	SetupButton( Hud_GetChild( menu, "SwitchBloomEnable" ), "Bloom", "Toggles the bloom to reduce brightness and glare" )
+	SetupButton(
+		Hud_GetChild( menu, "SwitchBloomEnable" ),
+		"Bloom",
+		"Toggles the bloom to reduce brightness and glare"
+	)
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerEnable" )
-	SRMM_SetupButton( button, "Speedometer: ", "Enables a speedometer in single player.\nRequires a reload for changes to take effect", getSRMMsetting(SRMM_settings.enableSpeedometer) )
+	SRMM_SetupButton(
+		button,
+		"Speedometer",
+		"Enables a speedometer in single player.\n\n`2Requires a reload for changes to take effect",
+		SRMM_getSetting(SRMM_settings.enableSpeedometer)
+	)
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerEnableToggle )
 	
-	SetupButton( Hud_GetChild( menu, "SwitchSpeedometerMode" ), "Speedometer Mode", "Sets which unit the speedometer measures\nRequires a reload for changes to take effect" )
+	SetupButton(
+		Hud_GetChild( menu, "SwitchSpeedometerMode" ),
+		"Speedometer Mode",
+		"Sets which unit the speedometer measures\n\n`2Requires a reload for changes to take effect"
+	)
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerIncludeZ" )
-	SRMM_SetupButton( button, "Include Z Axis: ", "Include vertical axis in the speedometer display", getSRMMsetting(SRMM_settings.speedometerIncludeZ) )
+	SRMM_SetupButton(
+		button,
+		"Include Z Axis",
+		"Include vertical axis in the speedometer display",
+		SRMM_getSetting(SRMM_settings.speedometerIncludeZ)
+	)
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerIncludeZToggle )
 	
 	button = Hud_GetChild( menu, "BtnSpeedometerEnableFadeout" )
-	SRMM_SetupButton( button, "Fadeout: ", "Fade out the speedometer display when moving slowly", getSRMMsetting(SRMM_settings.speedometerFadeout) )
+	SRMM_SetupButton(
+		button,
+		"Fadeout",
+		"Fade out the speedometer display when moving slowly",
+		SRMM_getSetting(SRMM_settings.speedometerFadeout)
+	)
 	AddButtonEventHandler( button, UIE_CLICK, SpeedometerFadeoutToggle )
 	
-	SetupButton( Hud_GetChild( menu, "SwitchShowFps" ), "Show FPS", "Shows an overlay with FPS and server tickrate\n\nTop-right: Displays the FPS and server tickrate in the Top-right hand side of the screen\n\nTop-left: Displays the FPS and server tickrate in the Top-left hand side of the screen\n\nServer: Displays only the server tickrate\n\nMinimal: Displays a smaller FPS and tickrate display on the top left hand side of the screen" )
-	SetupButton( Hud_GetChild( menu, "SwitchShowFpsBig" ), "Show Large FPS", "FPS: Shows a large overlay with FPS and server tickrate\n\nFPS/Graph: Shows a large FPS overlay and performance graph" )
-	SetupButton( Hud_GetChild( menu, "SwitchShowPos" ), "Show Positional Information", "Player Position: Shows position, angle and velocity from the player model\n\nCamera Position: Shows position, angle and velocity from the player camera" )
+	SetupButton(
+		Hud_GetChild( menu, "SwitchShowFps" ),
+		"Show FPS",
+		"Shows an overlay with FPS and server tickrate\n\n`1Top-right: `0Displays the FPS and server tickrate in the Top-right hand side of the screen\n\n`1Top-left: `0Displays the FPS and server tickrate in the Top-left hand side of the screen\n\n`1Server: `0Displays only the server tickrate\n\n`1Minimal: `0Displays a smaller FPS and tickrate display on the top left hand side of the screen"
+	)
+	SetupButton(
+		Hud_GetChild( menu, "SwitchShowFpsBig" ),
+		"Show Large FPS",
+		"`1FPS: `0Shows a large overlay with FPS and server tickrate\n\n`1FPS/Graph: `0Shows a large FPS overlay and performance graph"
+	)
+	SetupButton(
+		Hud_GetChild( menu, "SwitchShowPos" ),
+		"Show Positional Information",
+		"`1Player Position: `0Shows position, angle and velocity from the player model\n\n`1Camera Position: `0Shows position, angle and velocity from the player camera"
+	)
 
-	SetupButton( Hud_GetChild( menu, "SwitchEnableCheats" ), "Enable Cheats", "NOT LEADERBOARD LEGAL!\n\nSets the sv_cheats console variable.\nEnables use of host_timescale console command" )
-	SetupButton( Hud_GetChild( menu, "SwitchEnableMP" ), "Enable Multiplayer", "Enables or disables the multiplayer buttons in the main menu" )
+	SetupButton(
+		Hud_GetChild( menu, "SwitchEnableCheats" ),
+		"Enable Cheats",
+		"`2NOT LEADERBOARD LEGAL!\n\n`0Sets the sv_cheats console variable.\nEnables use of host_timescale console command"
+	)
+	SetupButton(
+		Hud_GetChild( menu, "SwitchEnableMP" ),
+		"Enable Multiplayer",
+		"Enables or disables the multiplayer buttons in the main menu"
+	)
 	
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
-	SetupButton( button, "Reset Helmets", "Reset every helmet collectible to be uncollected" )
+	SetupButton(
+		button,
+		"Reset Helmets",
+		"Reset every helmet collectible to be uncollected"
+	)
 	AddButtonEventHandler( button, UIE_CLICK, ResetHelmetsDialog )
 
 	button = Hud_GetChild( menu, "BtnUnlockLevels" )
-	SetupButton( button, "Unlock all Levels", "Unlocks all levels to be selectable from the menu" )
+	SetupButton(
+		button,
+		"Unlock all Levels",
+		"Unlocks all levels to be selectable from the menu"
+	)
 	AddButtonEventHandler( button, UIE_CLICK, UnlockLevelsDialog )
 
 	button = Hud_GetChild( menu, "BtnCKfix" )
-	SRMM_SetupButton(button, "Crouch Kick Fix: ", "Adds an 8 ms Buffer to your jump and crouch inputs.\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input", getSRMMsetting(SRMM_settings.CKfix) )
+	SRMM_SetupButton(button,
+		"Crouch Kick Fix",
+		"Adds an 8 ms Buffer to your jump and crouch inputs.\n\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input",
+		SRMM_getSetting(SRMM_settings.CKfix)
+	)
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
 
 	button = Hud_GetChild( menu, "BtnTASMode" )
-	SRMM_SetupButton( button, "TAS Mode: ", "NOT LEADERBOARD LEGAL!\n\nChanges your game settings to be TAS compatible\n- Disables load audio fade\n- Enables use of host_timescale", getSRMMsetting(SRMM_settings.TASmode) )
+	SRMM_SetupButton(
+		button,
+		"TAS Mode",
+		"`2NOT LEADERBOARD LEGAL!\n\n`0Changes your game settings to be TAS compatible\n\n- Disables load audio fade\n- Disables input prevention on saveload\n- Enables use of host_timescale",
+		SRMM_getSetting(SRMM_settings.TASmode)
+	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
@@ -63,9 +125,9 @@ void function InitExtrasMenu()
 }
 
 void function SRMM_buttonToggle(var button, int setting, string buttonLabel) {
-	toggleSRMMsetting(setting)
+	SRMM_toggleSetting(setting)
 	string settingLabel
-	if (getSRMMsetting(setting)) {
+	if (SRMM_getSetting(setting)) {
 		settingLabel = "Enabled"
 	} else {
 		settingLabel = "Disabled"
@@ -121,9 +183,9 @@ void function CKfixToggle(var button)
 
 void function TASModeToggle(var button)
 {
-	toggleSRMMsetting(SRMM_settings.TASmode)
+	SRMM_toggleSetting(SRMM_settings.TASmode)
 	string settingLabel
-	if (getSRMMsetting(SRMM_settings.TASmode)) {
+	if (SRMM_getSetting(SRMM_settings.TASmode)) {
 		EnableTASMode()
 		settingLabel = "Enabled"
 	} else {
@@ -153,13 +215,13 @@ void function DisableTASMode()
 	SetConVarInt("sv_cheats", 0)
 }
 
-void function OnOpenExtrasMenu()
+void function SRMM_OnOpenSettingsMenu()
 {
 	UI_SetPresentationType( ePresentationType.NO_MODELS )
 
 }
 
-void function OnCloseExtrasMenu()
+void function SRMM_OnCloseSettingsMenu()
 {
 	SavePlayerSettings()
 }
@@ -178,6 +240,7 @@ void function SRMM_SetupButton(var button, string buttonLabel, string descriptio
 	} else {
 		settingLabel = "Disabled"
 	}
+	buttonLabel += ": "
 	SetButtonRuiText(button, buttonLabel + settingLabel)
 	
 	file.buttonDescriptions[ button ] <- description
@@ -187,7 +250,7 @@ void function SRMM_SetupButton(var button, string buttonLabel, string descriptio
 void function Button_Focused( var button )
 {
 	string description = file.buttonDescriptions[ button ]
-	SetElementsTextByClassname( file.menu, "MenuItemDescriptionClass", description )
+	RuiSetString( Hud_GetRui( file.itemDescriptionBox ), "description", description )
 }
 
 void function FooterButton_Focused( var button )

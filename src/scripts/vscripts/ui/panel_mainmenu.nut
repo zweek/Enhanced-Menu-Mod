@@ -95,7 +95,7 @@ void function InitMainMenuPanel()
 		Hud_AddEventHandler( videoButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "VideoMenu" ) ) )
 	#endif
 	var srButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "Speedrunning")
-	AddButtonEventHandler( srButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ExtrasMenu" ) ) )
+	AddButtonEventHandler( srButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "SRMM_SettingsMenu" ) ) )
 
 	var spotlightLargeButton = Hud_GetChild( file.spotlightPanel, "SpotlightLarge" )
 	spotlightLargeButton.SetNavLeft( file.spButtons[0] )

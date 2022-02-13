@@ -73,7 +73,7 @@ void function ClSpHud_Init()
 	if ( IsLobby() )
 		return
 
-	thread SRInfoHUD_Init()
+	thread SRMM_InfoHUD_Init()
 	thread ClPilotSpeedometer_Init()
 	AddCallback_OnPlayerLifeStateChanged( CallbackUpdatePlayerStatusCounts )
 

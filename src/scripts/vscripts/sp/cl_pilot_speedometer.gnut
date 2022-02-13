@@ -17,7 +17,7 @@ void function ClPilotSpeedometer_Init()
 		file.useMetric = false
 	}
 
-	if (getSRMMsetting(SRMM_settings.enableSpeedometer)) {
+	if (SRMM_getSetting(SRMM_settings.enableSpeedometer)) {
 		AddCreatePilotCockpitCallback( CreatePilotSpeedometer )
 	} else return
 }

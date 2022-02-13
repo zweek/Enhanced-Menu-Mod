@@ -1,4 +1,4 @@
-resource/ui/menus/extras.menu
+resource/ui/menus/srmm_settings.menu
 {
 	menu
 	{
@@ -50,11 +50,12 @@ resource/ui/menus/extras.menu
 
 		LblMenuItemDescription
 		{
-			ControlName				Label
-			InheritProperties		OptionMenuTooltip
-			classname 				MenuItemDescriptionClass
+			ControlName				RuiPanel
 			xpos					975
-			ypos					168
+			ypos					158
+			tall					370
+			wide 					844
+			rui                     "ui/control_options_description.rpak"
 		}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,7 +225,7 @@ resource/ui/menus/extras.menu
 			InheritProperties		SwitchButton
 			style					DialogListButton
 			navUp					SwitchShowFpsBig
-			navDown					SwitchEnableCheats
+			navDown					BtnResetHelmets
 			ConVar					"cl_showpos"
 			list
 			{
@@ -240,13 +241,57 @@ resource/ui/menus/extras.menu
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		// Misc subheader
-		ImgMiscSubheaderBackground
+		// Actions subheader
+		ImgActionsSubheaderBackground
 		{
 			ControlName				ImagePanel
 			InheritProperties		SubheaderBackground
 			xpos					96
 			ypos					620
+		}
+		LblActionsSubheaderText
+		{
+			ControlName				Label
+			InheritProperties		SubheaderText
+			pin_to_sibling			ImgActionsSubheaderBackground
+			pin_corner_to_sibling	LEFT
+			pin_to_sibling_corner	LEFT
+			labelText				"Actions"
+		}
+
+		BtnResetHelmets
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			LblActionsSubheaderText
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					SwitchShowPos
+			navDown					BtnUnlockLevels
+		}
+
+		BtnUnlockLevels
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnResetHelmets
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnResetHelmets
+			navDown					SwitchEnableCheats
+		}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		// Misc subheader
+		ImgMiscSubheaderBackground
+		{
+			ControlName				ImagePanel
+			InheritProperties		SubheaderBackground
+			xpos					950
+			ypos					570
 		}
 		LblMiscSubheaderText
 		{
@@ -274,7 +319,7 @@ resource/ui/menus/extras.menu
 			}
 			tabPosition				1
 			ypos					1
-			navUp					SwitchShowPos
+			navUp					BtnUnlockLevels
 			navDown					SwitchEnableMP
 		}
 
@@ -318,50 +363,6 @@ resource/ui/menus/extras.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnCKfix
-			navDown					BtnResetHelmets
-		}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// Actions subheader
-		ImgActionsSubheaderBackground
-		{
-			ControlName				ImagePanel
-			InheritProperties		SubheaderBackground
-			xpos					950
-			ypos					480
-		}
-		LblActionsSubheaderText
-		{
-			ControlName				Label
-			InheritProperties		SubheaderText
-			pin_to_sibling			ImgActionsSubheaderBackground
-			pin_corner_to_sibling	LEFT
-			pin_to_sibling_corner	LEFT
-			labelText				"Actions"
-		}
-
-		BtnResetHelmets
-		{
-			ControlName				RuiButton
-			InheritProperties		WideButton
-			pin_to_sibling			LblActionsSubheaderText
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-			ypos					1
-			navUp					BtnTASMode
-			navDown					BtnUnlockLevels
-		}
-
-		BtnUnlockLevels
-		{
-			ControlName				RuiButton
-			InheritProperties		WideButton
-			pin_to_sibling			BtnResetHelmets
-			pin_corner_to_sibling	TOP_LEFT
-			pin_to_sibling_corner	BOTTOM_LEFT
-			ypos					1
-			navUp					BtnResetHelmets
 			navDown					SwitchBloomEnable
 		}
 

@@ -1,4 +1,4 @@
-global function SRInfoHUD_Init
+global function SRMM_InfoHUD_Init
 
 global struct InfoDisplay
 {
@@ -15,7 +15,7 @@ struct
     array<string> moddedVars = []
 } file
 
-void function SRInfoHUD_Init()
+void function SRMM_InfoHUD_Init()
 {
     RegisterInfo("sv_cheats")
     RegisterInfo("host_timescale")
@@ -25,16 +25,16 @@ void function SRInfoHUD_Init()
     {
         file.infoDisplays.append(CreateInfoDisplay(i))
     }
-    thread InfoHud_Thread()
+    thread SRMM_InfoHUD_Thread()
 }
 
-void function InfoHud_Thread()
+void function SRMM_InfoHUD_Thread()
 {
     while (true)
     {
         WaitFrame()
         // check for TAS mode & clear info display
-        if (getSRMMsetting(SRMM_settings.TASmode))
+        if (SRMM_getSetting(SRMM_settings.TASmode))
         {
             SetInfoName(file.infoDisplays[0], "TAS")
             for (int i = 1; i < displayLines; i++) {
@@ -71,12 +71,17 @@ void function SetInfoName(InfoDisplay display, string name)
 }
 
 void function SetHudPos(InfoDisplay display, int line) {
-    float pos = 0
-    if (GetConVarInt("cl_showpos") > 0) pos += 0.07
-    if (GetConVarInt("cl_showfps") > 1) pos += 0.02
+    float ypos = 0.0
+    float xpos = 0.0
+    float aspectRatio = GetScreenSize()[0] / GetScreenSize()[1]
+    
+    if (GetConVarInt("cl_showpos") > 0) ypos += 0.07
+    if (GetConVarInt("cl_showfps") > 1) ypos += 0.02
     // scale vertical position with screen size since cl_showpos scales badly
-    pos *= 3 - GetScreenSize()[1] / 540
-    RuiSetFloat2( display.infoTitle, "msgPos", <0.0, 0.05 * line + pos, 0.0> )
+    ypos *= 3 - GetScreenSize()[1] / 540
+    // scale horizontal position wth aspect ratio
+    xpos = -0.2 * (aspectRatio - 1.777)
+    RuiSetFloat2( display.infoTitle, "msgPos", <xpos, 0.05 * line + ypos, 0.0> )
 }
 
 InfoDisplay function CreateInfoDisplay(int line)
