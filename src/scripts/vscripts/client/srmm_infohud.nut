@@ -115,7 +115,7 @@ InfoDisplay function CreateUCKFInfoDisplay()
     InfoDisplay display
     var rui
     rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
-    RuiSetFloat2( rui, "msgPos", <0.265, 0.86, 0.0> )
+    RuiSetFloat2( rui, "msgPos", <0.15, 0.86, 0.0> )
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 35.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )

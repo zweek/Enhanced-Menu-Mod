@@ -9,7 +9,8 @@ global enum SRMM_settings {
     speedometerIncludeZ,
     speedometerFadeout,
     TASmode,
-    CKfix
+    CKfix,
+	practiceMode
 }
 
 bool function SRMM_getSetting(int i) {
