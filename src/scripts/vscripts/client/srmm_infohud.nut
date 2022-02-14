@@ -13,6 +13,7 @@ struct
     table<string, string> infoNames = {}
     array<string> displayInfos = []
     array<string> moddedVars = []
+    array<InfoDisplay> UCKF_infoDisplay
 } file
 
 void function SRMM_InfoHUD_Init()
@@ -25,6 +26,7 @@ void function SRMM_InfoHUD_Init()
     {
         file.infoDisplays.append(CreateInfoDisplay(i))
     }
+    file.UCKF_infoDisplay.append(CreateUCKFInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
 
@@ -62,6 +64,12 @@ void function SRMM_InfoHUD_Thread()
         {
             SetHudPos(file.infoDisplays[i], i)
         }
+
+        if (SRMM_getSetting(SRMM_settings.CKfix)) {
+            SetInfoName(file.UCKF_infoDisplay[0], "UCKF")
+        } else {
+            SetInfoName(file.UCKF_infoDisplay[0], "")
+        }
     }
 }
 
@@ -94,6 +102,22 @@ InfoDisplay function CreateInfoDisplay(int line)
     RuiSetFloat2( rui, "msgPos", <0.0, 0.05 * line, 0.0> )
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
+    RuiSetFloat( rui, "msgAlpha", 0.7 )
+    RuiSetFloat( rui, "thicken", 0.0 )
+    RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
+    display.infoTitle = rui
+
+    return display
+}
+
+InfoDisplay function CreateUCKFInfoDisplay()
+{
+    InfoDisplay display
+    var rui
+    rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
+    RuiSetFloat2( rui, "msgPos", <0.265, 0.86, 0.0> )
+    RuiSetString( rui, "msgText", "" )
+    RuiSetFloat( rui, "msgFontSize", 35.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
     RuiSetFloat( rui, "thicken", 0.0 )
     RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
