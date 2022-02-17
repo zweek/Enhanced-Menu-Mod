@@ -6,7 +6,7 @@
 
 This is a forked version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. I cut a few features that were not relevant for runners, and added a bunch more specifically for speedrunning to make runner's lives a bit easier.
 
-[contribute? :\]](https://github.com/zweek/TF2SR-Menu-Mod/blob/main/contribute.md)
+[contribute?](https://github.com/zweek/TF2SR-Menu-Mod/blob/main/contribute.md) :]
 
 # Features
 **Settings**
@@ -19,22 +19,25 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 * Show Player Position - `cl_showpos`
 * Cheats toggle - `sv_cheats`
 * Toggle to enable/disable multiplayer
+* Crouch Kick Fix <a title="Adds an 8 millisecond buffer to your crouch and jump inputs. If the second input occurs within 8 milliseconds after the first input, then both inputs are sent at the same time. Otherwise the first input is sent as normal after the 8 millisecond buffer.">(?)</a>
 * Button to Reset Helmets
 * Button to unlock all levels
-* Dedicated TAS mode
-* Demos
+* Dedicated TAS mode <a title="Changes console variables like cheats, input debounce and saveload audio fade to allow for easier TASing">(?)</a>
 
 **Bindings**
-* Binds for Individual Level & Full Game Resets
+* Reset binds
+  * Reset Helmets
+  * Reset for Any%
+  * Reset for All Helmets
+  * Reset for Individual Levels
 * Save/Load 3 Quicksaves
 * NCS Saves 1-9
 * NCS Helmet Saves 2 & 5
-* Demo Binds
 * `host_timescale` `5`, `0.2` & `0.05`
 
 **Other features**
 * Remove clutter from the main menu
-* Info Hud that shows `sv_cheats` and other ConVars or `TAS`
+* Info Hud that shows the state of certain console variables, TAS mode and UCKF
 * Separate releases for ENG and CHI text for the chinese version of the game
 * Removed crashes from Dev launch arguments `-dev +developer 1`
 
