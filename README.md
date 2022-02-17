@@ -19,10 +19,10 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 * Show Player Position - `cl_showpos`
 * Cheats toggle - `sv_cheats`
 * Toggle to enable/disable multiplayer
-* Crouch Kick Fix <a title="Adds an 8 millisecond buffer to your crouch and jump inputs. If the second input occurs within 8 milliseconds after the first input, then both inputs are sent at the same time. Otherwise the first input is sent as normal after the 8 millisecond buffer.">(?)</a>
+* Crouch Kick Fix <a href="" title="Adds an 8 millisecond buffer to your crouch and jump inputs. If the second input occurs within 8 milliseconds after the first input, then both inputs are sent at the same time. Otherwise the first input is sent as normal after the 8 millisecond buffer.">(?)</a>
 * Button to Reset Helmets
 * Button to unlock all levels
-* Dedicated TAS mode <a title="Changes console variables like cheats, input debounce and saveload audio fade to allow for easier TASing">(?)</a>
+* Dedicated TAS mode <a href="" title="Changes console variables like cheats, input debounce and saveload audio fade to allow for easier TASing">(?)</a>
 
 **Bindings**
 * Reset binds
