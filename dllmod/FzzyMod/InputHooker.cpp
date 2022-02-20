@@ -5,6 +5,7 @@
 #include <mutex>
 #include <string>
 #include <bitset>
+#include <cmath>
 
 using namespace std;
 
@@ -28,8 +29,7 @@ inline MH_STATUS MH_CreateHookApiEx(LPCWSTR pszModule, LPCSTR pszProcName, LPVOI
 	return MH_CreateHookApi(pszModule, pszProcName, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
 }
 
-InputHolder jumpInputHolder;
-InputHolder crouchInputHolder;
+int tasLurch[2];
 
 int jump[2];
 int crouch[2];
@@ -53,10 +53,15 @@ void findBinds() {
 	char crouchSearch[] = "+duck";
 	int crouchIndex = 0;
 
+	char tasLurchSearch[] = "tas_lurch";
+	int tasLurchIndex = 0;
+
 	jump[0] = 0;
 	jump[1] = 0;
 	crouch[0] = 0;
 	crouch[1] = 0;
+	tasLurch[0] = 0;
+	tasLurch[1] = 0;
 
 	for (int buttonCode = 0; buttonCode < BUTTON_CODE_COUNT; buttonCode++) {
 		int offset = buttonCode * 0x10;
@@ -64,6 +69,8 @@ void findBinds() {
 		if (ptr == 0) continue;
 
 		char* bound = (char*)(ptr);
+
+		// find jump binds
 		for (int i = 0; i < 100; i++) {
 			if (bound[i] == '\0' && i == sizeof(jumpSearch)) {
 				if (jumpIndex >= sizeof(jump)) break;
@@ -73,6 +80,8 @@ void findBinds() {
 			}
 			if (i >= sizeof(jumpSearch) || bound[i] != jumpSearch[i]) break;
 		}
+
+		// find crouch binds
 		for (int i = 0; i < 100; i++) {
 			if (bound[i] == '\0' && i == sizeof(crouchSearch)) {
 				if (crouchIndex >= sizeof(crouch)) break;
@@ -81,6 +90,17 @@ void findBinds() {
 				break;
 			}
 			if (i >= sizeof(crouchSearch) || bound[i] != crouchSearch[i]) break;
+		}
+
+		// find tas lurch binds
+		for (int i = 0; i < 100; i++) {
+			if (bound[i] == '\0' && i == sizeof(tasLurchSearch)) {
+				if (tasLurchIndex >= sizeof(tasLurch)) break;
+				tasLurch[tasLurchIndex] = s_pButtonCodeToVirtual[buttonCode];
+				tasLurchIndex++;
+				break;
+			}
+			if (i >= sizeof(tasLurchSearch) || bound[i] != tasLurchSearch[i]) break;
 		}
 	}
 
@@ -120,7 +140,53 @@ void findBinds() {
 //	}
 //}
 
+InputHolder jumpPressHolder;
+InputHolder jumpReleaseHolder;
+InputHolder crouchPressHolder;
+InputHolder crouchReleaseHolder;
+
 LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	if (jumpPressHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpPressHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			jumpPressHolder.waitingToSend = false;
+			hookedInputProc(jumpPressHolder.a, jumpPressHolder.hWnd, jumpPressHolder.uMsg, jumpPressHolder.wParam, jumpPressHolder.lParam);
+		}
+	}
+	if (jumpReleaseHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpReleaseHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			jumpReleaseHolder.waitingToSend = false;
+			hookedInputProc(jumpReleaseHolder.a, jumpReleaseHolder.hWnd, jumpReleaseHolder.uMsg, jumpReleaseHolder.wParam, jumpReleaseHolder.lParam);
+			cout << "send delayed release" << endl;
+		}
+	}
+
+	if (crouchPressHolder.waitingToSend) {
+		auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchPressHolder.timestamp;
+		long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
+
+		if (sinceCrouch > CROUCHKICK_BUFFERING) {
+			crouchPressHolder.waitingToSend = false;
+			hookedInputProc(crouchPressHolder.a, crouchPressHolder.hWnd, crouchPressHolder.uMsg, crouchPressHolder.wParam, crouchPressHolder.lParam);
+		}
+	}
+	if (crouchReleaseHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::high_resolution_clock::now() - crouchReleaseHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			crouchReleaseHolder.waitingToSend = false;
+			hookedInputProc(crouchReleaseHolder.a, crouchReleaseHolder.hWnd, crouchReleaseHolder.uMsg, crouchReleaseHolder.wParam, crouchReleaseHolder.lParam);
+			cout << "send delayed release" << endl;
+		}
+	}
+
 	WPARAM key = wParam;
 	if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONDBLCLK) key = VK_RBUTTON;
 	if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK) key = VK_LBUTTON;
@@ -134,6 +200,32 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 		}
 	}
 	switch (uMsg) {
+	case WM_KEYUP:
+		if ((key == jump[0] || key == jump[1]) && !jumpReleaseHolder.waitingToSend) {
+			jumpReleaseHolder.a = a;
+			jumpReleaseHolder.hWnd = hWnd;
+			jumpReleaseHolder.uMsg = uMsg;
+			jumpReleaseHolder.wParam = wParam;
+			jumpReleaseHolder.lParam = lParam;
+
+			jumpReleaseHolder.waitingToSend = true;
+			jumpReleaseHolder.timestamp = std::chrono::high_resolution_clock::now();
+
+			uMsg = WM_NULL;
+		}
+		if ((key == crouch[0] || key == crouch[1]) && !crouchReleaseHolder.waitingToSend) {
+			crouchReleaseHolder.a = a;
+			crouchReleaseHolder.hWnd = hWnd;
+			crouchReleaseHolder.uMsg = uMsg;
+			crouchReleaseHolder.wParam = wParam;
+			crouchReleaseHolder.lParam = lParam;
+
+			crouchReleaseHolder.waitingToSend = true;
+			crouchReleaseHolder.timestamp = std::chrono::high_resolution_clock::now();
+
+			uMsg = WM_NULL;
+		}
+		break;
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONDBLCLK:
 	case WM_LBUTTONDOWN:
@@ -143,48 +235,48 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 	case WM_KEYDOWN:
 		if (!(lParam & (1 << 30)))
 		{
-			if ((key == jump[0] || key == jump[1]) && !jumpInputHolder.waitingToPress) {
-				if (crouchInputHolder.waitingToPress) {
-					crouchInputHolder.waitingToPress = false;
-					auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchInputHolder.timestamp;
+			if ((key == jump[0] || key == jump[1]) && !jumpPressHolder.waitingToSend) {
+				if (crouchPressHolder.waitingToSend) {
+					crouchPressHolder.waitingToSend = false;
+					auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchPressHolder.timestamp;
 					long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
-					cout << "crouchkick: " << sinceCrouch / 1000.0 << endl;
+					cout << "crouchkick: " << sinceCrouch / 100.0 << endl;
 
 					//playSound();
-					hookedInputProc(crouchInputHolder.a, crouchInputHolder.hWnd, crouchInputHolder.uMsg, crouchInputHolder.wParam, crouchInputHolder.lParam);
+					hookedInputProc(crouchPressHolder.a, crouchPressHolder.hWnd, crouchPressHolder.uMsg, crouchPressHolder.wParam, crouchPressHolder.lParam);
 				}
 				else {
-					jumpInputHolder.a = a;
-					jumpInputHolder.hWnd = hWnd;
-					jumpInputHolder.uMsg = uMsg;
-					jumpInputHolder.wParam = wParam;
-					jumpInputHolder.lParam = lParam;
+					jumpPressHolder.a = a;
+					jumpPressHolder.hWnd = hWnd;
+					jumpPressHolder.uMsg = uMsg;
+					jumpPressHolder.wParam = wParam;
+					jumpPressHolder.lParam = lParam;
 
-					jumpInputHolder.waitingToPress = true;
-					jumpInputHolder.timestamp = std::chrono::high_resolution_clock::now();
+					jumpPressHolder.waitingToSend = true;
+					jumpPressHolder.timestamp = std::chrono::high_resolution_clock::now();
 
 					uMsg = WM_NULL;
 				}
 			}
-			if ((key == crouch[0] || key == crouch[1]) && !crouchInputHolder.waitingToPress) {
-				if (jumpInputHolder.waitingToPress) {
-					jumpInputHolder.waitingToPress = false;
-					auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpInputHolder.timestamp;
+			if ((key == crouch[0] || key == crouch[1]) && !crouchPressHolder.waitingToSend) {
+				if (jumpPressHolder.waitingToSend) {
+					jumpPressHolder.waitingToSend = false;
+					auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpPressHolder.timestamp;
 					long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
-					cout << "crouchkick: " << sinceJump / 1000.0 << endl;
+					cout << "crouchkick: " << sinceJump / 100.0 << endl;
 
 					//playSound();
-					hookedInputProc(jumpInputHolder.a, jumpInputHolder.hWnd, jumpInputHolder.uMsg, jumpInputHolder.wParam, jumpInputHolder.lParam);
+					hookedInputProc(jumpPressHolder.a, jumpPressHolder.hWnd, jumpPressHolder.uMsg, jumpPressHolder.wParam, jumpPressHolder.lParam);
 				}
 				else {
-					crouchInputHolder.a = a;
-					crouchInputHolder.hWnd = hWnd;
-					crouchInputHolder.uMsg = uMsg;
-					crouchInputHolder.wParam = wParam;
-					crouchInputHolder.lParam = lParam;
+					crouchPressHolder.a = a;
+					crouchPressHolder.hWnd = hWnd;
+					crouchPressHolder.uMsg = uMsg;
+					crouchPressHolder.wParam = wParam;
+					crouchPressHolder.lParam = lParam;
 
-					crouchInputHolder.waitingToPress = true;
-					crouchInputHolder.timestamp = std::chrono::high_resolution_clock::now();
+					crouchPressHolder.waitingToSend = true;
+					crouchPressHolder.timestamp = std::chrono::high_resolution_clock::now();
 
 					uMsg = WM_NULL;
 				}
@@ -220,154 +312,191 @@ void __fastcall detourUpdateMouseButtonState(__int64 a, UINT nButtonMask, int db
 		}
 		if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4) {
 			if (key == jump[0] && bDown) {
-				if (jumpInputHolder.waitingToPress) nButtonMask = nButtonMask & ~(1 << i);
+				if (jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
 			}
 			if (key == jump[1] && bDown) {
-				if (jumpInputHolder.waitingToPress) nButtonMask = nButtonMask & ~(1 << i);
+				if (jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
 			}
 			if (key == crouch[0] && bDown) {
-				if (crouchInputHolder.waitingToPress) nButtonMask = nButtonMask & ~(1 << i);
+				if (crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
 			}
 			if (key == crouch[1] && bDown) {
-				if (crouchInputHolder.waitingToPress) nButtonMask = nButtonMask & ~(1 << i);
+				if (crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
 			}
 		}
 	}
 	return hookedUpdateMouseButtonState(a, nButtonMask, dblClickCode);
 }
 
-ControllerInputHolder controllerJumpInputHolder;
-ControllerInputHolder controllerCrouchInputHolder;
+ControllerInputHolder controllerJumpPressHolder;
+ControllerInputHolder controllerCrouchPressHolder;
+ControllerInputHolder controllerJumpReleaseHolder;
+ControllerInputHolder controllerCrouchReleaseHolder;
 
-void processXInput(XINPUT_STATE* pState, int i, bool jump, bool* restore) {
-	bool bDown = (pState->Gamepad.wButtons & (1 << i)) != 0;
-	if (jump) {
-		if (!controllerJumpInputHolder.isPressed && bDown) {
-			if (controllerCrouchInputHolder.waitingToPress) {
-				controllerCrouchInputHolder.waitingToPress = false;
-				*restore = true;
-				//playSound();
-			}
-			else {
-				controllerJumpInputHolder.waitingToPress = true;
-				controllerJumpInputHolder.timestamp = std::chrono::high_resolution_clock::now();
-			}
-		}
+bool controllerJumpWasPressed;
+bool controllerCrouchWasPressed;
 
-		if (controllerJumpInputHolder.waitingToPress) {
-			auto jumpElapsed = std::chrono::high_resolution_clock::now() - controllerJumpInputHolder.timestamp;
-			long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
-			if (sinceJump > CROUCHKICK_BUFFERING) {
-				controllerJumpInputHolder.waitingToPress = false;
-			}
-			else {
-				pState->Gamepad.wButtons = pState->Gamepad.wButtons & ~(1 << i);
-			}
-		}
-
-		controllerJumpInputHolder.isPressed = bDown;
-	}
-	else {
-		if (!controllerCrouchInputHolder.isPressed && bDown) {
-			if (controllerJumpInputHolder.waitingToPress) {
-				controllerJumpInputHolder.waitingToPress = false;
-				*restore = true;
-				//playSound();
-			}
-			else {
-				controllerCrouchInputHolder.waitingToPress = true;
-				controllerCrouchInputHolder.timestamp = std::chrono::high_resolution_clock::now();
-			}
-		}
-
-		if (controllerCrouchInputHolder.waitingToPress) {
-			auto crouchElapsed = std::chrono::high_resolution_clock::now() - controllerCrouchInputHolder.timestamp;
-			long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
-			if (sinceCrouch > CROUCHKICK_BUFFERING) {
-				controllerCrouchInputHolder.waitingToPress = false;
-			}
-			else {
-				pState->Gamepad.wButtons = pState->Gamepad.wButtons & ~(1 << i);
-			}
-		}
-
-		controllerCrouchInputHolder.isPressed = bDown;
-	}
-}
+auto flipTimestamp = std::chrono::high_resolution_clock::now();
+bool flip;
 
 DWORD WINAPI detourXInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
 	DWORD toReturn = hookedXInputGetState(dwUserIndex, pState);
 
-	//bitset<16> x(pState->Gamepad.wButtons);
-	//cout << x << endl;
 	WORD og = pState->Gamepad.wButtons;
-	bool restore = false;
+	// Convert wButtons to button code so i can match up binds
+	int jumpButtonIndex = 0;
+	int crouchButtonIndex = 0;
 	for (int i = 0; i < 14; i++) {
 		bool bDown = (pState->Gamepad.wButtons & (1 << i)) != 0;
 		switch (i) {
 		case 0:
-			if (controllerJump == KEY_XBUTTON_UP) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_UP) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_UP) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_UP) crouchButtonIndex = i;
 			break;
 		case 1:
-			if (controllerJump == KEY_XBUTTON_DOWN) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_DOWN) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_DOWN) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_DOWN) crouchButtonIndex = i;
 			break;
 		case 2:
-			if (controllerJump == KEY_XBUTTON_LEFT) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_LEFT) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_LEFT) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_LEFT) crouchButtonIndex = i;
 			break;
 		case 3:
-			if (controllerJump == KEY_XBUTTON_RIGHT) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_RIGHT) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_RIGHT) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_RIGHT) crouchButtonIndex = i;
 			break;
 		case 4:
-			if (controllerJump == KEY_XBUTTON_START) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_START) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_START) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_START) crouchButtonIndex = i;
 			break;
 		case 5:
-			if (controllerJump == KEY_XBUTTON_BACK) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_BACK) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_BACK) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_BACK) crouchButtonIndex = i;
 			break;
 		case 6:
-			if (controllerJump == KEY_XBUTTON_STICK1) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_STICK1) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_STICK1) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_STICK1) crouchButtonIndex = i;
 			break;
 		case 7:
-			if (controllerJump == KEY_XBUTTON_STICK2) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_STICK2) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_STICK2) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_STICK2) crouchButtonIndex = i;
 			break;
 		case 8:
-			if (controllerJump == KEY_XBUTTON_LEFT_SHOULDER) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_LEFT_SHOULDER) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_LEFT_SHOULDER) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_LEFT_SHOULDER) crouchButtonIndex = i;
 			break;
 		case 9:
-			if (controllerJump == KEY_XBUTTON_RIGHT_SHOULDER) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_RIGHT_SHOULDER) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_RIGHT_SHOULDER) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_RIGHT_SHOULDER) crouchButtonIndex = i;
 			break;
 		case 10:
-			if (controllerJump == KEY_XBUTTON_A) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_A) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_A) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_A) crouchButtonIndex = i;
 			break;
 		case 11:
-			if (controllerJump == KEY_XBUTTON_B) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_B) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_B) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_B) crouchButtonIndex = i;
 			break;
 		case 12:
-			if (controllerJump == KEY_XBUTTON_X) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_X) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_X) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_X) crouchButtonIndex = i;
 			break;
 		case 13:
-			if (controllerJump == KEY_XBUTTON_Y) processXInput(pState, i, true, &restore);
-			if (controllerCrouch == KEY_XBUTTON_Y) processXInput(pState, i, false, &restore);
+			if (controllerJump == KEY_XBUTTON_Y) jumpButtonIndex = i;
+			if (controllerCrouch == KEY_XBUTTON_Y) crouchButtonIndex = i;
 			break;
 		}
 	}
 
-	if (restore) {
-		pState->Gamepad.wButtons = og;
+	// Handle controller jump/crouch buffering
+	bool jumpDown = (pState->Gamepad.wButtons & (1 << jumpButtonIndex)) != 0;
+	bool crouchDown = (pState->Gamepad.wButtons & (1 << crouchButtonIndex)) != 0;
+
+	// Jump Press
+	if (!controllerJumpWasPressed && jumpDown) {
+		if (controllerCrouchPressHolder.waitingToSend) {
+			controllerCrouchPressHolder.waitingToSend = false;
+			//playSound();
+			auto crouchElapsed = std::chrono::high_resolution_clock::now() - controllerCrouchPressHolder.timestamp;
+			long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
+			cout << "crouchkick: " << sinceCrouch / 1000.0 << endl;
+		}
+		else {
+			controllerJumpPressHolder.waitingToSend = true;
+			controllerJumpPressHolder.timestamp = std::chrono::high_resolution_clock::now();
+		}
 	}
+	// Jump Release
+	if (controllerJumpWasPressed && !jumpDown) {
+		controllerJumpReleaseHolder.waitingToSend = true;
+		controllerJumpReleaseHolder.timestamp = std::chrono::high_resolution_clock::now();
+	}
+
+	// Crouch Press
+	if (!controllerCrouchWasPressed && crouchDown) {
+		if (controllerJumpPressHolder.waitingToSend) {
+			controllerJumpPressHolder.waitingToSend = false;
+			//playSound();
+			auto jumpElapsed = std::chrono::high_resolution_clock::now() - controllerJumpPressHolder.timestamp;
+			long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+			cout << "crouchkick: " << sinceJump / 1000.0 << endl;
+		}
+		else {
+			controllerCrouchPressHolder.waitingToSend = true;
+			controllerCrouchPressHolder.timestamp = std::chrono::high_resolution_clock::now();
+		}
+	}
+	// Crouch Release
+	if (controllerCrouchWasPressed && !crouchDown) {
+		controllerCrouchReleaseHolder.waitingToSend = true;
+		controllerCrouchReleaseHolder.timestamp = std::chrono::high_resolution_clock::now();
+	}
+
+	if (controllerJumpReleaseHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::high_resolution_clock::now() - controllerJumpReleaseHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			controllerJumpReleaseHolder.waitingToSend = false;
+		}
+		else {
+			pState->Gamepad.wButtons = pState->Gamepad.wButtons | (1 << jumpButtonIndex);
+		}
+	}
+	if (controllerCrouchReleaseHolder.waitingToSend) {
+		auto crouchElapsed = std::chrono::high_resolution_clock::now() - controllerCrouchReleaseHolder.timestamp;
+		long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
+		if (sinceCrouch > CROUCHKICK_BUFFERING) {
+			controllerCrouchReleaseHolder.waitingToSend = false;
+		}
+		else {
+			pState->Gamepad.wButtons = pState->Gamepad.wButtons | (1 << crouchButtonIndex);
+		}
+	}
+
+	if (controllerJumpPressHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::high_resolution_clock::now() - controllerJumpPressHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			controllerJumpPressHolder.waitingToSend = false;
+		}
+		else {
+			pState->Gamepad.wButtons = pState->Gamepad.wButtons & ~(1 << jumpButtonIndex);
+		}
+	}
+	if (controllerCrouchPressHolder.waitingToSend) {
+		auto crouchElapsed = std::chrono::high_resolution_clock::now() - controllerCrouchPressHolder.timestamp;
+		long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
+		if (sinceCrouch > CROUCHKICK_BUFFERING) {
+			controllerCrouchPressHolder.waitingToSend = false;
+		}
+		else {
+			pState->Gamepad.wButtons = pState->Gamepad.wButtons & ~(1 << crouchButtonIndex);
+		}
+	}
+
+	controllerJumpWasPressed = jumpDown;
+	controllerCrouchWasPressed = crouchDown;
 
 	return toReturn;
 }
@@ -376,7 +505,10 @@ void hookedInputProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	hookedInputSystemProc(a, hWnd, uMsg, wParam, lParam);
 }
 
+bool allHooksSet;
+
 void setInputHooks() {
+	if (allHooksSet) return;
 	s_pVirtualKeyToButtonCode['0'] = KEY_0;
 	s_pVirtualKeyToButtonCode['1'] = KEY_1;
 	s_pVirtualKeyToButtonCode['2'] = KEY_2;
@@ -492,25 +624,33 @@ void setInputHooks() {
 	}
 
 	uintptr_t moduleBase = (uintptr_t)GetModuleHandleW(L"inputsystem.dll");
+	allHooksSet = true;
 
 	INPUTSYSTEMPROC inputSystemProc = INPUTSYSTEMPROC(moduleBase + 0x8B80);
-	if (MH_CreateHookEx(inputSystemProc, &detourInputSystemProc, &hookedInputSystemProc) != MH_OK) {
-		cout << "hook InputSystemProc failed" << endl;
+	DWORD inputSystemProcResult = MH_CreateHookEx(inputSystemProc, &detourInputSystemProc, &hookedInputSystemProc);
+	if (inputSystemProcResult != MH_OK && inputSystemProcResult != MH_ERROR_ALREADY_CREATED) {
+		cout << "hook InputSystemProc failed" << inputSystemProcResult << endl;
+		allHooksSet = false;
 	}
 
 	UPDATEMOUSEBUTTONSTATE updateMouseButtonState = UPDATEMOUSEBUTTONSTATE(moduleBase + 0x8A20);
-	if (MH_CreateHookEx(updateMouseButtonState, &detourUpdateMouseButtonState, &hookedUpdateMouseButtonState) != MH_OK) {
-		cout << "hook updateMouseButtonState failed" << endl;
+	DWORD mouseStateResult = MH_CreateHookEx(updateMouseButtonState, &detourUpdateMouseButtonState, &hookedUpdateMouseButtonState);
+	if (mouseStateResult != MH_OK && mouseStateResult != MH_ERROR_ALREADY_CREATED) {
+		cout << "hook updateMouseButtonState failed" << mouseStateResult << endl;
+		allHooksSet = false;
 	}
 
-	if (MH_CreateHookApiEx(L"xinput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState) != MH_OK) {
-		cout << "hook XInputGetState failed" << endl;
+	DWORD xinputResult = MH_CreateHookApiEx(L"XInput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState);
+	if (xinputResult != MH_OK && xinputResult != MH_ERROR_ALREADY_CREATED) {
+		cout << "hook XInputGetState failed: " << xinputResult << endl;
+		allHooksSet = false;
 	}
 }
 
 bool hooksEnabled = false;
 
 void enableInputHooks() {
+	if (!allHooksSet) return;
 	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
 	{
 		std::cout << "enabling hooks failed" << std::endl;
@@ -521,7 +661,7 @@ void enableInputHooks() {
 }
 
 void disableInputHooks() {
-
+	if (!allHooksSet) return;
 	if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
 	{
 		std::cout << "disabling hooks failed" << std::endl;

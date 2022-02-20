@@ -10,15 +10,14 @@ struct InputHolder {
 	WPARAM wParam;
 	LPARAM lParam;
 
-	bool waitingToPress;
+	bool waitingToSend;
 	std::chrono::steady_clock::time_point timestamp;
 };
 
 struct ControllerInputHolder {
 	int buttonIndex;
 
-	bool isPressed;
-	bool waitingToPress;
+	bool waitingToSend;
 	std::chrono::steady_clock::time_point timestamp;
 };
 
@@ -267,17 +266,12 @@ enum ButtonCode_t
 
 const long long CROUCHKICK_BUFFERING = 8 * 1000;
 
-extern InputHolder jumpInputHolder;
-extern InputHolder crouchInputHolder;
-
-extern ControllerInputHolder controllerJumpInputHolder;
-extern ControllerInputHolder controllerCrouchInputHolder;
-
 void hookedInputProc(__int64, HWND, UINT, WPARAM, LPARAM);
 
 void findBinds();
 
 extern bool hooksEnabled;
+extern bool allHooksSet;
 
 void setInputHooks();
 void enableInputHooks();

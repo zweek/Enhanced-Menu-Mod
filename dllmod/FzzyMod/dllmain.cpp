@@ -74,7 +74,7 @@ void ModSpeedometer() {
 	uintptr_t position2 = speedometer + 0x8C;
 
 	// Include/Exclude Z Axis
-	// check if bit at pos 1 is 0
+	// check if bit at pos 1 is 1
 	if (!GetSRMMsetting(1)) {
 		// overwrite to only include x&y axis
 		WriteBytes((void*)position1, 0x12, 1);
@@ -87,7 +87,7 @@ void ModSpeedometer() {
 	}
 
 	// Enable/Disable Fadeout
-	// check if bit at pos 2 is 0
+	// check if bit at pos 2 is 1
 	if (!GetSRMMsetting(2)) {
 		// disable fadeout
 		WriteBytes((void*)alwaysShow, 0x90, 2);
@@ -107,52 +107,27 @@ void ModAltTab() {
 }
 
 DWORD WINAPI Thread(HMODULE hModule) {
-	Sleep(10000);
-	//AllocConsole();
-	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	Sleep(7000);
+	AllocConsole();
+	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
-	setInputHooks();
-
-	auto periodic = std::chrono::high_resolution_clock::now();
 
 	while (true) {
-		Sleep(1);
+		Sleep(1000);
 
-		long long sincePeriodic = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - periodic).count();
-		if (sincePeriodic > 1000 * 1000) {
-			periodic = std::chrono::high_resolution_clock::now();
+		setInputHooks();
 
-			if (!hooksEnabled && GetSRMMsetting(4)) {
-				enableInputHooks();
-			}
-			if (hooksEnabled && !GetSRMMsetting(4)) {
-				disableInputHooks();
-			}
+		ModSpeedometer();
 
-			ModSpeedometer();
-			findBinds();
+		if (!hooksEnabled && GetSRMMsetting(4)) {
+			enableInputHooks();
+		}
+		if (hooksEnabled && !GetSRMMsetting(4)) {
+			disableInputHooks();
 		}
 
-		if (jumpInputHolder.waitingToPress) {
-			auto jumpElapsed = std::chrono::high_resolution_clock::now() - jumpInputHolder.timestamp;
-			long long sinceJump = std::chrono::duration_cast<std::chrono::microseconds>(jumpElapsed).count();
-
-			if (sinceJump > CROUCHKICK_BUFFERING) {
-				jumpInputHolder.waitingToPress = false;
-				hookedInputProc(jumpInputHolder.a, jumpInputHolder.hWnd, jumpInputHolder.uMsg, jumpInputHolder.wParam, jumpInputHolder.lParam);
-			}
-		}
-
-		if (crouchInputHolder.waitingToPress) {
-			auto crouchElapsed = std::chrono::high_resolution_clock::now() - crouchInputHolder.timestamp;
-			long long sinceCrouch = std::chrono::duration_cast<std::chrono::microseconds>(crouchElapsed).count();
-
-			if (sinceCrouch > CROUCHKICK_BUFFERING) {
-				crouchInputHolder.waitingToPress = false;
-				hookedInputProc(crouchInputHolder.a, crouchInputHolder.hWnd, crouchInputHolder.uMsg, crouchInputHolder.wParam, crouchInputHolder.lParam);
-			}
-		}
+		findBinds();
 	}
 	return 0;
 }
