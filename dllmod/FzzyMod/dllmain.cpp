@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <chrono>
 #include <thread>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 #include "InputHooker.h"
 #include "include/MinHook.h"
@@ -99,19 +99,21 @@ void ModSpeedometer() {
 	}
 }
 
-void ModAltTab() {
-	uintptr_t base = (uintptr_t)GetModuleHandle("engine.dll");
-	uintptr_t target = base + 0x1C8C17;
-
-	WriteBytes((void*)target, 0x75, 1);
-}
+//void ModAltTab() {
+//	uintptr_t base = (uintptr_t)GetModuleHandle("engine.dll");
+//	uintptr_t target = base + 0x1C8C17;
+//
+//	WriteBytes((void*)target, 0x75, 1);
+//}
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(7000);
-	AllocConsole();
-	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	//AllocConsole();
+	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
+
+	//ModAltTab();
 
 	while (true) {
 		Sleep(1000);

@@ -29,7 +29,7 @@ inline MH_STATUS MH_CreateHookApiEx(LPCWSTR pszModule, LPCSTR pszProcName, LPVOI
 	return MH_CreateHookApi(pszModule, pszProcName, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
 }
 
-int tasLurch[2];
+//int tasLurch[2];
 
 int jump[2];
 int crouch[2];
@@ -60,8 +60,8 @@ void findBinds() {
 	jump[1] = 0;
 	crouch[0] = 0;
 	crouch[1] = 0;
-	tasLurch[0] = 0;
-	tasLurch[1] = 0;
+	//tasLurch[0] = 0;
+	//tasLurch[1] = 0;
 
 	for (int buttonCode = 0; buttonCode < BUTTON_CODE_COUNT; buttonCode++) {
 		int offset = buttonCode * 0x10;
@@ -93,7 +93,7 @@ void findBinds() {
 		}
 
 		// find tas lurch binds
-		for (int i = 0; i < 100; i++) {
+		/*for (int i = 0; i < 100; i++) {
 			if (bound[i] == '\0' && i == sizeof(tasLurchSearch)) {
 				if (tasLurchIndex >= sizeof(tasLurch)) break;
 				tasLurch[tasLurchIndex] = s_pButtonCodeToVirtual[buttonCode];
@@ -101,7 +101,7 @@ void findBinds() {
 				break;
 			}
 			if (i >= sizeof(tasLurchSearch) || bound[i] != tasLurchSearch[i]) break;
-		}
+		}*/
 	}
 
 	controllerJump = 0;
@@ -145,6 +145,9 @@ InputHolder jumpReleaseHolder;
 InputHolder crouchPressHolder;
 InputHolder crouchReleaseHolder;
 
+int icount = 0;
+auto itime = std::chrono::high_resolution_clock::now();
+
 LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (jumpPressHolder.waitingToSend) {
@@ -163,7 +166,6 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 		if (sinceJump > CROUCHKICK_BUFFERING) {
 			jumpReleaseHolder.waitingToSend = false;
 			hookedInputProc(jumpReleaseHolder.a, jumpReleaseHolder.hWnd, jumpReleaseHolder.uMsg, jumpReleaseHolder.wParam, jumpReleaseHolder.lParam);
-			cout << "send delayed release" << endl;
 		}
 	}
 
@@ -183,9 +185,14 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 		if (sinceJump > CROUCHKICK_BUFFERING) {
 			crouchReleaseHolder.waitingToSend = false;
 			hookedInputProc(crouchReleaseHolder.a, crouchReleaseHolder.hWnd, crouchReleaseHolder.uMsg, crouchReleaseHolder.wParam, crouchReleaseHolder.lParam);
-			cout << "send delayed release" << endl;
 		}
 	}
+	
+	int clFrames = *(int*)(*(uintptr_t*)((uintptr_t)GetModuleHandle("materialsystem_dx11.dll") + 0x1A9F4A8) + 0x58C);
+	bool inLoadingScreen = *(bool*)((uintptr_t)GetModuleHandle("client.dll") + 0xB38C5C);
+	int tickCount = *(int*)((uintptr_t)GetModuleHandle("engine.dll") + 0x765A24);
+	int paused = *(int*)((uintptr_t)GetModuleHandle("engine.dll") + 0x12A53D48);
+	if (clFrames <= 0 || inLoadingScreen || tickCount <= 23 || paused != 2) return hookedInputSystemProc(a, hWnd, uMsg, wParam, lParam);
 
 	WPARAM key = wParam;
 	if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONDBLCLK) key = VK_RBUTTON;
@@ -200,6 +207,9 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 		}
 	}
 	switch (uMsg) {
+	case WM_RBUTTONUP:
+	case WM_LBUTTONUP:
+	case WM_XBUTTONUP:
 	case WM_KEYUP:
 		if ((key == jump[0] || key == jump[1]) && !jumpReleaseHolder.waitingToSend) {
 			jumpReleaseHolder.a = a;
@@ -311,17 +321,21 @@ void __fastcall detourUpdateMouseButtonState(__int64 a, UINT nButtonMask, int db
 			break;
 		}
 		if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4) {
-			if (key == jump[0] && bDown) {
-				if (jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+			if (key == jump[0]) {
+				if (bDown && jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+				if (!bDown && jumpReleaseHolder.waitingToSend) nButtonMask = nButtonMask | (1 << i);
 			}
-			if (key == jump[1] && bDown) {
-				if (jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+			if (key == jump[1]) {
+				if (bDown && jumpPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+				if (!bDown && jumpReleaseHolder.waitingToSend) nButtonMask = nButtonMask | (1 << i);
 			}
-			if (key == crouch[0] && bDown) {
-				if (crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+			if (key == crouch[0]) {
+				if (bDown && crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+				if (!bDown && crouchReleaseHolder.waitingToSend) nButtonMask = nButtonMask | (1 << i);
 			}
-			if (key == crouch[1] && bDown) {
-				if (crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+			if (key == crouch[1]) {
+				if (bDown && crouchPressHolder.waitingToSend) nButtonMask = nButtonMask & ~(1 << i);
+				if (!bDown && crouchReleaseHolder.waitingToSend) nButtonMask = nButtonMask | (1 << i);
 			}
 		}
 	}
@@ -342,6 +356,45 @@ bool flip;
 DWORD WINAPI detourXInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
 	DWORD toReturn = hookedXInputGetState(dwUserIndex, pState);
+
+	/*float velX = *(float*)((uintptr_t)GetModuleHandle("client.dll") + 0xB34C2C);
+	float velY = *(float*)((uintptr_t)GetModuleHandle("client.dll") + 0xB34C30);
+
+	float yaw = *(float*)((uintptr_t)GetModuleHandle("engine.dll") + 0x7B6668);
+
+	float toDegrees = (180.0f / 3.14159265f);
+	float toRadians = (3.14159265f / 180.0f);
+	float magnitude = sqrt(pow(velX, 2) + pow(velY, 2));
+
+	auto elapsed = std::chrono::high_resolution_clock::now() - flipTimestamp;
+	long long since = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+	if (since > 100 * 1000) {
+		flip = !flip;
+	}
+
+	if (magnitude > 100) {
+		float airSpeed = 50;
+		float velDegrees = atan2f(velY, velX) * toDegrees;
+		float velDirection = yaw - velDegrees;
+
+		float rightx = sinf((velDirection + 90) * toRadians);
+		float righty = cosf((velDirection + 90) * toRadians);
+
+		float offsetx = velX + rightx * airSpeed;
+		float offsety = velY + righty * airSpeed;
+
+		float angle = atan2f(offsety, offsetx) - atan2f(velY, velX);
+		float offsetAngle = atan2f(righty, rightx) - angle;
+		cout << offsetAngle << endl;
+
+		short tx = cosf(offsetAngle * toRadians) * 32767.0f;
+		short ty = sinf(offsetAngle * toRadians) * 32767.0f;
+		//cout << tx << " : " << ty << endl;
+
+		pState->Gamepad.sThumbLX = tx;
+		pState->Gamepad.sThumbLY = ty;
+	}*/
+	//}
 
 	WORD og = pState->Gamepad.wButtons;
 	// Convert wButtons to button code so i can match up binds
