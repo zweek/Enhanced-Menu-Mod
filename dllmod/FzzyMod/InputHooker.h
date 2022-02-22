@@ -21,6 +21,16 @@ struct ControllerInputHolder {
 	std::chrono::steady_clock::time_point timestamp;
 };
 
+enum SRMM_settings
+{
+	SRMM_ENABLE_SPEEDOMETER,
+	SRMM_SPEEDOMETER_INCLUDE_Z,
+	SRMM_SPEEDOMETER_FADEOUT,
+	SRMM_TAS_MODE,
+	SRMM_CK_FIX,
+	SRMM_ENABLE_CONSOLE,
+};
+
 enum
 {
 	MAX_JOYSTICKS = 1,
@@ -264,7 +274,12 @@ enum ButtonCode_t
 	KEY_XSTICK2_UP,								// VAXIS NEGATIVE
 };
 
-const long long CROUCHKICK_BUFFERING = 8 * 1000;
+//struct handle_data {
+//	unsigned long process_id;
+//	HWND best_handle;
+//};
+
+const long long CROUCHKICK_BUFFERING = 8;
 
 void hookedInputProc(__int64, HWND, UINT, WPARAM, LPARAM);
 

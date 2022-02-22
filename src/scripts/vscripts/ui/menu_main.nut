@@ -21,7 +21,7 @@ struct
 
 void function InitMainMenu()
 {
-	ClientCommand("setinfo srmmVersion \"SRMM v2.0.1\"")
+	ClientCommand("setinfo srmmVersion \"SRMM v2.1\"")
 	// helmet reset
 	ClientCommand("alias hr \"sp_unlocks_level_0 0;sp_unlocks_level_1 0;sp_unlocks_level_2 0;sp_unlocks_level_3 0;sp_unlocks_level_4 0;sp_unlocks_level_5 0;sp_unlocks_level_6 0;sp_unlocks_level_7 0;sp_unlocks_level_8 0;sp_unlocks_level_9 0;sp_unlocks_level_10 0;sp_unlocks_level_11 0;sp_unlocks_level_12 0;sp_unlocks_level_13 0;sp_unlocks_level_14 0\"")
 	// full game reset

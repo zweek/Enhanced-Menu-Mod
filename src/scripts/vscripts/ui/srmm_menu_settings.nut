@@ -105,6 +105,15 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
+	button = Hud_GetChild( menu, "BtnEnableConsole" )
+	SRMM_SetupButton(
+		button,
+		"Console",
+		"Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
+		SRMM_getSetting(SRMM_settings.enableConsole)
+	)
+	AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )
+
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton(
@@ -141,6 +150,11 @@ void function SRMM_InitSettingsMenu()
 void function SpeedometerEnableToggle(var button)
 {
 	SRMM_buttonToggle(button, SRMM_settings.enableSpeedometer, "Speedometer")
+	//if (SRMM_getSetting(SRMM_settings.enableSpeedometer)) {
+	//	CreatePilotSpeedometer();
+	//} else {
+	//	DestroyPilotSpeedometer();
+	//}
 }
 
 void function SpeedometerIncludeZToggle(var button)
@@ -215,6 +229,10 @@ void function DisableTASMode()
 	SetConVarFloat("miles_map_begin_silence_time", 0.5)
 	SetConVarFloat("player_respawnInputDebounceDuration", 0.5)
 	SetConVarInt("sv_cheats", 0)
+}
+
+void function ConsoleToggle(var button) {
+	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
 }
 
 

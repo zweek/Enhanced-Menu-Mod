@@ -13,7 +13,7 @@ struct
     table<string, string> infoNames = {}
     array<string> displayInfos = []
     array<string> moddedVars = []
-    array<InfoDisplay> UCKF_infoDisplay
+    array<InfoDisplay> CKF_infoDisplay
 } file
 
 void function SRMM_InfoHUD_Init()
@@ -21,12 +21,13 @@ void function SRMM_InfoHUD_Init()
     RegisterInfo("sv_cheats")
     RegisterInfo("host_timescale")
     RegisterInfo("player_respawnInputDebounceDuration")
+    RegisterInfo("console")
 
     for (int i = 0; i < displayLines; i++)
     {
         file.infoDisplays.append(CreateInfoDisplay(i))
     }
-    file.UCKF_infoDisplay.append(CreateUCKFInfoDisplay())
+    file.CKF_infoDisplay.append(CreateUCKFInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
 
@@ -47,12 +48,12 @@ void function SRMM_InfoHUD_Thread()
         {
             GetModdedVars()
             int slot = 0
-            foreach(string m in file.moddedVars){
+            foreach(string m in file.moddedVars) {
                 if (!file.displayInfos.contains(m) || slot >= displayLines) {
                     continue;
                 }
                 // display names and values of modded ConVars
-                SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
+                SetInfoName(file.infoDisplays[slot], file.infoNames[m])
                 slot++
             }
             for (int i = displayLines - 1; i >= slot; i--)
@@ -66,9 +67,9 @@ void function SRMM_InfoHUD_Thread()
         }
 
         if (SRMM_getSetting(SRMM_settings.CKfix)) {
-            SetInfoName(file.UCKF_infoDisplay[0], "UCKF")
+            SetInfoName(file.CKF_infoDisplay[0], "CKF")
         } else {
-            SetInfoName(file.UCKF_infoDisplay[0], "")
+            SetInfoName(file.CKF_infoDisplay[0], "")
         }
     }
 }
@@ -139,6 +140,7 @@ void function GetModdedVars()
     AddVarIfModded("sv_cheats", 0)
     AddVarIfModded("host_timescale", 1)
     AddVarIfModded("player_respawnInputDebounceDuration", 0.5)
+    if (SRMM_getSetting(SRMM_settings.enableConsole)) file.moddedVars.append("console")
 }
 
 void function AddVarIfModded(string ConVar, float defautValue) {

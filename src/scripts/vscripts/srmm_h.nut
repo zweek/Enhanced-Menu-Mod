@@ -3,13 +3,14 @@ global function SRMM_setSetting
 global function SRMM_toggleSetting
 
 // aliases for srmm settings
-// enableSpeedometer = 1, speedometerIncludeZ = 2, ...
+// enableSpeedometer = 0, speedometerIncludeZ = 1, ...
 global enum SRMM_settings {
     enableSpeedometer,
     speedometerIncludeZ,
     speedometerFadeout,
     TASmode,
     CKfix,
+	enableConsole
 }
 
 bool function SRMM_getSetting(int i) {
