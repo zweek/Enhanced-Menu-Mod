@@ -135,13 +135,13 @@ void findBinds() {
 	}
 }
 
-void playSound() {
-	struct stat buffer;
-	std::string name = "crouchkick.wav";
-	if (stat(name.c_str(), &buffer) == 0) {
-		PlaySound("crouchkick.wav", NULL, SND_ASYNC);
-	}
-}
+//void playSound() {
+//	struct stat buffer;
+//	std::string name = "crouchkick.wav";
+//	if (stat(name.c_str(), &buffer) == 0) {
+//		PlaySound("crouchkick.wav", NULL, SND_ASYNC);
+//	}
+//}
 
 InputHolder jumpPressHolder;
 InputHolder jumpReleaseHolder;
@@ -279,7 +279,7 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 					long long sinceCrouch = std::chrono::duration_cast<std::chrono::milliseconds>(crouchElapsed).count();
 					cout << "crouchkick: " << sinceCrouch << "ms CROUCH IS EARLY" << endl;
 
-					playSound();
+					//playSound();
 					hookedInputProc(crouchPressHolder.a, crouchPressHolder.hWnd, crouchPressHolder.uMsg, crouchPressHolder.wParam, crouchPressHolder.lParam);
 				}
 				else {
@@ -302,7 +302,7 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 					long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
 					cout << "crouchkick: " << sinceJump << "ms JUMP IS EARLY" << endl;
 
-					playSound();
+					//playSound();
 					hookedInputProc(jumpPressHolder.a, jumpPressHolder.hWnd, jumpPressHolder.uMsg, jumpPressHolder.wParam, jumpPressHolder.lParam);
 				}
 				else {
@@ -497,7 +497,7 @@ DWORD WINAPI detourXInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	if (!controllerJumpWasPressed && jumpDown) {
 		if (controllerCrouchPressHolder.waitingToSend) {
 			controllerCrouchPressHolder.waitingToSend = false;
-			playSound();
+			//playSound();
 			auto crouchElapsed = std::chrono::steady_clock::now() - controllerCrouchPressHolder.timestamp;
 			long long sinceCrouch = std::chrono::duration_cast<std::chrono::milliseconds>(crouchElapsed).count();
 			cout << "crouchkick: " << sinceCrouch << endl;
@@ -517,7 +517,7 @@ DWORD WINAPI detourXInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	if (!controllerCrouchWasPressed && crouchDown) {
 		if (controllerJumpPressHolder.waitingToSend) {
 			controllerJumpPressHolder.waitingToSend = false;
-			playSound();
+			//playSound();
 			auto jumpElapsed = std::chrono::steady_clock::now() - controllerJumpPressHolder.timestamp;
 			long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
 			cout << "crouchkick: " << sinceJump << endl;

@@ -109,7 +109,7 @@ void function SRMM_InitSettingsMenu()
 	SRMM_SetupButton(
 		button,
 		"Console",
-		"Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
+		"`2Only for testing and debug purposes!\n\n`0Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
 		SRMM_getSetting(SRMM_settings.enableConsole)
 	)
 	AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )

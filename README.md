@@ -37,7 +37,7 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 
 **Other features**
 * Remove clutter from the main menu
-* Info Hud that shows the state of certain console variables, TAS mode and UCKF
+* Info Hud that shows the state of certain console variables, TAS mode and CKF
 * Separate releases for ENG and CHI text for the chinese version of the game
 * Removed crashes from Dev launch arguments `-dev +developer 1`
 

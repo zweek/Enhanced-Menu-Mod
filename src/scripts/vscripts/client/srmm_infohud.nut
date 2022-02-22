@@ -27,7 +27,7 @@ void function SRMM_InfoHUD_Init()
     {
         file.infoDisplays.append(CreateInfoDisplay(i))
     }
-    file.CKF_infoDisplay.append(CreateUCKFInfoDisplay())
+    file.CKF_infoDisplay.append(CreateCKFInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
 
@@ -111,7 +111,7 @@ InfoDisplay function CreateInfoDisplay(int line)
     return display
 }
 
-InfoDisplay function CreateUCKFInfoDisplay()
+InfoDisplay function CreateCKFInfoDisplay()
 {
     InfoDisplay display
     var rui
