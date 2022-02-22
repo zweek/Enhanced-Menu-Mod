@@ -1,17 +1,15 @@
 @echo off
+
+mkdir export\vpk
+copy dir\englishclient_frontend.bsp.pak000_dir.vpk export\vpk
+pushd export\vpk
+RSPNVPK englishclient_frontend.bsp.pak000_dir.vpk -s -d ..\..\src
+
 if "%1"=="" (
-    mkdir export\vpk
-    copy dir\englishclient_frontend.bsp.pak000_dir.vpk export\vpk
-    pushd export\vpk
-    RSPNVPK englishclient_frontend.bsp.pak000_dir.vpk -s -d ..\..\src
     popd
 )
 
 if "%1"=="test" (
-    mkdir export\vpk
-    copy dir\englishclient_frontend.bsp.pak000_dir.vpk export\vpk
-    pushd export\vpk
-    RSPNVPK englishclient_frontend.bsp.pak000_dir.vpk -s -d ..\..\src
     cd ..
     xcopy vpk "C:\Program Files (x86)\Steam\steamapps\common\Titanfall2\vpk" /y
     popd
@@ -19,10 +17,6 @@ if "%1"=="test" (
 )
 
 if "%1"=="release" (
-    mkdir export\vpk
-    copy dir\englishclient_frontend.bsp.pak000_dir.vpk export\vpk
-    pushd export\vpk
-    RSPNVPK englishclient_frontend.bsp.pak000_dir.vpk -s -d ..\..\src
     cd ..
     7z a SRMM-v%2-ENG.zip vpk midimap.dll
     cd ..\src\resource
