@@ -4,16 +4,22 @@
 
 ## Things you'll need
 
-* [RSPNVPK](https://github.com/taskinoz/RSPNVPK) (to build the .vpk files)
-* [Visual Studio](https://visualstudio.microsoft.com/downloads/) (to build the .dll file)
+* [RSPNVPK](https://github.com/taskinoz/RSPNVPK) (to build the `.vpk` files)
+* [Visual Studio](https://visualstudio.microsoft.com/downloads/) (to build the `.dll` file)
+* [7-zip](https://www.7-zip.org/) (Optional, to make release builds through the batch files)
 
 ## Setting up the VPK build
 
-Once you have RSPNVPK installed somewhere, I'd recommend adding that folder to your path so that the command line can access the `RSPNVPK.exe` from anywhere and you can simply run the .bat file to build the vpk's
+Once you have RSPNVPK installed somewhere, I'd recommend adding that folder to your PATH so that the command line can access the `RSPNVPK.exe` from anywhere and you can simply run the `.bat` file to build the vpk's
 
-Create a folder called `dir` in the main source code directory right next to `src` and `dllmod`. This is where you want to put the _dir.vpk file that you'll be repacking with the files located within `src`. In this case that file is `englishclient_frontend.bsp.pak000_dir.vpk`. If you have a vanilla install of Titanfall 2, you can just grab that file from your `Titanfall2/vpk` folder.
+Create a folder called `dir` in the main source code directory right next to `src` and `dllmod`. This is where you want to put the `_dir.vpk` file that you'll be repacking with the files located within `src`. In this case that file is `englishclient_frontend.bsp.pak000_dir.vpk`. If you have a vanilla install of Titanfall 2, you can just grab that file from your `Titanfall2/vpk` folder.
 
-When running the .bat file, it will create a new `export/vpk` folder structure. There it will drop the newly built .vpk files
+When running the `.bat` file, it will create a new `export/vpk` folder structure. There it will drop the newly built .vpk files
+
+You can also run the batch file with extra arguments like `test` and `release` and it'll do all of the grunt work for you when you want to put the files in your game or create a zipped folder containing all the necessary files for a release.
+
+If you want to use these arguments, make sure that when using `test`, the line copying the vpk folder into the game files should point to your actual game directory. You may need to edit that line for it to point to the right place. 
+When using `release`, you'll also want to make sure you have 7-zip downloaded and added to your PATH
 
 ## Setting up the DLL build
 
