@@ -5,6 +5,8 @@
 //#include <vector>
 #include "InputHooker.h"
 #include "include/MinHook.h"
+#include "TF2Binds.h"
+#include "TASTools.h"
 
 #pragma region Proxy
 struct midimap_dll {
@@ -93,14 +95,14 @@ void ModAltTab() {
 	WriteBytes((void*)target, 0x75, 1);
 }
 
-bool consoleCreated = false;
-
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(7000);
 	//AllocConsole();
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
+	InitializeTF2Binds();
+	//hookDirectXPresent();
 
 	//ModAltTab();
 
@@ -118,16 +120,16 @@ DWORD WINAPI Thread(HMODULE hModule) {
 			disableInputHooks();
 		}
 
-		if (SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && !consoleCreated) {
+		if (SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && !consoleEnabled) {
 			AllocConsole();
 			freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-			consoleCreated = true;
+			consoleEnabled = true;
 		}
-		if (!SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && consoleCreated) {
+		if (!SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && consoleEnabled) {
 			HWND console = GetConsoleWindow();
 			FreeConsole();
 			PostMessage(console, WM_CLOSE, 0, 0);
-			consoleCreated = false;
+			consoleEnabled = false;
 		}
 
 		findBinds();

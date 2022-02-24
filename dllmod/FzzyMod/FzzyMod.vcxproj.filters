@@ -48,6 +48,12 @@
     <ClInclude Include="src\hde\table64.h">
       <Filter>Source Files\src\hde</Filter>
     </ClInclude>
+    <ClInclude Include="TASTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TF2Binds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -70,6 +76,12 @@
     </ClCompile>
     <ClCompile Include="src\hde\hde64.c">
       <Filter>Source Files\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="TASTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TF2Binds.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
