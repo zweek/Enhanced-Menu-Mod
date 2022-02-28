@@ -7,6 +7,7 @@
 #include <bitset>
 #include <cmath>
 #include "TF2Binds.h"
+#include "SourceConsole.h"
 
 using namespace std;
 

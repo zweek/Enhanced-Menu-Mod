@@ -54,6 +54,21 @@
     <ClInclude Include="TF2Binds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SourceConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VTableHooking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IVEngineServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -81,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TF2Binds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

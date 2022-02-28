@@ -105,15 +105,6 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
-	button = Hud_GetChild( menu, "BtnEnableConsole" )
-	SRMM_SetupButton(
-		button,
-		"Console",
-		"`2Only for testing and debug purposes!\n\n`0Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
-		SRMM_getSetting(SRMM_settings.enableConsole)
-	)
-	AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )
-
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton(

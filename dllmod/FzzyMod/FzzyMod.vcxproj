@@ -162,6 +162,9 @@
   <ItemGroup>
     <ClInclude Include="include\MinHook.h" />
     <ClInclude Include="InputHooker.h" />
+    <ClInclude Include="IVEngineServer.h" />
+    <ClInclude Include="SourceConsole.h" />
+    <ClInclude Include="SourceInterface.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\hde\hde32.h" />
     <ClInclude Include="src\hde\hde64.h" />
@@ -171,10 +174,13 @@
     <ClInclude Include="src\trampoline.h" />
     <ClInclude Include="TASTools.h" />
     <ClInclude Include="TF2Binds.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="VTableHooking.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InputHooker.cpp" />
+    <ClCompile Include="SourceConsole.cpp" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\hde\hde32.c" />
     <ClCompile Include="src\hde\hde64.c" />
@@ -182,6 +188,7 @@
     <ClCompile Include="src\trampoline.c" />
     <ClCompile Include="TASTools.cpp" />
     <ClCompile Include="TF2Binds.cpp" />
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="midimap.asm" />
