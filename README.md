@@ -43,9 +43,15 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 
 # Installation
 
+Manual:
 1) Download the latest release from the releases page
 2) (Optional, but recommended) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk`
 3) Drag all contents of the downloaded .zip into your `Titanfall2` folder
+
+LiveSplit:
+1) If you have LiveSplit, right click -> Edit Splits
+2) Select Titanfall 2 as the game, activate the Autosplitter and click Settings
+3) Click the Install Menu Mod button in the Autosplitter Settings
 
 ## Uninstalling
 
