@@ -44,7 +44,7 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 # Installation
 
 Manual:
-1) Download the latest release from the releases page
+1) Download the latest release from the [releases page](https://github.com/zweek/TF2SR-Menu-Mod/releases)
 2) (Optional, but recommended) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk`
 3) Drag all contents of the downloaded .zip into your `Titanfall2` folder
 
