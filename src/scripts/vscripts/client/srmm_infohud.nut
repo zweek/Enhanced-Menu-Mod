@@ -52,7 +52,7 @@ void function SRMM_InfoHUD_Thread()
                     continue;
                 }
                 // display names and values of modded ConVars
-                SetInfoName(file.infoDisplays[slot], file.infoNames[m])
+                SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
                 slot++
             }
             for (int i = displayLines - 1; i >= slot; i--)
