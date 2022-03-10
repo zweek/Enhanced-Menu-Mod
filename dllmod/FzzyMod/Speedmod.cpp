@@ -138,7 +138,7 @@ void LoadSave(string save) {
 void SpeedmodTick() {
     bool speedmodEnabled = Util::SRMM_GetSetting(SRMM_ENABLE_SPEEDMOD);
     if (!speedmodWasEnabled && speedmodEnabled) {
-        InstallSpeedmodSaves();
+        //InstallSpeedmodSaves();
         MakeAlliesInvincible();
         RemoveWallFriction();
     }
