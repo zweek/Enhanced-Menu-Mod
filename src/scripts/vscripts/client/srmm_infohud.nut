@@ -145,6 +145,7 @@ void function GetModdedVars()
     AddVarIfModded("sv_cheats", 0)
     AddVarIfModded("host_timescale", 1)
     AddVarIfModded("player_respawnInputDebounceDuration", 0.5)
+    if (SRMM_getSetting(SRMM_settings.enableSpeedmod)) file.moddedVars.append("speedmod")
 }
 
 void function AddVarIfModded(string ConVar, float defautValue) {

@@ -7,32 +7,135 @@
 #include <iostream>
 #include "include/MinHook.h"
 #include "InputHooker.h"
+#include <bitset>
 
 using namespace std;
 
 typedef HRESULT(__stdcall* D3D11PRESENT) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+typedef void(__fastcall* SLIDEFRICTION)();
+typedef void(__fastcall* GROUNDFRICTION)();
+typedef void(__fastcall* WALLFRICTION)();
+
+static SLIDEFRICTION hookedSlideFriction = nullptr;
+static GROUNDFRICTION hookedGroundFriction = nullptr;
+static WALLFRICTION hookedWallFriction = nullptr;
 static D3D11PRESENT hookedD3D11Present = nullptr;
+
+template <typename T>
+inline MH_STATUS MH_CreateHookEx(LPVOID pTarget, LPVOID pDetour, T** ppOriginal)
+{
+	return MH_CreateHook(pTarget, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
+}
+
+template <typename T>
+inline MH_STATUS MH_CreateHookApiEx(LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, T** ppOriginal)
+{
+	return MH_CreateHookApi(pszModule, pszProcName, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
+}
 
 auto flipTimestamp = std::chrono::steady_clock::now();
 bool flip;
 
-void TASProcessInputProc(UINT &uMsg, WPARAM &wParam, LPARAM &lParam) {
-	bool onGround = *(bool*)((uintptr_t)GetModuleHandle("client.dll") + 0x11EED78);
+bool pressingForward;
+bool pressingRight;
+bool pressingLeft;
+bool onWall;
+bool onGround;
 
-	if (uMsg == WM_KEYDOWN) {
-		//int scanCode = (lParam >> 16) & 0xFF;
-		//cout << scanCode << endl;
-		if (wParam == forwardBinds[0] || wParam == forwardBinds[1]) {
-			simulateKeyDown(leftBinds[0]);
-			//wParam = leftBinds[0];
-			if (!onGround) {
-				//uMsg = WM_NULL;
+bool nldj;
+
+bool TASProcessInputDown(WPARAM& key) {
+
+	if (key == jumpBinds[0] || key == jumpBinds[1]) {
+		nldj = true;
+		cout << "eat jump" << endl;
+		return false;
+	}
+	if (key == forwardBinds[0] || key == forwardBinds[1]) {
+		pressingForward = true;
+	}
+	if (key == rightBinds[0] || key == rightBinds[1]) {
+		pressingRight = true;
+		//return false;
+	}
+	if (key == leftBinds[0] || key == leftBinds[1]) {
+		pressingLeft = true;
+		//return false;
+	}
+	return true;
+}
+
+bool TASProcessInputUp(WPARAM& key) {
+	if (key == forwardBinds[0] || key == forwardBinds[1]) {
+		pressingForward = false;
+	}
+	if (key == rightBinds[0] || key == rightBinds[1]) {
+		pressingRight = false;
+		//return false;
+	}
+	if (key == leftBinds[0] || key == leftBinds[1]) {
+		pressingLeft = false;
+		//return false;
+	}
+	return true;
+}
+
+XINPUT_STATE xState;
+
+void TASProcessXInput(XINPUT_STATE* pState) {
+	pState->Gamepad = xState.Gamepad;
+}
+
+bool pressingLurch = false;
+bool pressingJump;
+
+HRESULT __stdcall detourD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
+	bool fullyCrouched = *(float*)((uintptr_t)GetModuleHandle("engine.dll") + 0xF84BDAC) == 38;
+	int jump = jumpBinds[0];
+	if (jump <= 0x06) jump = jumpBinds[1];
+	if (jump <= 0x06) return hookedD3D11Present(pSwapChain, SyncInterval, Flags);
+	if (pressingJump) {
+		simulateKeyUp(jump);
+		if (nldj) {
+			if (!pressingRight) simulateKeyUp(rightBinds[0]);
+			if (!pressingLeft) simulateKeyUp(leftBinds[0]);
+			nldj = false;
+		}
+	}
+	if (nldj) {
+		simulateKeyDown(rightBinds[0]);
+		simulateKeyDown(leftBinds[0]);
+		//simulateKeyDown(jump);
+		pressingJump = true;
+	}
+
+	if (!onGround && !onWall) {
+		if (pressingForward) {
+			if (pressingLurch) {
+				simulateKeyUp(forwardBinds[0]);
+				pressingLurch = false;
+			}
+			else {
+				simulateKeyDown(forwardBinds[0]);
+				pressingLurch = true;
 			}
 		}
 	}
-}
+	if ((onGround || onWall) && pressingForward && !pressingLurch) {
+		simulateKeyDown(forwardBinds[0]);
+		pressingLurch = true;
+	}
 
-void TASProcessXInput(XINPUT_STATE* pState) {
+	if (onGround && fullyCrouched) {
+		simulateKeyDown(jump);
+		pressingJump = true;
+	}
+
+	if (onWall) {
+		simulateKeyDown(jump);
+		pressingJump = true;
+	}
+
 	float velX = *(float*)((uintptr_t)GetModuleHandle("client.dll") + 0xB34C2C);
 	float velY = *(float*)((uintptr_t)GetModuleHandle("client.dll") + 0xB34C30);
 
@@ -42,16 +145,11 @@ void TASProcessXInput(XINPUT_STATE* pState) {
 	float toRadians = (3.14159265f / 180.0f);
 	float magnitude = sqrt(pow(velX, 2) + pow(velY, 2));
 
-	auto elapsed = chrono::steady_clock::now() - flipTimestamp;
-	long long since = chrono::duration_cast<chrono::milliseconds>(elapsed).count();
-	if (since > 100) {
-		flip = !flip;
-	}
-
-	if (magnitude > 100) {
+	/*if (!onGround && !onWall) {
 		float airSpeed = 50;
-		float velDegrees = atan2f(velY, velX) * toDegrees;
-		float velDirection = yaw - velDegrees;
+		float margin = 10;
+		float velDegrees = atan2f(velX, -velY) * toDegrees;
+		float velDirection = velDegrees - yaw;
 
 		float rightx = sinf((velDirection + 90) * toRadians);
 		float righty = cosf((velDirection + 90) * toRadians);
@@ -59,30 +157,40 @@ void TASProcessXInput(XINPUT_STATE* pState) {
 		float offsetx = velX + rightx * airSpeed;
 		float offsety = velY + righty * airSpeed;
 
-		float angle = atan2f(offsety, offsetx) - atan2f(velY, velX);
-		float offsetAngle = atan2f(righty, rightx) - angle;
-		cout << offsetAngle << endl;
+		float angle = (atan2f(offsety, offsetx) - atan2f(velY, velX)) * toDegrees;
+		//cout << angle << endl;
+		//float offsetAngle = atan2f(righty, rightx) - angle;
 
-		short tx = cosf(offsetAngle * toRadians) * 32767.0f;
-		short ty = sinf(offsetAngle * toRadians) * 32767.0f;
-		//cout << tx << " : " << ty << endl;
+		float offset = fabsf(asinf(airSpeed - margin) / magnitude) * toDegrees;
+		float a = velDirection;
+		if (pressingLeft) flip = true;
+		if (pressingRight) flip = false;
+		if (flip) {
+			a += 89.7f;
+		}
+		else {
+			a -= 89.7f;
+		}
 
-		pState->Gamepad.sThumbLX = tx;
-		pState->Gamepad.sThumbLY = ty;
-	}
-}
+		short tx = cosf(a * toRadians) * 32767.0f;
+		short ty = sinf(a * toRadians) * 32767.0f;
 
-bool pressingLurch = false;
-
-HRESULT __stdcall detourD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
-	/*if (!pressingLurch) {
-		simulateKeyDown(forwardBinds[0]);
-		pressingLurch = true;
+		xState.Gamepad.sThumbLX = tx;
+		xState.Gamepad.sThumbLY = ty;
+		if (pressingLeft && pressingRight) {
+			xState.Gamepad.sThumbLX = 0;
+			xState.Gamepad.sThumbLY = 0;
+		}
 	}
 	else {
-		simulateKeyUp(forwardBinds[0]);
-		pressingLurch = false;
-	}*/
+		xState.Gamepad.sThumbLX = 0;
+		xState.Gamepad.sThumbLY = 0;
+	}
+	flip = !flip;*/
+
+	onWall = false;
+	onGround = false;
+
 	return hookedD3D11Present(pSwapChain, SyncInterval, Flags);
 }
 
@@ -151,4 +259,40 @@ void hookDirectXPresent() {
 	pTmpDevice->Release();
 	pTmpContext->Release();
 	pTmpSwapChain->Release();
+}
+
+void __fastcall detourSlideFriction() {
+	//cout << "slide friction" << endl;
+	onGround = true;
+	hookedSlideFriction();
+}
+
+void __fastcall detourWallFriction() {
+	//cout << "slide friction" << endl;
+	onWall = true;
+	hookedWallFriction();
+}
+
+void __fastcall detourGroundFriction() {
+	//cout << "slide friction" << endl;
+	onGround = true;
+	hookedGroundFriction();
+}
+
+void setMovementHooks() {
+	SLIDEFRICTION slideFriction = SLIDEFRICTION((uintptr_t)GetModuleHandle("client.dll") + 0x1F7573);
+	DWORD slideResult = MH_CreateHookEx(slideFriction, &detourSlideFriction, &hookedSlideFriction);
+	if (slideResult != MH_OK) {
+		cout << "hook slide friction failed" << slideResult << endl;
+	}
+	GROUNDFRICTION groundFriction = GROUNDFRICTION((uintptr_t)GetModuleHandle("client.dll") + 0x1FA2CF);
+	DWORD groundResult = MH_CreateHookEx(groundFriction, &detourGroundFriction, &hookedGroundFriction);
+	if (groundResult != MH_OK) {
+		cout << "hook ground friction failed" << groundResult << endl;
+	}
+	WALLFRICTION wallFriction = WALLFRICTION((uintptr_t)GetModuleHandle("client.dll") + 0x20D6E5);
+	DWORD wallResult = MH_CreateHookEx(wallFriction, &detourWallFriction, &hookedWallFriction);
+	if (wallResult != MH_OK) {
+		cout << "hook wall friction failed" << wallResult << endl;
+	}
 }

@@ -69,6 +69,12 @@
     <ClInclude Include="IVEngineServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IVEngineClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Speedmod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -102,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Speedmod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

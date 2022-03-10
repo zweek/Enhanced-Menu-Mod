@@ -4,6 +4,7 @@
 #include "VTableHooking.h"
 #include <memory>
 #include "IVEngineServer.h"
+#include "IVEngineClient.h"
 
 class ConCommand
 {
@@ -217,9 +218,12 @@ public:
     void Print(const char* pMessage);
     void DPrint(const char* pMessage);
 
+    IVEngineClient GetEngineClient();
+
 private:
     SourceInterface<CGameConsole> m_gameConsole;
     SourceInterface<IVEngineServer> m_engineServer;
+    SourceInterface<IVEngineClient> m_engineClient;
     HookedVTableFunc<decltype(&CConsoleDialog::VTable::OnCommandSubmitted), &CConsoleDialog::VTable::OnCommandSubmitted>
         CConsoleDialog_OnCommandSubmitted;
 

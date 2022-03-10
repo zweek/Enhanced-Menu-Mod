@@ -8,6 +8,8 @@ struct handle_data {
 
 void TASProcessXInput(XINPUT_STATE* pState);
 
-void TASProcessInputProc(UINT &uMsg, WPARAM &wParam, LPARAM &lParam);
+bool TASProcessInputDown(WPARAM& key);
+bool TASProcessInputUp(WPARAM& key);
 
 void hookDirectXPresent();
+void setMovementHooks();

@@ -105,6 +105,15 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
+	button = Hud_GetChild( menu, "BtnEnableSpeedmod" )
+	SRMM_SetupButton(
+		button,
+		"Speedmod",
+		"Speedmod Category",
+		SRMM_getSetting(SRMM_settings.enableSpeedmod)
+	)
+	AddButtonEventHandler( button, UIE_CLICK, SpeedmodToggle )
+
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton(
@@ -222,8 +231,8 @@ void function DisableTASMode()
 	SetConVarInt("sv_cheats", 0)
 }
 
-void function ConsoleToggle(var button) {
-	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
+void function SpeedmodToggle(var button) {
+	SRMM_buttonToggle(button, SRMM_settings.enableSpeedmod, "Speedmod")
 }
 
 

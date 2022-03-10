@@ -162,9 +162,11 @@
   <ItemGroup>
     <ClInclude Include="include\MinHook.h" />
     <ClInclude Include="InputHooker.h" />
+    <ClInclude Include="IVEngineClient.h" />
     <ClInclude Include="IVEngineServer.h" />
     <ClInclude Include="SourceConsole.h" />
     <ClInclude Include="SourceInterface.h" />
+    <ClInclude Include="Speedmod.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\hde\hde32.h" />
     <ClInclude Include="src\hde\hde64.h" />
@@ -181,6 +183,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InputHooker.cpp" />
     <ClCompile Include="SourceConsole.cpp" />
+    <ClCompile Include="Speedmod.cpp" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\hde\hde32.c" />
     <ClCompile Include="src\hde\hde64.c" />

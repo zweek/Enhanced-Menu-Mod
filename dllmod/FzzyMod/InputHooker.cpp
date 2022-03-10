@@ -8,6 +8,7 @@
 #include <cmath>
 #include "TF2Binds.h"
 #include "SourceConsole.h"
+#include "Speedmod.h"
 
 using namespace std;
 
@@ -46,42 +47,59 @@ InputHolder jumpReleaseHolder;
 InputHolder crouchPressHolder;
 InputHolder crouchReleaseHolder;
 
+UINT currentMouseState;
+
 auto jumptime = std::chrono::steady_clock::now();
 auto crouchtime = std::chrono::steady_clock::now();
 
 bool gameClosing;
 
 HWND lastWindow;
+__int64 lastA;
+
+bool simulated;
 
 void simulateKeyDown(WPARAM key) {
-	LPARAM lp;
-	int scanCode = ButtonCode_VirtualKeyToScanCode(key);
-
-	cout << "simulated scanCode: " << scanCode << endl;
-	for (int i = 0; i < 8; i++) {
-		int scan = (scanCode & (1 << i)) != 0;
-
-		if (scan) {
-			lp = lp | (1 << (i + 16));
-		}
-		else {
-			lp = lp & ~(1 << (i + 16));
-		}
-	}
-
-	SendMessage(lastWindow, WM_KEYDOWN, key, lp);
+	simulated = true;
+	SendMessage(lastWindow, WM_KEYDOWN, key, 0);
 }
 
 void simulateKeyUp(WPARAM key) {
-	SendMessage(lastWindow, WM_KEYUP, key, NULL);
+	simulated = true;
+	SendMessage(lastWindow, WM_KEYUP, key, 0);
 }
 
 LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	//lastWindow = hWnd;
+	lastWindow = hWnd;
+	lastA = a;
 	if (uMsg == WM_CLOSE) gameClosing = true;
 	if (gameClosing) return hookedInputSystemProc(a, hWnd, uMsg, wParam, lParam);
+	if ((uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) && simulated) {
+		simulated = false;
+		int scanCode = MapVirtualKey(wParam, MAPVK_VK_TO_VSC);
 
-	//TASProcessInputProc(uMsg, wParam, lParam);
+		lParam = (long)0;
+		for (int i = 0; i < 8; i++) {
+			int scan = (scanCode & (1 << i)) != 0;
+			long targetIndex = (long)i + (long)16;
+			if (scan) {
+				lParam = lParam | ((long)1 << targetIndex);
+			}
+			else {
+				lParam = lParam & ~((long)1 << targetIndex);
+			}
+		}
+		if (uMsg == WM_KEYUP) {
+			lParam = lParam | ((long)1 << (long)30);
+			lParam = lParam | ((long)1 << (long)31);
+		}
+		else {
+			lParam = lParam | (long)1;
+		}
+		return hookedInputSystemProc(a, hWnd, uMsg, wParam, lParam);
+	}
+
+	SpeedmodTick();
 
 	if (jumpPressHolder.waitingToSend) {
 		auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
@@ -155,36 +173,45 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 			key = VK_XBUTTON2;
 		}
 	}
+
 	switch (uMsg) {
 	case WM_RBUTTONUP:
 	case WM_LBUTTONUP:
 	case WM_XBUTTONUP:
 	case WM_KEYUP:
-		if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpReleaseHolder.waitingToSend) {
-			jumpReleaseHolder.a = a;
-			jumpReleaseHolder.hWnd = hWnd;
-			jumpReleaseHolder.uMsg = uMsg;
-			jumpReleaseHolder.wParam = wParam;
-			jumpReleaseHolder.lParam = lParam;
-
-			jumpReleaseHolder.waitingToSend = true;
-			jumpReleaseHolder.timestamp = std::chrono::steady_clock::now();
-
+		bool allow = true;// TASProcessInputUp(key);
+		if (!allow) {
 			uMsg = WM_NULL;
 		}
-		if ((key == crouchBinds[0] || key == crouchBinds[1]) && !crouchReleaseHolder.waitingToSend) {
-			crouchReleaseHolder.a = a;
-			crouchReleaseHolder.hWnd = hWnd;
-			crouchReleaseHolder.uMsg = uMsg;
-			crouchReleaseHolder.wParam = wParam;
-			crouchReleaseHolder.lParam = lParam;
+		else {
+			if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpReleaseHolder.waitingToSend) {
+				jumpReleaseHolder.a = a;
+				jumpReleaseHolder.hWnd = hWnd;
+				jumpReleaseHolder.uMsg = uMsg;
+				jumpReleaseHolder.wParam = wParam;
+				jumpReleaseHolder.lParam = lParam;
 
-			crouchReleaseHolder.waitingToSend = true;
-			crouchReleaseHolder.timestamp = std::chrono::steady_clock::now();
+				jumpReleaseHolder.waitingToSend = true;
+				jumpReleaseHolder.timestamp = std::chrono::steady_clock::now();
 
-			uMsg = WM_NULL;
+				uMsg = WM_NULL;
+			}
+			if ((key == crouchBinds[0] || key == crouchBinds[1]) && !crouchReleaseHolder.waitingToSend) {
+				crouchReleaseHolder.a = a;
+				crouchReleaseHolder.hWnd = hWnd;
+				crouchReleaseHolder.uMsg = uMsg;
+				crouchReleaseHolder.wParam = wParam;
+				crouchReleaseHolder.lParam = lParam;
+
+				crouchReleaseHolder.waitingToSend = true;
+				crouchReleaseHolder.timestamp = std::chrono::steady_clock::now();
+
+				uMsg = WM_NULL;
+			}
 		}
 		break;
+	}
+	switch (uMsg) {
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONDBLCLK:
 	case WM_LBUTTONDOWN:
@@ -194,50 +221,56 @@ LRESULT __fastcall detourInputSystemProc(__int64 a, HWND hWnd, UINT uMsg, WPARAM
 	case WM_KEYDOWN:
 		if (!(lParam & (1 << 30)))
 		{
-			if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpPressHolder.waitingToSend) {
-				if (crouchPressHolder.waitingToSend) {
-					crouchPressHolder.waitingToSend = false;
-					auto crouchElapsed = std::chrono::steady_clock::now() - crouchPressHolder.timestamp;
-					long long sinceCrouch = std::chrono::duration_cast<std::chrono::milliseconds>(crouchElapsed).count();
-					if (consoleEnabled) cout << "crouchkick: " << sinceCrouch << "ms CROUCH IS EARLY" << endl;
-
-					//playSound();
-					hookedInputProc(crouchPressHolder.a, crouchPressHolder.hWnd, crouchPressHolder.uMsg, crouchPressHolder.wParam, crouchPressHolder.lParam);
-				}
-				else {
-					jumpPressHolder.a = a;
-					jumpPressHolder.hWnd = hWnd;
-					jumpPressHolder.uMsg = uMsg;
-					jumpPressHolder.wParam = wParam;
-					jumpPressHolder.lParam = lParam;
-
-					jumpPressHolder.waitingToSend = true;
-					jumpPressHolder.timestamp = std::chrono::steady_clock::now();
-
-					uMsg = WM_NULL;
-				}
+			bool allow = true;// TASProcessInputDown(key);
+			if (!allow) {
+				uMsg = WM_NULL;
 			}
-			if ((key == crouchBinds[0] || key == crouchBinds[1]) && !crouchPressHolder.waitingToSend) {
-				if (jumpPressHolder.waitingToSend) {
-					jumpPressHolder.waitingToSend = false;
-					auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
-					long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
-					if (consoleEnabled) cout << "crouchkick: " << sinceJump << "ms JUMP IS EARLY" << endl;
+			else {
+				if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpPressHolder.waitingToSend) {
+					if (crouchPressHolder.waitingToSend) {
+						crouchPressHolder.waitingToSend = false;
+						auto crouchElapsed = std::chrono::steady_clock::now() - crouchPressHolder.timestamp;
+						long long sinceCrouch = std::chrono::duration_cast<std::chrono::milliseconds>(crouchElapsed).count();
+						if (consoleEnabled) cout << "crouchkick: " << sinceCrouch << "ms CROUCH IS EARLY" << endl;
 
-					//playSound();
-					hookedInputProc(jumpPressHolder.a, jumpPressHolder.hWnd, jumpPressHolder.uMsg, jumpPressHolder.wParam, jumpPressHolder.lParam);
+						//playSound();
+						hookedInputProc(crouchPressHolder.a, crouchPressHolder.hWnd, crouchPressHolder.uMsg, crouchPressHolder.wParam, crouchPressHolder.lParam);
+					}
+					else {
+						jumpPressHolder.a = a;
+						jumpPressHolder.hWnd = hWnd;
+						jumpPressHolder.uMsg = uMsg;
+						jumpPressHolder.wParam = wParam;
+						jumpPressHolder.lParam = lParam;
+
+						jumpPressHolder.waitingToSend = true;
+						jumpPressHolder.timestamp = std::chrono::steady_clock::now();
+
+						uMsg = WM_NULL;
+					}
 				}
-				else {
-					crouchPressHolder.a = a;
-					crouchPressHolder.hWnd = hWnd;
-					crouchPressHolder.uMsg = uMsg;
-					crouchPressHolder.wParam = wParam;
-					crouchPressHolder.lParam = lParam;
+				if ((key == crouchBinds[0] || key == crouchBinds[1]) && !crouchPressHolder.waitingToSend) {
+					if (jumpPressHolder.waitingToSend) {
+						jumpPressHolder.waitingToSend = false;
+						auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
+						long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
+						if (consoleEnabled) cout << "crouchkick: " << sinceJump << "ms JUMP IS EARLY" << endl;
 
-					crouchPressHolder.waitingToSend = true;
-					crouchPressHolder.timestamp = std::chrono::steady_clock::now();
+						//playSound();
+						hookedInputProc(jumpPressHolder.a, jumpPressHolder.hWnd, jumpPressHolder.uMsg, jumpPressHolder.wParam, jumpPressHolder.lParam);
+					}
+					else {
+						crouchPressHolder.a = a;
+						crouchPressHolder.hWnd = hWnd;
+						crouchPressHolder.uMsg = uMsg;
+						crouchPressHolder.wParam = wParam;
+						crouchPressHolder.lParam = lParam;
 
-					uMsg = WM_NULL;
+						crouchPressHolder.waitingToSend = true;
+						crouchPressHolder.timestamp = std::chrono::steady_clock::now();
+
+						uMsg = WM_NULL;
+					}
 				}
 			}
 		}
@@ -251,7 +284,8 @@ void __fastcall detourUpdateMouseButtonState(__int64 a, UINT nButtonMask, int db
 	for (int i = 0; i < 5; ++i)
 	{
 		bool bDown = (nButtonMask & (1 << i)) != 0;
-		INT key = VK_RBUTTON;
+		bool bWasDown = (currentMouseState & (1 << i)) != 0;
+		WPARAM key = VK_RBUTTON;
 		switch (i) {
 		case 0:
 			key = VK_LBUTTON;
@@ -268,6 +302,20 @@ void __fastcall detourUpdateMouseButtonState(__int64 a, UINT nButtonMask, int db
 		case 4:
 			key = VK_XBUTTON2;
 			break;
+		}
+		if (bDown && !bWasDown) {
+			bool allow = true;// TASProcessInputDown(key);
+			if (!allow) {
+				bDown = false;
+				nButtonMask = nButtonMask & ~(1 << i);
+			}
+		}
+		if (!bDown && bWasDown) {
+			bool allow = true;// TASProcessInputUp(key);
+			if (!allow) {
+				bDown = true;
+				nButtonMask = nButtonMask | (1 << i);
+			}
 		}
 		if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4) {
 			if (key == jumpBinds[0]) {
@@ -288,6 +336,7 @@ void __fastcall detourUpdateMouseButtonState(__int64 a, UINT nButtonMask, int db
 			}
 		}
 	}
+	currentMouseState = nButtonMask;
 	return hookedUpdateMouseButtonState(a, nButtonMask, dblClickCode);
 }
 

@@ -12,7 +12,7 @@ SourceConsole& SourceCon()
 #define WRAPPED_MEMBER(name)                                                                                           \
     MemberWrapper<decltype(&SourceConsole::##name), &SourceConsole::##name, decltype(&SourceCon), &SourceCon>::Call
 
-SourceConsole::SourceConsole() : m_gameConsole("client.dll", "GameConsole004"), m_engineServer("engine.dll", "VEngineServer022")
+SourceConsole::SourceConsole() : m_gameConsole("client.dll", "GameConsole004"), m_engineServer("engine.dll", "VEngineServer022"), m_engineClient("engine.dll", "VEngineClient013")
 {
 	RegisterConsoleCommand("toggleconsole", WRAPPED_MEMBER(ToggleConsoleCommand), "Show/hide the console",
 		0);
@@ -20,6 +20,10 @@ SourceConsole::SourceConsole() : m_gameConsole("client.dll", "GameConsole004"), 
 	RegisterConsoleCommand("togglenoclip", WRAPPED_MEMBER(ToggleNoclip), "Toggles noclip", 0);
 
 	InitialiseSource();
+}
+
+IVEngineClient SourceConsole::GetEngineClient() {
+	return *m_engineClient;
 }
 
 typedef void(*ConCommand_ConCommand)(ConCommand*, const char*, void (*)(const CCommand&), const char*, int, void*);

@@ -65,4 +65,60 @@ namespace Util
         }
     }
 
+    void WriteBytes(void* ptr, int byte, int size) {
+        DWORD curProtection;
+        VirtualProtect(ptr, size, PAGE_EXECUTE_READWRITE, &curProtection);
+        memset(ptr, byte, size);
+        DWORD temp;
+        VirtualProtect(ptr, size, curProtection, &temp);
+    }
+
+    void WriteBytes(uintptr_t ptr, std::vector<int> bytes) {
+        for (int i = 0; i < bytes.size(); i++) {
+            int b = bytes[i];
+            void* current = (void*)(ptr + i);
+            DWORD curProtection;
+            VirtualProtect(current, 1, PAGE_EXECUTE_READWRITE, &curProtection);
+            memset(current, b, 1);
+            DWORD temp;
+            VirtualProtect(current, 1, curProtection, &temp);
+        }
+    }
+
+    bool SRMM_GetSetting(int pos) {
+        // voice_forcemicrecord convar
+        uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
+        uintptr_t srmmSetting = *(uintptr_t*)srmmSettingBase;
+        // check for a 1 in the binary of srmmSetting at pos
+        return (srmmSetting & ((unsigned long long)1 << pos)) > 0;
+    }
+
+    bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t& addr)
+    {
+        addr = ptr;
+        MEMORY_BASIC_INFORMATION mbi;
+        for (unsigned int i = 0; i < offsets.size(); ++i)
+        {
+            VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+            if (mbi.Protect != 0x4) return false;
+            addr = *(uintptr_t*)addr;
+            addr += offsets[i];
+        }
+        return true;
+    }
+
+    uintptr_t FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets)
+    {
+        uintptr_t addr = ptr;
+        MEMORY_BASIC_INFORMATION mbi;
+        for (unsigned int i = 0; i < offsets.size(); ++i)
+        {
+            VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+            if (mbi.Protect != 0x4) return false;
+            addr = *(uintptr_t*)addr;
+            addr += offsets[i];
+        }
+        return addr;
+    }
+
 } // namespace Util

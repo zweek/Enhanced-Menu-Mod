@@ -25,4 +25,9 @@ namespace Util
     void FindAndReplaceAll(std::string& data, const std::string& search, const std::string& replace);
     void* ResolveLibraryExport(const char* module, const char* exportName);
     void FixSlashes(char* pname, char separator);
+    void WriteBytes(void* ptr, int byte, int size);
+    void WriteBytes(uintptr_t ptr, std::vector<int> bytes);
+    bool SRMM_GetSetting(int pos);
+    bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t& addr);
+    uintptr_t FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets);
 } // namespace Util

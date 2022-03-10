@@ -280,10 +280,10 @@ resource/ui/menus/srmm_settings.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnResetHelmets
-			navDown					BtnMouseKeyboardBindings
+			navDown					BtnEnableSpeedmod
 		}
 
-		BtnMouseKeyboardBindings [!$GAMECONSOLE]
+		BtnEnableSpeedmod
 		{
 			ControlName				RuiButton
 			InheritProperties		WideButton
@@ -292,6 +292,18 @@ resource/ui/menus/srmm_settings.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnUnlockLevels
+			navDown					BtnMouseKeyboardBindings
+		}
+
+		BtnMouseKeyboardBindings [!$GAMECONSOLE]
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnEnableSpeedmod
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnEnableSpeedmod
 			navDown					SwitchEnableCheats
 		}
 
