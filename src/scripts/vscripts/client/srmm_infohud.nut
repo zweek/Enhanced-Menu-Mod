@@ -1,32 +1,52 @@
 global function SRMM_InfoHUD_Init
 
+int displayLines = 3 // maximum number of lines that can be displayed
+
 global struct InfoDisplay
 {
     var infoTitle
 }
 
-int displayLines = 3 // maximum number of lines that can be displayed
-
-struct
+struct SRMM_ConVarInfo
 {
-    array<InfoDisplay> infoDisplays
-    table<string, string> infoNames = {}
-    array<string> displayInfos = []
-    array<string> moddedVars = []
-    array<InfoDisplay> CKF_infoDisplay
-} file
+    string infoName
+    float defautValue
+    float value
+    bool isModded
+}
+
+struct SRMM_SettingInfo
+{
+    string infoName
+    int settingInt
+    bool isModded
+    int displayPriority
+}
+
+enum SRMM_settingDisplayPriority
+{
+    speedmod
+    TASmode,
+}
+
+array<SRMM_ConVarInfo> SRMM_ConVarInfos = []
+array<SRMM_SettingInfo> SRMM_SettingInfos = []
+array<InfoDisplay> InfoDisplays = []
+array<InfoDisplay> CKF_infoDisplay = []
 
 void function SRMM_InfoHUD_Init()
 {
-    RegisterInfo("sv_cheats")
-    RegisterInfo("host_timescale")
-    RegisterInfo("player_respawnInputDebounceDuration")
+    RegisterConVar("sv_cheats", 0)
+    RegisterConVar("host_timescale", 1)
+    RegisterConVar("player_respawnInputDebounceDuration", 0.5)
+    RegisterSetting("TAS", SRMM_settings.TASmode, SRMM_settingDisplayPriority.TASmode)
+    RegisterSetting("speedmod", SRMM_settings.enableSpeedmod, SRMM_settingDisplayPriority.speedmod)
 
     for (int i = 0; i < displayLines; i++)
     {
-        file.infoDisplays.append(CreateInfoDisplay(i))
+        InfoDisplays.append(CreateInfoDisplay())
     }
-    file.CKF_infoDisplay.append(CreateCKFInfoDisplay())
+    CKF_infoDisplay.append(CreateCKFInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
 
@@ -35,41 +55,114 @@ void function SRMM_InfoHUD_Thread()
     while (true)
     {
         WaitFrame()
-        // check for TAS mode & clear info display
-        if (SRMM_getSetting(SRMM_settings.TASmode))
+
+        // setting display
+        bool isSettingModded = false
+        int highestPriority = 0
+        int highestPriorityPos = 0
+
+        UpdateModdedSettings()
+        for (int i = 0; i < SRMM_SettingInfos.len(); i++)
         {
-            SetInfoName(file.infoDisplays[0], "TAS")
-            for (int i = 1; i < displayLines; i++) {
-                SetInfoName(file.infoDisplays[i], "")
+            if (SRMM_SettingInfos[i].isModded)
+            {
+                highestPriority = SRMM_SettingInfos[i].displayPriority
+                highestPriorityPos = i
+                isSettingModded = true
+                break;
             }
         }
-        else 
+
+        for (int i = highestPriorityPos + 1; i < SRMM_SettingInfos.len(); i++)
         {
-            GetModdedVars()
+            if (!SRMM_SettingInfos[i].isModded) continue;
+            if (highestPriority < SRMM_SettingInfos[i].displayPriority) 
+            {
+                highestPriority = SRMM_SettingInfos[i].displayPriority
+                highestPriorityPos = i
+            } 
+        }
+        
+        if (isSettingModded)
+        {
+            SetInfoName(InfoDisplays[0], SRMM_SettingInfos[highestPriorityPos].infoName)
+            SetHudPos(InfoDisplays[0], 0)
+            for (int i = 1; i < displayLines; i++)
+            {
+                SetInfoName(InfoDisplays[i], "")
+            }
+        }
+        else
+        {
+
+            // ConVar display
+            UpdateModdedConVars()
             int slot = 0
-            foreach(string m in file.moddedVars) {
-                if (!file.displayInfos.contains(m) || slot >= displayLines) {
-                    continue;
+            for (int i = 0; i < displayLines; i++)
+            {
+                if (SRMM_ConVarInfos[i].isModded) {
+                    SetInfoName(InfoDisplays[slot], SRMM_ConVarInfos[i].infoName + " " + SRMM_ConVarInfos[i].value.tostring())
+                    SetHudPos(InfoDisplays[i], i)
+                    slot++
                 }
-                // display names and values of modded ConVars
-                SetInfoName(file.infoDisplays[slot], file.infoNames[m] + " " + GetConVarFloat(file.infoNames[m]).tostring())
-                slot++
             }
             for (int i = displayLines - 1; i >= slot; i--)
             {
-                SetInfoName(file.infoDisplays[i], "")
+                SetInfoName(InfoDisplays[i], "")
             }
-        }
-        for (int i = 0; i < displayLines; i++)
-        {
-            SetHudPos(file.infoDisplays[i], i)
-        }
 
-        if (SRMM_getSetting(SRMM_settings.CKfix)) {
-            SetInfoName(file.CKF_infoDisplay[0], "CKF")
-        } else {
-            SetInfoName(file.CKF_infoDisplay[0], "")
+            // Crouch kick fix display
+            if (SRMM_getSetting(SRMM_settings.CKfix)) {
+                SetInfoName(CKF_infoDisplay[0], "CKF")
+            } else {
+                SetInfoName(CKF_infoDisplay[0], "")
+            }
+
         }
+        
+    }
+}
+
+void function RegisterConVar(string infoName, float defautValue)
+{
+    SRMM_ConVarInfo info
+
+    info.infoName = infoName
+    info.value = GetConVarFloat(infoName)
+    info.defautValue = defautValue
+    info.isModded = info.value != info.defautValue
+
+    SRMM_ConVarInfos.append(info)
+}
+
+void function RegisterSetting(string infoName, int SRMM_setting, int displayPriority)
+{
+    SRMM_SettingInfo info
+
+    info.infoName = infoName
+    info.settingInt = SRMM_setting
+    info.isModded = SRMM_getSetting(SRMM_setting)
+    info.displayPriority = displayPriority
+
+    SRMM_SettingInfos.append(info)
+}
+
+void function UpdateModdedConVars()
+{
+    for(int i = 0; i < SRMM_ConVarInfos.len(); i++)
+    {
+        SRMM_ConVarInfo ConVar = SRMM_ConVarInfos[i]
+        ConVar.value = GetConVarFloat(ConVar.infoName)
+        ConVar.isModded = ConVar.value != ConVar.defautValue
+    }
+}
+
+void function UpdateModdedSettings()
+{
+    for (int i = 0; i < SRMM_SettingInfos.len(); i++)
+    {
+        SRMM_SettingInfo setting = SRMM_SettingInfos[i]
+        setting.isModded = SRMM_getSetting(setting.settingInt)
     }
 }
 
@@ -99,17 +192,16 @@ void function SetHudPos(InfoDisplay display, int line) {
     // actual scaling of the position seems to be <1.0, 0.9>
 }
 
-InfoDisplay function CreateInfoDisplay(int line)
+InfoDisplay function CreateInfoDisplay()
 {
     InfoDisplay display
+
     var rui
     rui = CreateFullscreenRui( $"ui/cockpit_console_text_top_left.rpak" )
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
-    RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
-    RuiSetFloat( rui, "thicken", 0.0 )
     RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
     display.infoTitle = rui
 
@@ -122,32 +214,11 @@ InfoDisplay function CreateCKFInfoDisplay()
     var rui
     rui = CreateCockpitRui( $"ui/cockpit_console_text_top_left.rpak" )
     RuiSetFloat2( rui, "msgPos", <0.15, 0.86, 0.0> )
-    RuiSetString( rui, "msgText", "" )
+    RuiSetString( rui, "msgText", "CKF" )
     RuiSetFloat( rui, "msgFontSize", 35.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
-    RuiSetFloat( rui, "thicken", 0.0 )
     RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
     display.infoTitle = rui
 
     return display
-}
-
-void function RegisterInfo( string infoName )
-{
-    file.infoNames[infoName] <- infoName
-    file.displayInfos.append(infoName)
-}
-
-void function GetModdedVars()
-{
-    file.moddedVars = []
-
-    AddVarIfModded("sv_cheats", 0)
-    AddVarIfModded("host_timescale", 1)
-    AddVarIfModded("player_respawnInputDebounceDuration", 0.5)
-    if (SRMM_getSetting(SRMM_settings.enableSpeedmod)) file.moddedVars.append("speedmod")
-}
-
-void function AddVarIfModded(string ConVar, float defautValue) {
-    if (GetConVarFloat(ConVar) != defautValue) file.moddedVars.append(ConVar)
 }
