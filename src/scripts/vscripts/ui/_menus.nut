@@ -945,6 +945,7 @@ void function InitMenus()
 
 	AddMenu( "SinglePlayerDevMenu", $"resource/ui/menus/singleplayer_dev.menu", InitSinglePlayerDevMenu, "SINGLE PLAYER DEV" )
 	AddMenu( "SinglePlayerMenu", $"resource/ui/menus/singleplayer.menu", InitSinglePlayerMenu, "SINGLE PLAYER" )
+	AddMenu( "SRMM_PracticeWarpsMenu", $"resource/ui/menus/srmm_practicewarps.menu", SRMM_InitPracticeWarpsMenu, "PRACTICE WARPS" )
 
 	AddMenu( "SearchMenu", $"resource/ui/menus/search.menu", InitSearchMenu )
 
