@@ -917,6 +917,7 @@ Scripts:
 	ui/menu_playlist_mixtape.nut
 	ui/menu_single_player.nut
 	ui/menu_single_player_dev.nut
+	ui/srmm_menu_practicewarps.nut
 	ui/menu_sp_loadout_titan.nut
 	ui/menu_sp_loadout_titan_tutorial.nut
 	ui/menu_sp_training.gnut

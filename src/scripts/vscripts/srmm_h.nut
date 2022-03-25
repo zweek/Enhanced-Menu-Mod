@@ -13,6 +13,8 @@ global enum SRMM_settings {
     enableSpeedmod
 }
 
+global string srmmVersion = "SRMM v2.1.1"
+
 bool function SRMM_getSetting(int i) {
 	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {
 		return true
