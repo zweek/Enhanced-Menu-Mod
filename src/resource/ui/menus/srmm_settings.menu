@@ -304,6 +304,18 @@ resource/ui/menus/srmm_settings.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnEnableSpeedmod
+			navDown					BtnPracticeWarps
+		}
+
+		BtnPracticeWarps
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnMouseKeyboardBindings
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnMouseKeyboardBindings
 			navDown					SwitchEnableCheats
 		}
 
@@ -343,7 +355,7 @@ resource/ui/menus/srmm_settings.menu
 			}
 			tabPosition				1
 			ypos					1
-			navUp					BtnMouseKeyboardBindings
+			navUp					BtnPracticeWarps
 			navDown					SwitchEnableMP
 		}
 
