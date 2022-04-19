@@ -139,6 +139,14 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "MouseKeyboardBindingsMenu" ) ) )
 
+	button = Hud_GetChild( menu, "BtnPracticeWarps" )
+	SetupButton(
+		button,
+		"Practice Warps",
+		"Warp to dev start points throughout the game to practice segments"
+	)
+	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "SRMM_PracticeWarpsMenu" ) ) )
+
 	AddEventHandlerToButtonClass( menu, "RuiFooterButtonClass", UIE_GET_FOCUS, FooterButton_Focused )
 	
 	AddMenuFooterOption( menu, BUTTON_A, "#A_BUTTON_SELECT" )

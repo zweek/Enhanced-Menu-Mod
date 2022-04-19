@@ -974,6 +974,7 @@ Scripts:
 	ui/menu_audio_settings.nut
 	ui/menu_video_settings.nut
 	ui/srmm_menu_settings.nut
+	ui/srmm_menu_startpointwarps.nut
 ]
 
 When: "UI && CONSOLE_PROG"

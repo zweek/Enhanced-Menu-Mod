@@ -37,10 +37,6 @@ void function SRMM_InitPracticeWarpsMenu()
 	var menu = GetMenu( "SRMM_PracticeWarpsMenu" )
 	file.menu = menu
 
-	file.levelPartSelectFunc.append( LevelPartSelect_Pt1 )
-	file.levelPartSelectFunc.append( LevelPartSelect_Pt2 )
-	file.levelPartSelectFunc.append( LevelPartSelect_Pt3 )
-
 	var dataTable = GetDataTable( $"datatable/sp_levels.rpak" )
 	int numRows = GetDatatableRowCount( dataTable )
 
@@ -114,16 +110,9 @@ void function UpdateButtonData( var button, int elemNum )
 	var rui = Hud_GetRui( button )
 	string bspName = data.levelBsp
 	string levelName = data.levelName
-	if ( elemNum > file.lastLevelUnlocked )
-	{
-		RuiSetString( rui, "title", "#MENU_ITEM_LOCKED" )
-		Hud_SetLocked( button, true )
-	}
-	else
-	{
-		RuiSetString( rui, "title", levelName )
-		Hud_SetLocked( button, false )
-	}
+
+	RuiSetString( rui, "title", levelName )
+	Hud_SetLocked( button, false )
 
 	int foundLions = GetCombinedCollectiblesFoundForLevel( bspName )
 	int maxLions = GetCombinedLionsInLevel( bspName )
@@ -147,15 +136,7 @@ void function SPButton_GetFocus( var button, int elemNum )
 	string levelName = data.levelName
 	string desc = data.levelDesc
 
-	if ( elemNum > file.lastLevelUnlocked )
-	{
-		levelName = "#MENU_ITEM_LOCKED"
-		desc = "#MENU_ITEM_LOCKED"
-	}
-	else
-	{
-		file.lastLevelSelected = elemNum
-	}
+	file.lastLevelSelected = elemNum
 
 	HudElem_SetText( GetMenuChild( file.menu, "ContentDescriptionTitle" ), levelName )
 	HudElem_SetText( GetMenuChild( file.menu, "ContentDescription" ), desc )
@@ -163,253 +144,21 @@ void function SPButton_GetFocus( var button, int elemNum )
 
 void function SPButton_Click( var button, int elemNum )
 {
-	if ( elemNum > file.lastLevelUnlocked )
-	{
-		return
-	}
-
 	SPLevelStartStruct data = file.mainLevels[ elemNum ]
 	file.selectedLevelNum = elemNum
 	file.selectedLevel = data.levelBsp
 	file.selectedStartPoint = data.startPoint
 	file.playIntro = false
 
-	if ( DevStartPoints() )
-	{
-		if ( Dev_CommandLineHasParm( STARTPOINT_DEV_STRING ) )
-			Dev_CommandLineRemoveParm( STARTPOINT_DEV_STRING )
-	}
-
-	if ( elemNum == 0 )
-	{
-		TrainingModeSelect()
-		return
-	}
-	else if ( GetLastLevelUnlocked() > elemNum )
-	{
-		if ( LevelPartSelect( elemNum ) )
-			return
-	}
-
-	DifficultyMenuPopUp()
-}
-
-bool function LevelPartSelect( int levelNum )
-{
-	array<SPLevelStartStruct> parts = file.allLevels[ levelNum ]
-
-	if ( parts.len() <= 1 )
-		return false
-
-	DialogData dialogData
-	dialogData.header = Localize( "#MENU_SP_CHAPTER_SELECT_TITLE_MSG", Localize( file.mainLevels[ levelNum ].levelName ) )
-	dialogData.message = "#MENU_SP_CHAPTER_SELECT_TITLE"
-
-	for ( int i=0; i<parts.len(); i++ )
-	{
-		SPLevelStartStruct data = parts[i]
-
-		string baseString = "#MENU_MISSION_SELECT_CHAPTER"
-
-		if ( data.showLions )
-		{
-			if ( GetCompletedMasterForLevelId( data.levelId ) )
-			{
-				baseString = "#MENU_MISSION_SELECT_CHAPTER_MASTER"
-			}
-			else
-			{
-				baseString = "#MENU_MISSION_SELECT_CHAPTER"
-			}
-		}
-		else
-		{
-			if ( GetCompletedMasterForLevelId( data.levelId ) )
-			{
-				baseString = "#MENU_MISSION_SELECT_CHAPTER_NOLION_MASTER"
-			}
-			else
-			{
-				baseString = "#MENU_MISSION_SELECT_CHAPTER_NOLION"
-			}
-		}
-
-		if ( data.showLions )
-			AddDialogButton( dialogData, Localize( baseString, (i+1), GetCollectiblesFoundForLevel( data.levelBsp ), GetMaxLionsInLevel( data.levelBsp ) ), file.levelPartSelectFunc[i] )
-		else
-			AddDialogButton( dialogData, Localize( baseString, (i+1) ), file.levelPartSelectFunc[i] )
-	}
-
-	AddDialogPCBackButton( dialogData )
-	AddDialogFooter( dialogData, "#A_BUTTON_ACCEPT" )
-	AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
-
-	OpenDialog( dialogData )
-
-	return true
-}
-
-void function TrainingStart_NormalMode()
-{
-	if ( DevStartPoints() )
-	{
-		if ( Dev_CommandLineHasParm( STARTPOINT_DEV_STRING ) )
-			Dev_CommandLineRemoveParm( STARTPOINT_DEV_STRING )
-	}
-
-	PreCacheLevelDuringVideo( "sp_training" )
-	file.selectedLevel = "sp_training"
-	file.selectedStartPoint = "Pod Intro"
-	file.playIntro = true
-	StartLevelNormal()
-
-	if ( uiGlobal.activeMenu == file.menu )
-		CloseActiveMenu()
-}
-
-void function TrainingStart_GauntletMode()
-{
-	file.selectedLevel = "sp_training"
-	file.selectedStartPoint = "Gauntlet Mode"
-	LoadSPLevel()
-	if ( uiGlobal.activeMenu == file.menu )
-		CloseActiveMenu()
-}
-
-void function NewGame_ConfirmStart()
-{
-	DialogData dialogData
-	dialogData.header = "#MENU_NEW_GAME_CONFIRM_TITLE"
-	dialogData.message = "#MENU_NEW_GAME_CONFIRM_MSG"
-
-	AddDialogButton( dialogData, "#YES", NewGame_DoubleConfirmStart )
-	AddDialogButton( dialogData, "#CANCEL" )
-
-	AddDialogFooter( dialogData, "#A_BUTTON_ACCEPT" )
-	AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
-
-	OpenDialog( dialogData )
-}
-
-void function NewGame_DoubleConfirmStart()
-{
-	DialogData dialogData
-	dialogData.header = "#MENU_NEW_GAME_DOUBLE_CONFIRM_TITLE"
-	dialogData.message = "#MENU_NEW_GAME_DOUBLE_CONFIRM_MSG"
-
-	AddDialogButton( dialogData, "#MENU_NEW_GAME_DOUBLE_CONFIRM_BTN_OK", NewGame_Start )
-	AddDialogButton( dialogData, "#CANCEL" )
-
-	AddDialogFooter( dialogData, "#A_BUTTON_ACCEPT" )
-	AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
-
-	OpenDialog( dialogData )
-}
-
-void function NewGame_Start()
-{
-	if ( DevStartPoints() )
-	{
-		if ( Dev_CommandLineHasParm( STARTPOINT_DEV_STRING ) )
-			Dev_CommandLineRemoveParm( STARTPOINT_DEV_STRING )
-	}
-
-	NewGame_ResetCampaignProgress()
-	PreCacheLevelDuringVideo( "sp_training" )
-
-	file.selectedLevel = "sp_training"
-	file.selectedStartPoint = "Pod Intro"
-	file.playIntro = true
-
-	StartLevelNormal()
-	//DifficultyMenuPopUp()
-}
-
-void function NewGame_ResetCampaignProgress()
-{
-	// lock mission select
-	SetConVarInt( "sp_unlockedMission", 0 )
-
-	// reset collectibles
-	ResetCollectiblesProgress_All()
-
-	// reset unlocked titan loadouts
-	SetConVarInt( "sp_titanLoadoutsSelected", 0 )
-}
-
-void function DifficultyMenuPopUp()
-{
-	DialogData dialogData
-	dialogData.header = "#SP_DIFFICULTY_MISSION_SELECT_TITLE"
-
-	AddDialogButton( dialogData, "#SP_DIFFICULTY_EASY_TITLE", StartLevelEasy, "#SP_DIFFICULTY_EASY_DESCRIPTION" )
-	AddDialogButton( dialogData, "#SP_DIFFICULTY_NORMAL_TITLE", StartLevelNormal, "#SP_DIFFICULTY_NORMAL_DESCRIPTION" )
-	AddDialogButton( dialogData, "#SP_DIFFICULTY_HARD_TITLE", StartLevelHard, "#SP_DIFFICULTY_HARD_DESCRIPTION" )
-	AddDialogButton( dialogData, "#SP_DIFFICULTY_MASTER_TITLE", StartLevelMaster, "#SP_DIFFICULTY_MASTER_DESCRIPTION" )
-
-	AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
-	AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
-	AddDialogPCBackButton( dialogData )
-
-	OpenDialog( dialogData )
-}
-
-void function RunDifficulty()
-{
-	if ( file.selectedLevel == "" )
-		return
-
-	if ( file.selectedStartPoint == "" )
-		return
-
-	if ( file.playIntro )
-	{
-		SetMouseCursorVisible( false ) // restore done automatically on changing level/returning to main menu
-		PlayVideoMenu( "intro", true, LoadSPLevel )
-		StopMusic()
-	}
-	else
-	{
-		LoadSPLevel()
-	}
-
-	if ( uiGlobal.activeMenu == file.menu )
-		CloseActiveMenu()
-}
-
-void function LoadSPLevel()
-{
-	file.addObjectiveReminderOnSaveLoad = false
-	SetConVarInt( "sp_titanLoadoutCurrent", -1 )
-	SetConVarInt( "sp_difficulty", file.difficulty )
-	SetLevelNameForLoading( file.selectedLevel )
-	int idx = GetStartPointIndexFromName( file.selectedLevel, file.selectedStartPoint )
-	ExecuteLoadingClientCommands_SetStartPoint( file.selectedLevel, idx )
-	ClientCommand( "map " + file.selectedLevel )
-}
-
-void function StartLevelEasy()
-{
-	file.difficulty = DIFFICULTY_EASY
-	thread RunDifficulty()
-}
-
-void function StartLevelNormal()
-{
-	file.difficulty = DIFFICULTY_NORMAL
-	thread RunDifficulty()
-}
-
-void function StartLevelHard()
-{
-	file.difficulty = DIFFICULTY_HARD
-	thread RunDifficulty()
-}
-
-void function StartLevelMaster()
-{
-	file.difficulty = DIFFICULTY_MASTER
-	thread RunDifficulty()
+	if(elemNum == 0) AdvanceMenu( GetMenu( "SRMM_GauntletWarpsMenu" ) )
+	if(elemNum == 1) AdvanceMenu( GetMenu( "SRMM_BTWarpsMenu" ) )
+	if(elemNum == 2) AdvanceMenu( GetMenu( "SRMM_BNRWarpsMenu" ) )
+	// if(elemNum == 3) AdvanceMenu( GetMenu( "SRMM_ITAWarpsMenu" ) )
+	// if(elemNum == 4) AdvanceMenu( GetMenu( "SRMM_ENCWarpsMenu" ) )
+	// if(elemNum == 5) AdvanceMenu( GetMenu( "SRMM_BWarpsMenu" ) )
+	// if(elemNum == 6) AdvanceMenu( GetMenu( "SRMM_TBFWarpsMenu" ) )
+	// if(elemNum == 7) AdvanceMenu( GetMenu( "SRMM_ArkWarpsMenu" ) )
+	// if(elemNum == 8) AdvanceMenu( GetMenu( "SRMM_FoldWarpsMenu" ) )
 }
 
 void function OnOpenPracticeWarpsMenu()
@@ -495,31 +244,6 @@ void function Beacon_FreeTrialOverMessage()
 	AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
 
 	OpenDialog( dialogData )
-}
-
-void function LevelPartSelect_Pt1()
-{
-	LoadLevelPart( file.selectedLevelNum, 0 )
-}
-
-void function LevelPartSelect_Pt2()
-{
-	LoadLevelPart( file.selectedLevelNum, 1 )
-}
-
-void function LevelPartSelect_Pt3()
-{
-	LoadLevelPart( file.selectedLevelNum, 2 )
-}
-
-void function LoadLevelPart( int levelNum, int levelPart )
-{
-	array<SPLevelStartStruct> parts = file.allLevels[ levelNum ]
-	SPLevelStartStruct data = parts[ levelPart ]
-	file.selectedLevel = data.levelBsp
-	file.selectedStartPoint = data.startPoint
-
-	DifficultyMenuPopUp()
 }
 
 bool function IsUnlockedChapterFocused()
