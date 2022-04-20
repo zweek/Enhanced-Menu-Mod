@@ -945,11 +945,17 @@ void function InitMenus()
 
 	AddMenu( "SinglePlayerDevMenu", $"resource/ui/menus/singleplayer_dev.menu", InitSinglePlayerDevMenu, "SINGLE PLAYER DEV" )
 	AddMenu( "SinglePlayerMenu", $"resource/ui/menus/singleplayer.menu", InitSinglePlayerMenu, "SINGLE PLAYER" )
-	AddMenu( "SRMM_PracticeWarpsMenu", $"resource/ui/menus/srmm_practicewarps.menu", SRMM_InitPracticeWarpsMenu )
 
+	AddMenu( "SRMM_PracticeWarpsMenu", $"resource/ui/menus/srmm_practicewarps.menu", SRMM_InitPracticeWarpsMenu )
 	AddMenu( "SRMM_GauntletWarpsMenu", $"resource/ui/menus/warpmenus/srmm_gauntletwarps.menu", SRMM_InitGauntletWarpsMenu )
 	AddMenu( "SRMM_BTWarpsMenu", $"resource/ui/menus/warpmenus/srmm_btwarps.menu", SRMM_InitBTWarpsMenu )
 	AddMenu( "SRMM_BNRWarpsMenu", $"resource/ui/menus/warpmenus/srmm_bnrwarps.menu", SRMM_InitBNRWarpsMenu )
+	AddMenu( "SRMM_ITAWarpsMenu", $"resource/ui/menus/warpmenus/srmm_itawarps.menu", SRMM_InitITAWarpsMenu )
+	AddMenu( "SRMM_ENCWarpsMenu", $"resource/ui/menus/warpmenus/srmm_encwarps.menu", SRMM_InitENCWarpsMenu )
+	AddMenu( "SRMM_BWarpsMenu", $"resource/ui/menus/warpmenus/srmm_bwarps.menu", SRMM_InitBWarpsMenu )
+	AddMenu( "SRMM_TBFWarpsMenu", $"resource/ui/menus/warpmenus/srmm_tbfwarps.menu", SRMM_InitTBFWarpsMenu )
+	AddMenu( "SRMM_ArkWarpsMenu", $"resource/ui/menus/warpmenus/srmm_arkwarps.menu", SRMM_InitArkWarpsMenu )
+	AddMenu( "SRMM_FoldWarpsMenu", $"resource/ui/menus/warpmenus/srmm_foldwarps.menu", SRMM_InitFoldWarpsMenu )
 
 	AddMenu( "SearchMenu", $"resource/ui/menus/search.menu", InitSearchMenu )
 
