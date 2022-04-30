@@ -12,6 +12,7 @@ if "%1"=="" (
 if "%1"=="test" (
     cd ..
     xcopy vpk "C:\Program Files (x86)\Steam\steamapps\common\Titanfall2\vpk" /y
+    copy midimap.dll "C:\Program Files (x86)\Steam\steamapps\common\Titanfall2" /y
     popd
     echo Test build inserted!
 )
@@ -30,5 +31,5 @@ if "%1"=="release" (
     popd
     move *.dat src\resource
     move *.txt src\resource
-    echo Release builds done!
+    echo Release build v%2 packed!
 )
