@@ -25,6 +25,8 @@ void function InitMainMenu()
 	ClientCommand("alias hr \"sp_unlocks_level_0 0;sp_unlocks_level_1 0;sp_unlocks_level_2 0;sp_unlocks_level_3 0;sp_unlocks_level_4 0;sp_unlocks_level_5 0;sp_unlocks_level_6 0;sp_unlocks_level_7 0;sp_unlocks_level_8 0;sp_unlocks_level_9 0;sp_unlocks_level_10 0;sp_unlocks_level_11 0;sp_unlocks_level_12 0;sp_unlocks_level_13 0;sp_unlocks_level_14 0\"")
 	// full game reset
 	ClientCommand("alias fgr \"sp_startpoint 0;map sp_training;sp_difficulty 0;sv_cheats 0;set_loading_progress_detente #INTROSCREEN_HINT_PC #INTROSCREEN_HINT_CONSOLE\"")
+	// loadprompt
+	ClientCommand("alias lp \"set_loading_progress_detente #INTROSCREEN_HINT_PC #INTROSCREEN_HINT_CONSOLE\"")
 
 	RegisterSignal( "EndOnMainMenu_Open" )
 
