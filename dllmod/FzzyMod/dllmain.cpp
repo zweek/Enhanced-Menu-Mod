@@ -8,7 +8,6 @@
 #include "TF2Binds.h"
 #include "TASTools.h"
 #include <vector>
-#include "SourceConsole.h"
 
 #pragma region Proxy
 struct midimap_dll {
@@ -35,7 +34,6 @@ void setupFunctions() {
 #pragma endregion
 
 typedef void(__fastcall* UPDATELOADINGSCREENPROGRESS)(long long);
-
 static UPDATELOADINGSCREENPROGRESS hookedUpdateLoadingScreenProgress = nullptr;
 
 template <typename T>
@@ -148,6 +146,8 @@ void ModLoadingScreenProgress() {
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(7000);
+	//AllocConsole();
+	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
 	InitializeTF2Binds();
@@ -156,10 +156,20 @@ DWORD WINAPI Thread(HMODULE hModule) {
 
 	//ModAltTab();
 
-	m_sourceConsole.reset(new SourceConsole());
-
 	while (true) {
 		Sleep(1000);
+
+		if (SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && !consoleEnabled) {
+			AllocConsole();
+			freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+			consoleEnabled = true;
+		}
+		if (!SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && consoleEnabled) {
+			HWND console = GetConsoleWindow();
+			FreeConsole();
+			PostMessage(console, WM_CLOSE, 0, 0);
+			consoleEnabled = false;
+		}
 
 		setInputHooks();
 
