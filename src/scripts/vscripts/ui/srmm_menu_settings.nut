@@ -105,14 +105,14 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
 
-	button = Hud_GetChild( menu, "BtnEnableConsole" )
-	SRMM_SetupButton(
-		button,
-		"Console",
-		"`2Only for testing and debug purposes!\n\n`0Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
-		SRMM_getSetting(SRMM_settings.enableConsole)
-	)
-	AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )
+	// button = Hud_GetChild( menu, "BtnEnableConsole" )
+	// SRMM_SetupButton(
+	// 	button,
+	// 	"Console",
+	// 	"`2Only for testing and debug purposes!\n\n`0Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
+	// 	SRMM_getSetting(SRMM_settings.enableConsole)
+	// )
+	// AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )
 
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
@@ -239,9 +239,9 @@ void function DisableTASMode()
 	SetConVarInt("sv_cheats", 0)
 }
 
-void function ConsoleToggle(var button) {
-	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
-}
+// void function ConsoleToggle(var button) {
+// 	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
+// }
 
 
 void function SRMM_OnOpenSettingsMenu()

@@ -10,7 +10,6 @@ global enum SRMM_settings {
     speedometerFadeout,
     TASmode,
     CKfix,
-	enableConsole
 }
 
 global string srmmVersion = "SRMM v2.2"

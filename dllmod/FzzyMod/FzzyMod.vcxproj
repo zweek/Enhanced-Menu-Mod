@@ -183,16 +183,11 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InputHooker.cpp" />
-    <ClCompile Include="SourceConsole.cpp" />
-    <ClCompile Include="Speedmod.cpp" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\hde\hde32.c" />
     <ClCompile Include="src\hde\hde64.c" />
     <ClCompile Include="src\hook.c" />
     <ClCompile Include="src\trampoline.c" />
-    <ClCompile Include="TASTools.cpp" />
-    <ClCompile Include="TF2Binds.cpp" />
-    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="midimap.asm" />
