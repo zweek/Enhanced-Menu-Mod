@@ -25,6 +25,7 @@ void function ClPilotSpeedometer_Init()
 // TODO: find a way to access these through the UI VM
 void function CreatePilotSpeedometer( entity cockpit, entity player )
 {
+	//file.rui = CreateTitanCockpitRui( $"ui/pilot_speedometer.rpak" )
 	file.rui = CreatePermanentCockpitRui( $"ui/pilot_speedometer.rpak" )
 
 	RuiSetBool( file.rui, "useMetric", file.useMetric )

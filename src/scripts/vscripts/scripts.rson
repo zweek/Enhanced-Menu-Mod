@@ -917,6 +917,7 @@ Scripts:
 	ui/menu_playlist_mixtape.nut
 	ui/menu_single_player.nut
 	ui/menu_single_player_dev.nut
+	ui/srmm_menu_practicewarps.nut
 	ui/menu_sp_loadout_titan.nut
 	ui/menu_sp_loadout_titan_tutorial.nut
 	ui/menu_sp_training.gnut
@@ -973,6 +974,16 @@ Scripts:
 	ui/menu_audio_settings.nut
 	ui/menu_video_settings.nut
 	ui/srmm_menu_settings.nut
+	ui/practicewarps/srmm_practicewarps_h.nut
+	ui/practicewarps/srmm_menu_gauntletwarps.nut
+	ui/practicewarps/srmm_menu_btwarps.nut
+	ui/practicewarps/srmm_menu_bnrwarps.nut
+	ui/practicewarps/srmm_menu_itawarps.nut
+	ui/practicewarps/srmm_menu_encwarps.nut
+	ui/practicewarps/srmm_menu_bwarps.nut
+	ui/practicewarps/srmm_menu_tbfwarps.nut
+	ui/practicewarps/srmm_menu_arkwarps.nut
+	ui/practicewarps/srmm_menu_foldwarps.nut
 ]
 
 When: "UI && CONSOLE_PROG"

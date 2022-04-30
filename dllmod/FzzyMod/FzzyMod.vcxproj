@@ -84,7 +84,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>midimap</TargetName>
-    <OutDir>$(SolutionDir)\..\export</OutDir>
+    <OutDir>..\..\export</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -164,6 +164,11 @@
   <ItemGroup>
     <ClInclude Include="include\MinHook.h" />
     <ClInclude Include="InputHooker.h" />
+    <ClInclude Include="IVEngineClient.h" />
+    <ClInclude Include="IVEngineServer.h" />
+    <ClInclude Include="SourceConsole.h" />
+    <ClInclude Include="SourceInterface.h" />
+    <ClInclude Include="Speedmod.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\hde\hde32.h" />
     <ClInclude Include="src\hde\hde64.h" />
