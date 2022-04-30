@@ -134,8 +134,8 @@ void function SRMM_InitSettingsMenu()
 	button = Hud_GetChild( menu, "BtnMouseKeyboardBindings" )
 	SetupButton(
 		button,
-		"Key Bindings",
-		"Modify mouse / keyboard bindings"
+		"#KEY_BINDINGS",
+		"#MOUSE_KEYBOARD_MENU_CONTROLS_DESC"
 	)
 	AddButtonEventHandler( button, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "MouseKeyboardBindingsMenu" ) ) )
 
@@ -182,8 +182,8 @@ void function AreYouSureDialog(string header, string message, void functionref()
 	dialogData.header = header
 	dialogData.message = message
 
-	AddDialogButton(dialogData, "Yes", confirmFunc)
-	AddDialogButton(dialogData, "No")
+	AddDialogButton(dialogData, "#YES", confirmFunc)
+	AddDialogButton(dialogData, "#NO")
 
 	OpenDialog(dialogData)
 }

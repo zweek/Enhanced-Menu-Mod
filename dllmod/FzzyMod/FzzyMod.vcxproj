@@ -43,7 +43,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -128,13 +128,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;FZZYMOD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>midimap.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -175,23 +176,15 @@
     <ClInclude Include="src\hde\table32.h" />
     <ClInclude Include="src\hde\table64.h" />
     <ClInclude Include="src\trampoline.h" />
-    <ClInclude Include="TASTools.h" />
-    <ClInclude Include="TF2Binds.h" />
-    <ClInclude Include="Util.h" />
-    <ClInclude Include="VTableHooking.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InputHooker.cpp" />
-    <ClCompile Include="SourceConsole.cpp" />
     <ClCompile Include="src\buffer.c" />
     <ClCompile Include="src\hde\hde32.c" />
     <ClCompile Include="src\hde\hde64.c" />
     <ClCompile Include="src\hook.c" />
     <ClCompile Include="src\trampoline.c" />
-    <ClCompile Include="TASTools.cpp" />
-    <ClCompile Include="TF2Binds.cpp" />
-    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="midimap.asm" />

@@ -280,7 +280,7 @@ resource/ui/menus/srmm_settings.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					BtnResetHelmets
-			navDown					BtnMouseKeyboardBindings
+			navDown					BtnEnableConsole
 		}
 
 //		BtnEnableSpeedmod
