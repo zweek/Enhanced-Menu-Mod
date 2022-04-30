@@ -21,6 +21,7 @@ void function SRMM_InfoHUD_Init()
     RegisterInfo("sv_cheats")
     RegisterInfo("host_timescale")
     RegisterInfo("player_respawnInputDebounceDuration")
+    RegisterInfo("console")
 
     for (int i = 0; i < displayLines; i++)
     {
@@ -79,33 +80,27 @@ void function SetInfoName(InfoDisplay display, string name)
 }
 
 void function SetHudPos(InfoDisplay display, int line) {
-    float showposOffset = 0.0
-    bool isShowposOffsetActive = false
+    float ypos = 0.0
+    float xpos = 0.0
     float aspectRatio = GetScreenSize()[0] / GetScreenSize()[1]
     
-    if (GetConVarInt("cl_showpos") > 0) {
-        isShowposOffsetActive = true
-        showposOffset += 0.05
-    } 
-    if (GetConVarInt("cl_showfps") > 1) {
-        isShowposOffsetActive = true
-        showposOffset += 0.01
-    } 
-    if (isShowposOffsetActive) showposOffset += 0.03
-
+    if (GetConVarInt("cl_showpos") > 0) ypos += 0.07
+    if (GetConVarInt("cl_showfps") > 1) ypos += 0.02
     // scale vertical position with screen size since cl_showpos scales badly
-    showposOffset *= 3 - GetScreenSize()[1] / 540
-    RuiSetFloat2( display.infoTitle, "msgPos", <0.01, 0.04*line - 0.04 + aspectRatio/90 + showposOffset, 0.0> )
-    // actual scaling of the position seems to be <1.0, 0.9>
+    ypos *= 3 - GetScreenSize()[1] / 540
+    // scale horizontal position wth aspect ratio
+    xpos = -0.2 * (aspectRatio - 1.777)
+    RuiSetFloat2( display.infoTitle, "msgPos", <xpos, 0.05 * line + ypos, 0.0> )
 }
 
 InfoDisplay function CreateInfoDisplay(int line)
 {
     InfoDisplay display
     var rui
-    rui = CreateFullscreenRui( $"ui/cockpit_console_text_top_left.rpak" )
+    rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
+    RuiSetFloat2( rui, "msgPos", <0.0, 0.05 * line, 0.0> )
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
@@ -120,7 +115,7 @@ InfoDisplay function CreateCKFInfoDisplay()
 {
     InfoDisplay display
     var rui
-    rui = CreateCockpitRui( $"ui/cockpit_console_text_top_left.rpak" )
+    rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
     RuiSetFloat2( rui, "msgPos", <0.15, 0.86, 0.0> )
     RuiSetString( rui, "msgText", "" )
     RuiSetFloat( rui, "msgFontSize", 35.0 )
