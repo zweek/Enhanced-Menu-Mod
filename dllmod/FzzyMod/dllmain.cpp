@@ -5,6 +5,10 @@
 //#include <vector>
 #include "InputHooker.h"
 #include "include/MinHook.h"
+#include "TF2Binds.h"
+#include "TASTools.h"
+#include <vector>
+#include "SourceConsole.h"
 
 #pragma region Proxy
 struct midimap_dll {
@@ -29,6 +33,30 @@ void setupFunctions() {
 	midimap.omodmCallback = GetProcAddress(midimap.dll, "modmCallback");
 }
 #pragma endregion
+
+typedef void(__fastcall* UPDATELOADINGSCREENPROGRESS)(long long);
+
+static UPDATELOADINGSCREENPROGRESS hookedUpdateLoadingScreenProgress = nullptr;
+
+template <typename T>
+inline MH_STATUS MH_CreateHookEx(LPVOID pTarget, LPVOID pDetour, T** ppOriginal)
+{
+	return MH_CreateHook(pTarget, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
+}
+
+bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t &addr)
+{
+	addr = ptr;
+	MEMORY_BASIC_INFORMATION mbi;
+	for (unsigned int i = 0; i < offsets.size(); ++i)
+	{
+		VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+		if (mbi.Protect != 0x4) return false;
+		addr = *(uintptr_t*)addr;
+		addr += offsets[i];
+	}
+	return true;
+}
 
 void WriteBytes(void* ptr, int byte, int size) {
 	DWORD curProtection;
@@ -93,7 +121,30 @@ void ModAltTab() {
 	WriteBytes((void*)target, 0x75, 1);
 }
 
-bool consoleCreated = false;
+void __fastcall detourUpdateLoadingScreenProgress(long long var1) {
+	hookedUpdateLoadingScreenProgress(var1);
+
+	uintptr_t progressAddr;
+	if (FindDMAAddy((uintptr_t)GetModuleHandle("vgui2.dll") + 0x122268, { 0x40, 0x720, 0x2A0 }, progressAddr)) {
+		MEMORY_BASIC_INFORMATION mbi;
+		VirtualQuery((LPCVOID)progressAddr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+		if (mbi.Protect != 0x4) return;
+
+		long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+		long long index = (currentTime / 100) % 28;
+
+		*(int*)progressAddr = index;
+	}
+}
+
+void ModLoadingScreenProgress() {
+	uintptr_t moduleBase = (uintptr_t)GetModuleHandleW(L"client.dll");
+	UPDATELOADINGSCREENPROGRESS updateLoading = UPDATELOADINGSCREENPROGRESS(moduleBase + 0x4D0610);
+	DWORD updateLoadingResult = MH_CreateHookEx(updateLoading, &detourUpdateLoadingScreenProgress, &hookedUpdateLoadingScreenProgress);
+	if (updateLoadingResult != MH_OK) {
+		m_sourceConsole->Print(("hook UpdateLoading failed" + std::to_string(updateLoadingResult) + "\n").c_str());
+	}
+}
 
 DWORD WINAPI Thread(HMODULE hModule) {
 	Sleep(7000);
@@ -101,8 +152,10 @@ DWORD WINAPI Thread(HMODULE hModule) {
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
+	InitializeTF2Binds();
+	ModLoadingScreenProgress();
 
-	//ModAltTab();
+	m_sourceConsole.reset(new SourceConsole());
 
 	while (true) {
 		Sleep(1000);
@@ -116,18 +169,6 @@ DWORD WINAPI Thread(HMODULE hModule) {
 		}
 		if (hooksEnabled && !SRMM_GetSetting(SRMM_CK_FIX)) {
 			disableInputHooks();
-		}
-
-		if (SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && !consoleCreated) {
-			AllocConsole();
-			freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-			consoleCreated = true;
-		}
-		if (!SRMM_GetSetting(SRMM_ENABLE_CONSOLE) && consoleCreated) {
-			HWND console = GetConsoleWindow();
-			FreeConsole();
-			PostMessage(console, WM_CLOSE, 0, 0);
-			consoleCreated = false;
 		}
 
 		findBinds();
