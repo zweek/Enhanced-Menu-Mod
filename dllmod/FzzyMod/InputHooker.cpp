@@ -16,7 +16,9 @@ using namespace std;
 typedef DWORD(WINAPI* XINPUTGETSTATE)(DWORD, XINPUT_STATE*);
 typedef void(__fastcall* POSTEVENT)(__int64, InputEventType_t, int, ButtonCode_t, ButtonCode_t, int);
 typedef HRESULT(__stdcall* D3D11PRESENT) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+typedef void(__fastcall* POLLINPUTSTATE)(__int64, int);
 
+static POLLINPUTSTATE hookedPollInputState = nullptr;
 static D3D11PRESENT hookedD3D11Present = nullptr;
 static POSTEVENT hookedPostEvent = nullptr;
 static XINPUTGETSTATE hookedXInputGetState = nullptr;
@@ -235,9 +237,6 @@ void spoofPostEvent(__int64 a, InputEventType_t nType, int nTick, ButtonCode_t s
 void __fastcall detourPostEvent(__int64 a, InputEventType_t nType, int nTick, ButtonCode_t scanCode, ButtonCode_t virtualCode, int data3) {
 	ButtonCode_t key = scanCode;
 	//if (TASProcessInput(a, nType, nTick, scanCode, virtualCode, data3)) return;
-	if (nType == IE_AnalogValueChanged && scanCode == 3) {
-		m_sourceConsole->Print(("scanCode: " + to_string(scanCode) + "   virtualCode: " + to_string(virtualCode) + "    data3: " + to_string(data3) + "\n").c_str());
-	}
 	if (nType == IE_ButtonPressed) {
 		if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpPressHolder.waitingToSend) {
 			if (crouchPressHolder.waitingToSend) {
@@ -320,63 +319,7 @@ void __fastcall detourPostEvent(__int64 a, InputEventType_t nType, int nTick, Bu
 	hookedPostEvent(a, nType, nTick, scanCode, virtualCode, data3);
 }
 
-bool xinputHookSet;
-bool postEventHookSet;
-
-void setInputHooks() {
-	if (postEventHookSet && xinputHookSet) return;
-
-	uintptr_t moduleBase = (uintptr_t)GetModuleHandleW(L"inputsystem.dll");
-
-	if (!postEventHookSet) {
-		POSTEVENT postEvent = POSTEVENT(moduleBase + 0x7EC0);
-		DWORD postEventResult = MH_CreateHookEx(postEvent, &detourPostEvent, &hookedPostEvent);
-		if (postEventResult != MH_OK) {
-			m_sourceConsole->Print(("hook post failed " + to_string(postEventResult) + "\n").c_str());
-		}
-		else {
-			postEventHookSet = true;
-		}
-	}
-
-	if (!xinputHookSet) {
-		DWORD xinputResult = MH_CreateHookApiEx(L"XInput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState);
-		if (xinputResult != MH_OK) {
-			m_sourceConsole->Print(("hook XInputGetState failed " + to_string(xinputResult) + "\n").c_str());
-		}
-		else {
-			xinputHookSet = true;
-		}
-	}
-
-	hookDirectXPresent();
-}
-
-bool hooksEnabled = false;
-
-void enableInputHooks() {
-	if (!xinputHookSet || !postEventHookSet) return;
-	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
-	{
-		m_sourceConsole->Print("enable hooks failed");
-	}
-	else {
-		hooksEnabled = true;
-	}
-}
-
-void disableInputHooks() {
-	if (!xinputHookSet || !postEventHookSet) return;
-	if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
-	{
-		m_sourceConsole->Print("disabling hooks failed");
-	}
-	else {
-		hooksEnabled = false;
-	}
-}
-
-HRESULT __stdcall detourD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
+void __fastcall detourPollInputState(__int64 a, int unknown) {
 	if (jumpPressHolder.waitingToSend) {
 		auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
 		long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
@@ -434,72 +377,62 @@ HRESULT __stdcall detourD3D11Present(IDXGISwapChain* pSwapChain, UINT SyncInterv
 				crouchReleaseHolder.scanCode, crouchReleaseHolder.virtualCode, crouchReleaseHolder.data3);
 		}
 	}
-	return hookedD3D11Present(pSwapChain, SyncInterval, Flags);
+	hookedPollInputState(a, unknown);
 }
 
-BOOL CALLBACK enumWindowsCallback(HWND handle, LPARAM lParam)
-{
-	handle_data& data = *(handle_data*)lParam;
-	unsigned long process_id = 0;
-	GetWindowThreadProcessId(handle, &process_id);
-	if (data.process_id != process_id)
-	{
-		return TRUE;
+bool xinputHookSet;
+bool postEventHookSet;
+
+void setInputHooks() {
+	if (postEventHookSet && xinputHookSet) return;
+
+	uintptr_t moduleBase = (uintptr_t)GetModuleHandleW(L"inputsystem.dll");
+
+	if (!postEventHookSet) {
+		POSTEVENT postEvent = POSTEVENT(moduleBase + 0x7EC0);
+		DWORD postEventResult = MH_CreateHookEx(postEvent, &detourPostEvent, &hookedPostEvent);
+		if (postEventResult != MH_OK) {
+			m_sourceConsole->Print(("hook post failed " + to_string(postEventResult) + "\n").c_str());
+		}
+		else {
+			postEventHookSet = true;
+		}
 	}
-	data.best_handle = handle;
-	return FALSE;
+
+	if (!xinputHookSet) {
+		DWORD xinputResult = MH_CreateHookApiEx(L"XInput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState);
+		if (xinputResult != MH_OK) {
+			m_sourceConsole->Print(("hook XInputGetState failed " + to_string(xinputResult) + "\n").c_str());
+		}
+		else {
+			xinputHookSet = true;
+		}
+	}
+
+	POLLINPUTSTATE pollInput = POLLINPUTSTATE(moduleBase + 0x7CC0);
+	DWORD pollinputResult = MH_CreateHookEx(pollInput, &detourPollInputState, &hookedPollInputState);
 }
 
-void hookDirectXPresent() {
-	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-	swapChainDesc.BufferCount = 1;
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+bool hooksEnabled = false;
 
-	unsigned long pid = GetCurrentProcessId();
-	handle_data data;
-	data.process_id = pid;
-	data.best_handle = 0;
-	EnumWindows(enumWindowsCallback, (LPARAM)&data);
-
-	swapChainDesc.OutputWindow = data.best_handle;
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.Windowed = TRUE;
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	ID3D11Device* pTmpDevice = NULL;
-	ID3D11DeviceContext* pTmpContext = NULL;
-	IDXGISwapChain* pTmpSwapChain;
-	if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &pTmpSwapChain, &pTmpDevice, NULL, &pTmpContext)))
+void enableInputHooks() {
+	if (!xinputHookSet || !postEventHookSet) return;
+	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
 	{
-		cout << "Failed to create directX device and swapchain!" << endl;
-		return;
-	}
-
-	__int64* pSwapChainVtable = NULL;
-	__int64* pDeviceContextVTable = NULL;
-	pSwapChainVtable = (__int64*)pTmpSwapChain;
-	pSwapChainVtable = (__int64*)pSwapChainVtable[0];
-	pDeviceContextVTable = (__int64*)pTmpContext;
-	pDeviceContextVTable = (__int64*)pDeviceContextVTable[0];
-
-	if (MH_CreateHook((LPBYTE)pSwapChainVtable[8], &detourD3D11Present, reinterpret_cast<LPVOID*>(&hookedD3D11Present)) != MH_OK)
-	{
-		cout << "Hooking Present failed!" << endl;
-	}
-	if (MH_EnableHook((LPBYTE)pSwapChainVtable[8]) != MH_OK)
-	{
-		cout << "Enabling of Present hook failed!" << endl;
+		m_sourceConsole->Print("enable hooks failed");
 	}
 	else {
-		cout << "Hooked D3DPresent!" << endl;
+		hooksEnabled = true;
 	}
+}
 
-	pTmpDevice->Release();
-	pTmpContext->Release();
-	pTmpSwapChain->Release();
+void disableInputHooks() {
+	if (!xinputHookSet || !postEventHookSet) return;
+	if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
+	{
+		m_sourceConsole->Print("disabling hooks failed");
+	}
+	else {
+		hooksEnabled = false;
+	}
 }

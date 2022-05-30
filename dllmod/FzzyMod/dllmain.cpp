@@ -147,18 +147,18 @@ void ModLoadingScreenProgress() {
 }
 
 DWORD WINAPI Thread(HMODULE hModule) {
-	Sleep(7000);
+	Sleep(15000);
 	//AllocConsole();
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
 	InitializeTF2Binds();
-	ModLoadingScreenProgress();
+	//ModLoadingScreenProgress();
 
 	m_sourceConsole.reset(new SourceConsole());
 
 	while (true) {
-		Sleep(1000);
+		Sleep(7000);
 
 		setInputHooks();
 
