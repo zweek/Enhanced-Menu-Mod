@@ -12,7 +12,7 @@ global enum SRMM_settings {
     CKfix,
 }
 
-global string srmmVersion = "SRMM v2.2"
+global string srmmVersion = "SRMM v2.3"
 
 bool function SRMM_getSetting(int i) {
 	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {

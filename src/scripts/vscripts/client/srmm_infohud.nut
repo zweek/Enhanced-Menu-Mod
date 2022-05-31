@@ -198,6 +198,7 @@ InfoDisplay function CreateInfoDisplay()
 
     var rui
     rui = CreateFullscreenRui( $"ui/cockpit_console_text_top_left.rpak" )
+    RuiSetString( rui, "msgText", "" )
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
