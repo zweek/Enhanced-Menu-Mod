@@ -89,8 +89,8 @@ resource/ui/menus/srmm_settings.menu
 			ConVar					"mat_disable_bloom"
 			list
 			{
-				"Enabled"	0
-				"Disabled" 1
+				"#SETTING_ON"	0
+				"#SETTING_OFF" 1
 			}
 
 			pin_to_sibling			ImgVideoSubheaderBackground
