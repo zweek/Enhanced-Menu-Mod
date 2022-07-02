@@ -3,6 +3,7 @@
 #include <chrono>
 #include <Xinput.h>
 #include "TF2Binds.h"
+#include <vector>
 
 struct ControllerInputHolder {
 	int buttonIndex;
@@ -43,6 +44,7 @@ struct InputHolder {
 	ButtonCode_t scanCode;
 	ButtonCode_t virtualCode;
 	int data3;
+	int data4;
 
 	bool waitingToSend;
 	std::chrono::steady_clock::time_point timestamp;
@@ -63,3 +65,7 @@ void spoofPostEvent(__int64, InputEventType_t, int, ButtonCode_t, ButtonCode_t, 
 void setInputHooks();
 void enableInputHooks();
 void disableInputHooks();
+
+bool FindDMAAddy(uintptr_t, std::vector<unsigned int>, uintptr_t&);
+uintptr_t FindAddress(uintptr_t, std::vector<unsigned int>);
+uintptr_t FindAddress(uintptr_t);

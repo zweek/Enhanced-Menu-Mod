@@ -44,20 +44,6 @@ inline MH_STATUS MH_CreateHookEx(LPVOID pTarget, LPVOID pDetour, T** ppOriginal)
 	return MH_CreateHook(pTarget, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
 }
 
-bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t &addr)
-{
-	addr = ptr;
-	MEMORY_BASIC_INFORMATION mbi;
-	for (unsigned int i = 0; i < offsets.size(); ++i)
-	{
-		VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-		if (mbi.Protect != 0x4) return false;
-		addr = *(uintptr_t*)addr;
-		addr += offsets[i];
-	}
-	return true;
-}
-
 void WriteBytes(void* ptr, int byte, int size) {
 	DWORD curProtection;
 	VirtualProtect(ptr, size, PAGE_EXECUTE_READWRITE, &curProtection);
@@ -147,20 +133,20 @@ void ModLoadingScreenProgress() {
 }
 
 DWORD WINAPI Thread(HMODULE hModule) {
-	Sleep(15000);
+	Sleep(7000);
 	//AllocConsole();
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
 	MH_Initialize();
 	InitializeTF2Binds();
-	//ModLoadingScreenProgress();
+	ModLoadingScreenProgress();
+
+	setInputHooks();
 
 	m_sourceConsole.reset(new SourceConsole());
 
 	while (true) {
 		Sleep(7000);
-
-		setInputHooks();
 
 		ModSpeedometer();
 

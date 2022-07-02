@@ -33,3 +33,5 @@ if "%1"=="release" (
     move *.txt src\resource
     echo Release build v%2 packed!
 )
+
+pause

@@ -16,9 +16,7 @@ using namespace std;
 typedef DWORD(WINAPI* XINPUTGETSTATE)(DWORD, XINPUT_STATE*);
 typedef void(__fastcall* POSTEVENT)(__int64, InputEventType_t, int, ButtonCode_t, ButtonCode_t, int);
 typedef HRESULT(__stdcall* D3D11PRESENT) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
-typedef void(__fastcall* POLLINPUTSTATE)(__int64, int);
 
-static POLLINPUTSTATE hookedPollInputState = nullptr;
 static D3D11PRESENT hookedD3D11Present = nullptr;
 static POSTEVENT hookedPostEvent = nullptr;
 static XINPUTGETSTATE hookedXInputGetState = nullptr;
@@ -65,7 +63,7 @@ DWORD WINAPI detourXInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
 	DWORD toReturn = hookedXInputGetState(dwUserIndex, pState);
 
-	//TASProcessXInput(pState);
+	TASProcessXInput(pState);
 
 	//pState->Gamepad.sThumbLX = (short)32767;
 	//m_sourceConsole->Print(("LY IMMEDIATE: " + to_string(pState->Gamepad.sThumbLY) + "\n").c_str());
@@ -236,7 +234,7 @@ void spoofPostEvent(__int64 a, InputEventType_t nType, int nTick, ButtonCode_t s
 
 void __fastcall detourPostEvent(__int64 a, InputEventType_t nType, int nTick, ButtonCode_t scanCode, ButtonCode_t virtualCode, int data3) {
 	ButtonCode_t key = scanCode;
-	//if (TASProcessInput(a, nType, nTick, scanCode, virtualCode, data3)) return;
+	if (TASProcessInput(a, nType, nTick, scanCode, virtualCode, data3)) return;
 	if (nType == IE_ButtonPressed) {
 		if ((key == jumpBinds[0] || key == jumpBinds[1]) && !jumpPressHolder.waitingToSend) {
 			if (crouchPressHolder.waitingToSend) {
@@ -319,7 +317,119 @@ void __fastcall detourPostEvent(__int64 a, InputEventType_t nType, int nTick, Bu
 	hookedPostEvent(a, nType, nTick, scanCode, virtualCode, data3);
 }
 
-void __fastcall detourPollInputState(__int64 a, int unknown) {
+#define SAFE_RELEASE(p) if (p) { p->Release(); p = nullptr; }
+
+bool GetD3D11SwapchainDeviceContext(void** pSwapchainTable, size_t Size_Swapchain, void** pDeviceTable, size_t Size_Device, void** pContextTable, size_t Size_Context)
+{
+	WNDCLASSEX wc{ 0 };
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc = DefWindowProc;
+	wc.lpszClassName = TEXT("dummy class");
+
+	if (!RegisterClassEx(&wc))
+	{
+		return false;
+	}
+
+	HWND hWnd = CreateWindow(wc.lpszClassName, TEXT(""), WS_DISABLED, 0, 0, 0, 0, NULL, NULL, NULL, nullptr);
+
+	DXGI_SWAP_CHAIN_DESC swapChainDesc{ 0 };
+	swapChainDesc.BufferCount = 1;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	//swapChainDesc.OutputWindow = hWnd;
+	swapChainDesc.OutputWindow = hWnd;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.Windowed = TRUE;
+
+	D3D_FEATURE_LEVEL featureLevel;
+
+	IDXGISwapChain* pDummySwapChain = nullptr;
+	ID3D11Device* pDummyDevice = nullptr;
+	ID3D11DeviceContext* pDummyContext = nullptr;
+
+	HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &swapChainDesc, &pDummySwapChain, &pDummyDevice, &featureLevel, nullptr);
+	if (FAILED(hr))
+	{
+		DestroyWindow(swapChainDesc.OutputWindow);
+		UnregisterClass(wc.lpszClassName, GetModuleHandle(nullptr));
+		return false;
+	}
+
+	if (pSwapchainTable && pDummySwapChain)
+	{
+		memcpy(pSwapchainTable, *reinterpret_cast<void***>(pDummySwapChain), Size_Swapchain);
+	}
+
+	if (pDeviceTable && pDummyDevice)
+	{
+		memcpy(pDeviceTable, *reinterpret_cast<void***>(pDummyDevice), Size_Device);
+	}
+
+	if (pContextTable && pDummyContext)
+	{
+		memcpy(pContextTable, *reinterpret_cast<void***>(pDummyContext), Size_Context);
+	}
+
+	SAFE_RELEASE(pDummySwapChain);
+	SAFE_RELEASE(pDummyDevice);
+	SAFE_RELEASE(pDummyContext);
+
+	DestroyWindow(swapChainDesc.OutputWindow);
+	UnregisterClass(wc.lpszClassName, GetModuleHandle(nullptr));
+
+	return true;
+}
+
+void* Tramp64(void* src, void* dst, int len)
+{
+	int MinLen = 14;
+
+	if (len < MinLen) return NULL;
+
+	BYTE stub[] = {
+	0xFF, 0x25, 0x00, 0x00, 0x00, 0x00, // jmp qword ptr [$+6]
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // ptr
+	};
+
+	void* pTrampoline = VirtualAlloc(0, len + sizeof(stub), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+	DWORD dwOld = 0;
+	VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &dwOld);
+
+	uintptr_t retto = (uintptr_t)src + len;
+
+	// trampoline
+	memcpy(stub + 6, &retto, 8);
+	memcpy((void*)((uintptr_t)pTrampoline), src, len);
+	memcpy((void*)((uintptr_t)pTrampoline + len), stub, sizeof(stub));
+
+	// orig
+	memcpy(stub + 6, &dst, 8);
+	memcpy(src, stub, sizeof(stub));
+
+	for (int i = MinLen; i < len; i++)
+	{
+		*(BYTE*)((uintptr_t)src + i) = 0x90;
+	}
+
+	VirtualProtect(src, len, dwOld, &dwOld);
+	return (void*)((uintptr_t)pTrampoline);
+}
+
+void* SwapChain[18];
+void* Device[40];
+void* Context[108];
+
+typedef HRESULT(__fastcall* tPresent)(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags);
+tPresent oPresent = nullptr;
+
+HRESULT __fastcall hkPresent(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags)
+{
+	TASFrameHook();
 	if (jumpPressHolder.waitingToSend) {
 		auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
 		long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
@@ -377,46 +487,32 @@ void __fastcall detourPollInputState(__int64 a, int unknown) {
 				crouchReleaseHolder.scanCode, crouchReleaseHolder.virtualCode, crouchReleaseHolder.data3);
 		}
 	}
-	hookedPollInputState(a, unknown);
+	return oPresent(pThis, SyncInterval, Flags);
 }
 
-bool xinputHookSet;
-bool postEventHookSet;
-
 void setInputHooks() {
-	if (postEventHookSet && xinputHookSet) return;
-
 	uintptr_t moduleBase = (uintptr_t)GetModuleHandleW(L"inputsystem.dll");
 
-	if (!postEventHookSet) {
-		POSTEVENT postEvent = POSTEVENT(moduleBase + 0x7EC0);
-		DWORD postEventResult = MH_CreateHookEx(postEvent, &detourPostEvent, &hookedPostEvent);
-		if (postEventResult != MH_OK) {
-			m_sourceConsole->Print(("hook post failed " + to_string(postEventResult) + "\n").c_str());
-		}
-		else {
-			postEventHookSet = true;
-		}
+	POSTEVENT postEvent = POSTEVENT(moduleBase + 0x7EC0);
+	DWORD postEventResult = MH_CreateHookEx(postEvent, &detourPostEvent, &hookedPostEvent);
+	if (postEventResult != MH_OK) {
+		m_sourceConsole->Print(("hook post failed " + to_string(postEventResult) + "\n").c_str());
 	}
 
-	if (!xinputHookSet) {
-		DWORD xinputResult = MH_CreateHookApiEx(L"XInput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState);
-		if (xinputResult != MH_OK) {
-			m_sourceConsole->Print(("hook XInputGetState failed " + to_string(xinputResult) + "\n").c_str());
-		}
-		else {
-			xinputHookSet = true;
-		}
+	DWORD xinputResult = MH_CreateHookApiEx(L"XInput1_3", "XInputGetState", &detourXInputGetState, &hookedXInputGetState);
+	if (xinputResult != MH_OK) {
+		m_sourceConsole->Print(("hook XInputGetState failed " + to_string(xinputResult) + "\n").c_str());
 	}
 
-	POLLINPUTSTATE pollInput = POLLINPUTSTATE(moduleBase + 0x7CC0);
-	DWORD pollinputResult = MH_CreateHookEx(pollInput, &detourPollInputState, &hookedPollInputState);
+	if (GetD3D11SwapchainDeviceContext(SwapChain, sizeof(SwapChain), Device, sizeof(Device), Context, sizeof(Context)))
+	{
+		oPresent = (tPresent)Tramp64(SwapChain[8], hkPresent, 19);
+	}
 }
 
 bool hooksEnabled = false;
 
 void enableInputHooks() {
-	if (!xinputHookSet || !postEventHookSet) return;
 	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
 	{
 		m_sourceConsole->Print("enable hooks failed");
@@ -427,7 +523,6 @@ void enableInputHooks() {
 }
 
 void disableInputHooks() {
-	if (!xinputHookSet || !postEventHookSet) return;
 	if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
 	{
 		m_sourceConsole->Print("disabling hooks failed");
@@ -435,4 +530,56 @@ void disableInputHooks() {
 	else {
 		hooksEnabled = false;
 	}
+}
+
+bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t& addr)
+{
+	addr = ptr;
+	MEMORY_BASIC_INFORMATION mbi;
+	for (unsigned int i = 0; i < offsets.size(); ++i)
+	{
+		VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+		if (mbi.Protect != 0x4) return false;
+		addr = *(uintptr_t*)addr;
+
+		if (addr == 0) {
+			return false;
+		}
+
+		addr += offsets[i];
+	}
+	return true;
+}
+
+uintptr_t FindAddress(uintptr_t ptr, std::vector<unsigned int> offsets)
+{
+	uintptr_t addr = ptr;
+	MEMORY_BASIC_INFORMATION mbi;
+	for (unsigned int i = 0; i < offsets.size(); ++i)
+	{
+		VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+		if (mbi.Protect != 0x4) return 0;
+		addr = *(uintptr_t*)addr;
+
+		if (addr == 0) {
+			return 0;
+		}
+
+		addr += offsets[i];
+	}
+	return addr;
+}
+
+uintptr_t FindAddress(uintptr_t ptr)
+{
+	uintptr_t addr = ptr;
+	MEMORY_BASIC_INFORMATION mbi;
+	VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
+	if (mbi.Protect != 0x4) return 0;
+	addr = *(uintptr_t*)addr;
+
+	if (addr == 0) {
+		return 0;
+	}
+	return addr;
 }

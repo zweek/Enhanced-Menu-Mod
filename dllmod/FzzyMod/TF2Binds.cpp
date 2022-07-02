@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include "TF2Binds.h"
 #include <iostream>
+#include "SourceConsole.h"
 
 using namespace std;
 
@@ -10,6 +11,9 @@ int forwardBinds[2];
 int backBinds[2];
 int rightBinds[2];
 int leftBinds[2];
+int tasLurchBinds[2];
+int tasBumpLaunchBinds[2];
+int tasSurfStopBinds[2];
 
 int controllerJump;
 int controllerCrouch;
@@ -54,6 +58,11 @@ int ButtonCode_ButtonCodeToScanCode(ButtonCode_t button) {
 	for (int i = 0; i < sizeof(s_pScanToButtonCode_QWERTY); i++) {
 		if (s_pScanToButtonCode_QWERTY[i] == button) return s_pScanToButtonCode_QWERTY[i];
 	}
+}
+
+int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+{
+	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
 ButtonCode_t ButtonCode_ScanCodeToButtonCode(int lParam)
@@ -229,8 +238,7 @@ void InitializeTF2Binds() {
 	}
 }
 
-void findBind(char* bound, int &buttonCode, int* bind, int bindSize, int &index, char* search, int searchSize) {
-	cout << bindSize << endl;
+void findBind(char* bound, int& buttonCode, int* bind, int bindSize, int& index, char* search, int searchSize) {
 	for (int i = 0; i < 100; i++) {
 		if (bound[i] == '\0' && i == searchSize) {
 			if (index >= bindSize) break;
@@ -267,6 +275,15 @@ void findBinds() {
 	char rightSearch[] = "+moveright";
 	int rightIndex = 0;
 
+	char tasLurchSearch[] = "+taslurch";
+	int tasLurchIndex = 0;
+
+	char tasBumpLaunchSearch[] = "+tasbumplaunch";
+	int tasBumpLaunchIndex = 0;
+
+	char tasSurfStopSearch[] = "+tassurfstop";
+	int tasSurfStopIndex = 0;
+
 	jumpBinds[0] = 0;
 	jumpBinds[1] = 0;
 	crouchBinds[0] = 0;
@@ -279,76 +296,113 @@ void findBinds() {
 	leftBinds[1] = 0;
 	rightBinds[0] = 0;
 	rightBinds[1] = 0;
+	tasLurchBinds[0] = 0;
+	tasLurchBinds[1] = 0;
+	tasBumpLaunchBinds[0] = 0;
+	tasBumpLaunchBinds[1] = 0;
+	tasSurfStopBinds[0] = 0;
+	tasSurfStopBinds[1] = 0;
 
 	for (int buttonCode = 0; buttonCode < BUTTON_CODE_COUNT; buttonCode++) {
-		int offset = buttonCode * 0x10;
-		uintptr_t ptr = *reinterpret_cast<uintptr_t*>(engineBase + bindBase + offset);
-		if (ptr == 0) continue;
+		__try {
+			int offset = buttonCode * 0x10;
+			uintptr_t ptr = *reinterpret_cast<uintptr_t*>(engineBase + bindBase + offset);
+			if (ptr == 0) continue;
 
-		char* bound = (char*)(ptr);
+			char* bound = (char*)(ptr);
 
-		//findBind(bound, buttonCode, crouchBinds, crouchSearch, crouchIndex);
+			//findBind(bound, buttonCode, crouchBinds, crouchSearch, crouchIndex);
 
-		//findBind(bound, buttonCode, jumpBinds, sizeof(jumpBinds), jumpIndex, jumpSearch, sizeof(jumpSearch));
+			//findBind(bound, buttonCode, jumpBinds, sizeof(jumpBinds), jumpIndex, jumpSearch, sizeof(jumpSearch));
 
-		// find jump binds
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(jumpSearch)) {
-				if (jumpIndex >= sizeof(jumpBinds)) break;
-				jumpBinds[jumpIndex] = buttonCode;
-				jumpIndex++;
-				break;
+			// find jump binds
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(jumpSearch)) {
+					if (jumpIndex >= sizeof(jumpBinds)) break;
+					jumpBinds[jumpIndex] = buttonCode;
+					jumpIndex++;
+					break;
+				}
+				if (i >= sizeof(jumpSearch) || bound[i] != jumpSearch[i]) break;
 			}
-			if (i >= sizeof(jumpSearch) || bound[i] != jumpSearch[i]) break;
+
+			// find crouch binds
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(crouchSearch)) {
+					if (crouchIndex >= sizeof(crouchBinds)) break;
+					crouchBinds[crouchIndex] = buttonCode;
+					crouchIndex++;
+					break;
+				}
+				if (i >= sizeof(crouchSearch) || bound[i] != crouchSearch[i]) break;
+			}
+
+			// find movement binds
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(forwardSearch)) {
+					if (forwardIndex >= sizeof(forwardBinds)) break;
+					forwardBinds[forwardIndex] = buttonCode;
+					forwardIndex++;
+					break;
+				}
+				if (i >= sizeof(forwardSearch) || bound[i] != forwardSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(backSearch)) {
+					if (backIndex >= sizeof(backBinds)) break;
+					backBinds[backIndex] = buttonCode;
+					backIndex++;
+					break;
+				}
+				if (i >= sizeof(backSearch) || bound[i] != backSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(leftSearch)) {
+					if (leftIndex >= sizeof(leftBinds)) break;
+					leftBinds[leftIndex] = buttonCode;
+					leftIndex++;
+					break;
+				}
+				if (i >= sizeof(leftSearch) || bound[i] != leftSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(rightSearch)) {
+					if (rightIndex >= sizeof(rightBinds)) break;
+					rightBinds[forwardIndex] = buttonCode;
+					rightIndex++;
+					break;
+				}
+				if (i >= sizeof(rightSearch) || bound[i] != rightSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(tasLurchSearch)) {
+					if (tasLurchIndex >= sizeof(tasLurchBinds)) break;
+					tasLurchBinds[forwardIndex] = buttonCode;
+					tasLurchIndex++;
+					break;
+				}
+				if (i >= sizeof(tasLurchSearch) || bound[i] != tasLurchSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(tasBumpLaunchSearch)) {
+					if (tasBumpLaunchIndex >= sizeof(tasBumpLaunchBinds)) break;
+					tasBumpLaunchBinds[forwardIndex] = buttonCode;
+					tasBumpLaunchIndex++;
+					break;
+				}
+				if (i >= sizeof(tasBumpLaunchSearch) || bound[i] != tasBumpLaunchSearch[i]) break;
+			}
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(tasSurfStopSearch)) {
+					if (tasSurfStopIndex >= sizeof(tasSurfStopBinds)) break;
+					tasSurfStopBinds[forwardIndex] = buttonCode;
+					tasSurfStopIndex++;
+					break;
+				}
+				if (i >= sizeof(tasSurfStopSearch) || bound[i] != tasSurfStopSearch[i]) break;
+			}
 		}
-
-		// find crouch binds
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(crouchSearch)) {
-				if (crouchIndex >= sizeof(crouchBinds)) break;
-				crouchBinds[crouchIndex] = buttonCode;
-				crouchIndex++;
-				break;
-			}
-			if (i >= sizeof(crouchSearch) || bound[i] != crouchSearch[i]) break;
-		}
-
-		// find movement binds
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(forwardSearch)) {
-				if (forwardIndex >= sizeof(forwardBinds)) break;
-				forwardBinds[forwardIndex] = buttonCode;
-				forwardIndex++;
-				break;
-			}
-			if (i >= sizeof(forwardSearch) || bound[i] != forwardSearch[i]) break;
-		}
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(backSearch)) {
-				if (backIndex >= sizeof(backBinds)) break;
-				backBinds[backIndex] = buttonCode;
-				backIndex++;
-				break;
-			}
-			if (i >= sizeof(backSearch) || bound[i] != backSearch[i]) break;
-		}
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(leftSearch)) {
-				if (leftIndex >= sizeof(leftBinds)) break;
-				leftBinds[leftIndex] = buttonCode;
-				leftIndex++;
-				break;
-			}
-			if (i >= sizeof(leftSearch) || bound[i] != leftSearch[i]) break;
-		}
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(rightSearch)) {
-				if (rightIndex >= sizeof(rightBinds)) break;
-				rightBinds[forwardIndex] = buttonCode;
-				rightIndex++;
-				break;
-			}
-			if (i >= sizeof(rightSearch) || bound[i] != rightSearch[i]) break;
+		__except (filter(GetExceptionCode(), GetExceptionInformation())) {
 		}
 	}
 

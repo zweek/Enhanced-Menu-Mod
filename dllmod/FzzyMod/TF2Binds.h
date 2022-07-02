@@ -249,6 +249,9 @@ extern int forwardBinds[2];
 extern int backBinds[2];
 extern int rightBinds[2];
 extern int leftBinds[2];
+extern int tasLurchBinds[2];
+extern int tasBumpLaunchBinds[2];
+extern int tasSurfStopBinds[2];
 
 extern int controllerJump;
 extern int controllerCrouch;
