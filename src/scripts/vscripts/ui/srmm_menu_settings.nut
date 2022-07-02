@@ -226,6 +226,8 @@ void function EnableTASMode()
 	SetConVarFloat("miles_map_begin_silence_time", 0)
 	// input prevention on load
 	SetConVarFloat("player_respawnInputDebounceDuration", 0)
+	// command queue to make lower timescales work
+	SetConVarInt("sv_usercmd_max_queued", 400)
 
 	SetConVarInt("sv_cheats", 1)
 }
@@ -236,6 +238,7 @@ void function DisableTASMode()
 	SetConVarFloat("miles_map_begin_fade_time", 1.5)
 	SetConVarFloat("miles_map_begin_silence_time", 0.5)
 	SetConVarFloat("player_respawnInputDebounceDuration", 0.5)
+	SetConVarInt("sv_usercmd_max_queued", 40)
 	SetConVarInt("sv_cheats", 0)
 }
 
