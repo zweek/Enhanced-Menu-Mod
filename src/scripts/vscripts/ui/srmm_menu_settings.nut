@@ -227,7 +227,7 @@ void function EnableTASMode()
 	// input prevention on load
 	SetConVarFloat("player_respawnInputDebounceDuration", 0)
 	// command queue to make lower timescales work
-	SetConVarInt("sv_usercmd_max_queued", 400)
+	SetConVarInt("sv_usercmd_max_queued", 1000)
 
 	SetConVarInt("sv_cheats", 1)
 }

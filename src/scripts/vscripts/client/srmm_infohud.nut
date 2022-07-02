@@ -33,6 +33,7 @@ array<SRMM_ConVarInfo> SRMM_ConVarInfos = []
 array<SRMM_SettingInfo> SRMM_SettingInfos = []
 array<InfoDisplay> InfoDisplays = []
 array<InfoDisplay> CKF_infoDisplay = []
+array<InfoDisplay> TAStimescaleInfoDisplay = []
 
 void function SRMM_InfoHUD_Init()
 {
@@ -47,6 +48,7 @@ void function SRMM_InfoHUD_Init()
         InfoDisplays.append(CreateInfoDisplay())
     }
     CKF_infoDisplay.append(CreateCKFInfoDisplay())
+    TAStimescaleInfoDisplay.append(CreateTAStimescaleInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
 
@@ -91,9 +93,14 @@ void function SRMM_InfoHUD_Thread()
             {
                 SetInfoName(InfoDisplays[i], "")
             }
+
+            if (SRMM_getSetting(SRMM_settings.TASmode)) {
+                SetInfoName(TAStimescaleInfoDisplay[0], GetConVarFloat("host_timescale").tostring())
+            }
         }
         else
         {
+            SetInfoName(TAStimescaleInfoDisplay[0], "")
 
             // ConVar display
             UpdateModdedConVars()
@@ -198,6 +205,24 @@ InfoDisplay function CreateInfoDisplay()
 
     var rui
     rui = CreateFullscreenRui( $"ui/cockpit_console_text_top_left.rpak" )
+    RuiSetString( rui, "msgText", "" )
+    RuiSetInt( rui, "maxLines", 1 )
+    RuiSetInt( rui, "lineNum", 1 )
+    RuiSetFloat( rui, "msgFontSize", 40.0 )
+    RuiSetFloat( rui, "msgAlpha", 0.7 )
+    RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
+    display.infoTitle = rui
+
+    return display
+}
+
+InfoDisplay function CreateTAStimescaleInfoDisplay()
+{
+    InfoDisplay display
+
+    var rui
+    rui = CreateFullscreenRui( $"ui/cockpit_console_text_top_right.rpak" )
+    RuiSetFloat2( rui, "msgPos", <0.98, -0.02, 0.0> )
     RuiSetString( rui, "msgText", "" )
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
