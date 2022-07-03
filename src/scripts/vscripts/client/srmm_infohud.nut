@@ -47,7 +47,7 @@ void function SRMM_InfoHUD_Init()
     {
         InfoDisplays.append(CreateInfoDisplay())
     }
-    CKF_infoDisplay.append(CreateCKFInfoDisplay())
+    //CKF_infoDisplay.append(CreateCKFInfoDisplay())
     TAStimescaleInfoDisplay.append(CreateTAStimescaleInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
