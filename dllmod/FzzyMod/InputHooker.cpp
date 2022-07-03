@@ -16,7 +16,9 @@ using namespace std;
 typedef DWORD(WINAPI* XINPUTGETSTATE)(DWORD, XINPUT_STATE*);
 typedef void(__fastcall* POSTEVENT)(__int64, InputEventType_t, int, ButtonCode_t, ButtonCode_t, int);
 typedef HRESULT(__stdcall* D3D11PRESENT) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+typedef void(__fastcall* UPDATE)();
 
+static UPDATE hookedUpdate = nullptr;
 static D3D11PRESENT hookedD3D11Present = nullptr;
 static POSTEVENT hookedPostEvent = nullptr;
 static XINPUTGETSTATE hookedXInputGetState = nullptr;
@@ -337,7 +339,6 @@ bool GetD3D11SwapchainDeviceContext(void** pSwapchainTable, size_t Size_Swapchai
 	swapChainDesc.BufferCount = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -427,6 +428,74 @@ void* Context[108];
 typedef HRESULT(__fastcall* tPresent)(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags);
 tPresent oPresent = nullptr;
 
+bool half;
+
+void __fastcall detourUpdate() {
+	hookedUpdate();
+
+	half = !half;
+	if (half) return;
+
+	TASFrameHook();
+	if (jumpPressHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::steady_clock::now() - jumpPressHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			jumpPressHolder.waitingToSend = false;
+			hookedPostEvent(jumpPressHolder.a, jumpPressHolder.nType, jumpPressHolder.nTick,
+				jumpPressHolder.scanCode, jumpPressHolder.virtualCode, jumpPressHolder.data3);
+			auto e = std::chrono::steady_clock::now() - crouchtime;
+			long long s = std::chrono::duration_cast<std::chrono::milliseconds>(e).count();
+
+			if (s < 100) {
+				m_sourceConsole->Print(("not crouchkick: " + to_string(s) + "ms CROUCH IS EARLY\n").c_str());
+			}
+
+			jumptime = std::chrono::steady_clock::now();
+		}
+	}
+	if (jumpReleaseHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::steady_clock::now() - jumpReleaseHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			jumpReleaseHolder.waitingToSend = false;
+			hookedPostEvent(jumpReleaseHolder.a, jumpReleaseHolder.nType, jumpReleaseHolder.nTick,
+				jumpReleaseHolder.scanCode, jumpReleaseHolder.virtualCode, jumpReleaseHolder.data3);
+		}
+	}
+
+	if (crouchPressHolder.waitingToSend) {
+		auto crouchElapsed = std::chrono::steady_clock::now() - crouchPressHolder.timestamp;
+		long long sinceCrouch = std::chrono::duration_cast<std::chrono::milliseconds>(crouchElapsed).count();
+
+		if (sinceCrouch > CROUCHKICK_BUFFERING) {
+			crouchPressHolder.waitingToSend = false;
+			hookedPostEvent(crouchPressHolder.a, crouchPressHolder.nType, crouchPressHolder.nTick,
+				crouchPressHolder.scanCode, crouchPressHolder.virtualCode, crouchPressHolder.data3);
+			auto e = std::chrono::steady_clock::now() - jumptime;
+			long long s = std::chrono::duration_cast<std::chrono::milliseconds>(e).count();
+
+			if (s < 100) {
+				m_sourceConsole->Print(("not crouchkick: " + to_string(s) + "ms JUMP IS EARLY\n").c_str());
+			}
+
+			crouchtime = std::chrono::steady_clock::now();
+		}
+	}
+	if (crouchReleaseHolder.waitingToSend) {
+		auto jumpElapsed = std::chrono::steady_clock::now() - crouchReleaseHolder.timestamp;
+		long long sinceJump = std::chrono::duration_cast<std::chrono::milliseconds>(jumpElapsed).count();
+
+		if (sinceJump > CROUCHKICK_BUFFERING) {
+			crouchReleaseHolder.waitingToSend = false;
+			hookedPostEvent(crouchReleaseHolder.a, crouchReleaseHolder.nType, crouchReleaseHolder.nTick,
+				crouchReleaseHolder.scanCode, crouchReleaseHolder.virtualCode, crouchReleaseHolder.data3);
+		}
+	}
+}
+
 HRESULT __fastcall hkPresent(IDXGISwapChain* pThis, UINT SyncInterval, UINT Flags)
 {
 	TASFrameHook();
@@ -503,11 +572,15 @@ void setInputHooks() {
 	if (xinputResult != MH_OK) {
 		m_sourceConsole->Print(("hook XInputGetState failed " + to_string(xinputResult) + "\n").c_str());
 	}
+	uintptr_t engineBase = (uintptr_t)GetModuleHandleW(L"engine.dll");
 
-	if (GetD3D11SwapchainDeviceContext(SwapChain, sizeof(SwapChain), Device, sizeof(Device), Context, sizeof(Context)))
+	UPDATE update = UPDATE(engineBase + 0x77F50);
+	DWORD updateResult = MH_CreateHookEx(update, &detourUpdate, &hookedUpdate);
+
+	/*if (GetD3D11SwapchainDeviceContext(SwapChain, sizeof(SwapChain), Device, sizeof(Device), Context, sizeof(Context)))
 	{
 		oPresent = (tPresent)Tramp64(SwapChain[8], hkPresent, 19);
-	}
+	}*/
 }
 
 bool hooksEnabled = false;

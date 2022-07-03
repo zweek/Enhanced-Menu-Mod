@@ -412,24 +412,28 @@ void findBinds() {
 	char controllerCrouchSearch[] = "+toggle_duck";
 
 	for (int controllerCode = JOYSTICK_FIRST_BUTTON; controllerCode < KEY_XSTICK2_UP; controllerCode++) {
-		int offset = controllerCode * 0x10;
-		uintptr_t ptr = *reinterpret_cast<uintptr_t*>(engineBase + bindBase + offset);
-		if (ptr == 0) continue;
+		__try {
+			int offset = controllerCode * 0x10;
+			uintptr_t ptr = *reinterpret_cast<uintptr_t*>(engineBase + bindBase + offset);
+			if (ptr == 0) continue;
 
-		char* bound = (char*)(ptr);
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(controllerJumpSearch)) {
-				controllerJump = controllerCode;
-				break;
+			char* bound = (char*)(ptr);
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(controllerJumpSearch)) {
+					controllerJump = controllerCode;
+					break;
+				}
+				if (i >= sizeof(controllerJumpSearch) || bound[i] != controllerJumpSearch[i]) break;
 			}
-			if (i >= sizeof(controllerJumpSearch) || bound[i] != controllerJumpSearch[i]) break;
+			for (int i = 0; i < 100; i++) {
+				if (bound[i] == '\0' && i == sizeof(controllerCrouchSearch)) {
+					controllerCrouch = controllerCode;
+					break;
+				}
+				if (i >= sizeof(controllerCrouchSearch) || bound[i] != controllerCrouchSearch[i]) break;
+			}
 		}
-		for (int i = 0; i < 100; i++) {
-			if (bound[i] == '\0' && i == sizeof(controllerCrouchSearch)) {
-				controllerCrouch = controllerCode;
-				break;
-			}
-			if (i >= sizeof(controllerCrouchSearch) || bound[i] != controllerCrouchSearch[i]) break;
+		__except (filter(GetExceptionCode(), GetExceptionInformation())) {
 		}
 	}
 }

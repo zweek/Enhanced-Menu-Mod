@@ -63,6 +63,7 @@ extern bool allHooksSet;
 void spoofPostEvent(__int64, InputEventType_t, int, ButtonCode_t, ButtonCode_t, int);
 
 void setInputHooks();
+void hookD3DPresent();
 void enableInputHooks();
 void disableInputHooks();
 

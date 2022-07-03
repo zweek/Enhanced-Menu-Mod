@@ -259,6 +259,8 @@ extern int controllerCrouch;
 void findBinds();
 void InitializeTF2Binds();
 
+int filter(unsigned int, struct _EXCEPTION_POINTERS*);
+
 ButtonCode_t ButtonCode_ScanCodeToButtonCode(int);
 int ButtonCode_ButtonCodeToScanCode(ButtonCode_t);
 int ButtonCode_VirtualKeyToScanCode(int);
