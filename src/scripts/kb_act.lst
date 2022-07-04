@@ -86,7 +86,7 @@
 "load fasthelms2;lp" 	"Load NCS Helmet 1"
 "load fasthelms5;lp" 	"Load NCS Helmet 2"
 "blank"					"=========================="
-"blank"					"TAS"
+"blank"					"Timescale"
 "blank"					"=========================="
 "toggle host_timescale 0.05 1" "0.05x Timescale"
 "toggle host_timescale 0.2 1" "0.2x Timescale"

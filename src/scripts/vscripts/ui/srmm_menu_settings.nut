@@ -95,24 +95,6 @@ void function SRMM_InitSettingsMenu()
 		SRMM_getSetting(SRMM_settings.CKfix)
 	)
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
-
-	button = Hud_GetChild( menu, "BtnTASMode" )
-	SRMM_SetupButton(
-		button,
-		"TAS Mode",
-		"`2NOT LEADERBOARD LEGAL!\n\n`0Changes your game settings to be TAS compatible\n\n- Disables load audio fade\n- Disables input prevention on saveload\n- Enables use of host_timescale",
-		SRMM_getSetting(SRMM_settings.TASmode)
-	)
-	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
-
-	// button = Hud_GetChild( menu, "BtnEnableConsole" )
-	// SRMM_SetupButton(
-	// 	button,
-	// 	"Console",
-	// 	"`2Only for testing and debug purposes!\n\n`0Enable Standard Console output that shows information about the crouch kick buffer and your inputs",
-	// 	SRMM_getSetting(SRMM_settings.enableConsole)
-	// )
-	// AddButtonEventHandler( button, UIE_CLICK, ConsoleToggle )
     
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
@@ -204,44 +186,6 @@ void function CKfixToggle(var button)
 {
 	SRMM_buttonToggle(button, SRMM_settings.CKfix, "Crouch Kick Fix")
 }
-
-void function TASModeToggle(var button)
-{
-	SRMM_toggleSetting(SRMM_settings.TASmode)
-	string settingLabel
-	if (SRMM_getSetting(SRMM_settings.TASmode)) {
-		EnableTASMode()
-		settingLabel = "Enabled"
-	} else {
-		DisableTASMode()
-		settingLabel = "Disabled"
-	}
-	SetButtonRuiText(button, "TAS Mode: " + settingLabel)
-}
-
-void function EnableTASMode()
-{
-	// audio fade on load
-	SetConVarFloat("miles_map_begin_fade_time", 0)
-	SetConVarFloat("miles_map_begin_silence_time", 0)
-	// input prevention on load
-	SetConVarFloat("player_respawnInputDebounceDuration", 0)
-
-	SetConVarInt("sv_cheats", 1)
-}
-
-void function DisableTASMode()
-{
-	// revert to default values
-	SetConVarFloat("miles_map_begin_fade_time", 1.5)
-	SetConVarFloat("miles_map_begin_silence_time", 0.5)
-	SetConVarFloat("player_respawnInputDebounceDuration", 0.5)
-	SetConVarInt("sv_cheats", 0)
-}
-
-// void function ConsoleToggle(var button) {
-// 	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
-// }
 
 
 void function SRMM_OnOpenSettingsMenu()

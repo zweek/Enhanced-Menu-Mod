@@ -8,11 +8,11 @@ global enum SRMM_settings {
     enableSpeedometer,
     speedometerIncludeZ,
     speedometerFadeout,
-    TASmode,
+    // TASmode,
     CKfix,
 }
 
-global string srmmVersion = "SRMM v2.3.1"
+global string srmmVersion = "SRMM v2.4"
 
 bool function SRMM_getSetting(int i) {
 	if ((GetConVarInt("voice_forcemicrecord") & (1 << i)) > 0) {

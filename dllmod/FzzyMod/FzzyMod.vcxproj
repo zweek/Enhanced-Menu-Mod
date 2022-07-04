@@ -175,7 +175,6 @@
     <ClInclude Include="src\hde\table32.h" />
     <ClInclude Include="src\hde\table64.h" />
     <ClInclude Include="src\trampoline.h" />
-    <ClInclude Include="TASTools.h" />
     <ClInclude Include="TF2Binds.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="VTableHooking.h" />
@@ -189,7 +188,6 @@
     <ClCompile Include="src\hde\hde64.c" />
     <ClCompile Include="src\hook.c" />
     <ClCompile Include="src\trampoline.c" />
-    <ClCompile Include="TASTools.cpp" />
     <ClCompile Include="TF2Binds.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>

@@ -6,7 +6,6 @@
 #include "InputHooker.h"
 #include "include/MinHook.h"
 #include "TF2Binds.h"
-#include "TASTools.h"
 #include <vector>
 #include "SourceConsole.h"
 

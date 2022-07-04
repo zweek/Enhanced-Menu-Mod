@@ -8,7 +8,6 @@
 #include <cmath>
 #include "TF2Binds.h"
 #include "SourceConsole.h"
-#include "TASTools.h"
 #include <d3d11.h>
 
 using namespace std;
