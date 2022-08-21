@@ -39,6 +39,9 @@ void function SRMM_InfoHUD_Init()
     RegisterConVar("sv_cheats", 0)
     RegisterConVar("host_timescale", 1)
     RegisterConVar("player_respawnInputDebounceDuration", 0.5)
+
+    // in-game timer stuff
+    ClTimer_Init()
     // RegisterSetting("TAS", SRMM_settings.TASmode, SRMM_settingDisplayPriority.TASmode)
     // RegisterSetting("speedmod", SRMM_settings.enableSpeedmod, SRMM_settingDisplayPriority.speedmod)
 

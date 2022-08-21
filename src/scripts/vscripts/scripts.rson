@@ -1004,6 +1004,20 @@ Scripts:
 	client/_cl_model_viewer.nut
 ]
 
+// IN-GAME TIMER CONTENT
+
+When: "UI"
+Scripts:
+[
+	ui_timer.nut
+]
+
+When: "CLIENT"
+Scripts:
+[
+	cl_timer.nut
+]
+
 /*
 When: "SERVER && MAP_mp_ab_test"
 Scripts:

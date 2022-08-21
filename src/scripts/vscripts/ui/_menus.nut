@@ -946,6 +946,7 @@ void function InitMenus()
 	AddMenu( "SinglePlayerDevMenu", $"resource/ui/menus/singleplayer_dev.menu", InitSinglePlayerDevMenu, "SINGLE PLAYER DEV" )
 	AddMenu( "SinglePlayerMenu", $"resource/ui/menus/singleplayer.menu", InitSinglePlayerMenu, "SINGLE PLAYER" )
 
+	UITimer_Init()
 	AddMenu( "SRMM_PracticeWarpsMenu", $"resource/ui/menus/srmm_practicewarps.menu", SRMM_InitPracticeWarpsMenu )
 	AddMenu( "SRMM_GauntletWarpsMenu", $"resource/ui/menus/warpmenus/srmm_gauntletwarps.menu", SRMM_InitGauntletWarpsMenu )
 	AddMenu( "SRMM_BTWarpsMenu", $"resource/ui/menus/warpmenus/srmm_btwarps.menu", SRMM_InitBTWarpsMenu )
