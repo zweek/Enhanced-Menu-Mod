@@ -1,5 +1,6 @@
 global function UITimer_Init
 global function SRMM_SetIsPaused
+global function SRMM_LoadTimeFromSave
 
 // WHY IS THIS NOT IN CLIENT?
 
@@ -12,12 +13,16 @@ global function SRMM_SetIsPaused
 // we use 2 integers instead of a simple float because we want to avoid float precision fucking up our times
 int seconds = 0
 int microSeconds = 0
+int loadSeconds = 0
+int loadMicroSeconds = 0
 
 bool isPaused = false
 
 void function UITimer_Init()
 {
     //print("\n\n\n\n\n\n\nPAIN")
+    RegisterSignal("LoadedTime")
+    ClientCommand("sv_quota_stringcmdspersecond 1000")
     thread Timer()
 }
 
@@ -25,11 +30,35 @@ void function Timer()
 {
     while (true)
     {
+
+        // not when in loading screen
+        while (uiGlobal.loadingLevel != "")
+        {
+            //print("\n\n\n\nLOADING LEVEL")
+            seconds = 0
+            microSeconds = 0
+            loadSeconds = 0
+            loadMicroSeconds = 0
+            WaitFrame()
+        }
+        
+        // not when in menus
+        //print(uiGlobal.loadedLevel)
+        if (uiGlobal.loadedLevel == "")
+        {
+            seconds = 0
+            microSeconds = 0
+            loadSeconds = 0
+            loadMicroSeconds = 0
+            WaitSignal( uiGlobal.signalDummy, "LoadedTime" )
+        }
+
         float startTime = Time()
         WaitFrame()
         float delta = Time() - startTime
-        if (uiGlobal.activeMenu == null && !isPaused)
+        if (uiGlobal.activeMenu == null || !isPaused)
             delta *= GetConVarFloat( "host_timescale" )
+        
         int microSecondDelta = int(delta * 1000000)
 
         microSeconds += microSecondDelta
@@ -37,20 +66,19 @@ void function Timer()
         seconds += microSeconds / 1000000
 
         microSeconds = microSeconds % 1000000
-
-        // not when in loading screen
-        if (uiGlobal.loadingLevel != "")
-            continue
-        
-        // not when in menus
-        if (uiGlobal.loadedLevel == "")
-            continue
+        int totalSeconds = seconds + loadSeconds + (microSeconds + loadMicroSeconds) / 1000000
+        int totalMicroSeconds = (microSeconds + loadMicroSeconds) % 1000000
+        //printt(totalSeconds, totalMicroSeconds)
+        //printt("TOTAL TIME:", format("%02i:%02i.%03i", totalSeconds / 60, totalSeconds % 60, totalMicroSeconds / 1000))
+        //printt("TIME IN LEVEL:", format("%02i:%02i.%03i", seconds / 60, seconds % 60, microSeconds / 1000))
 
         //print(format("%i.%06i", seconds, microSeconds))
         // in a try/catch because I'm not bothering to check if Client VM is active lel
         try
         {
-            RunClientScript("SRMM_SetTime", seconds, microSeconds)
+            RunClientScript("SRMM_SetTime", totalSeconds, totalMicroSeconds)
+            //print("sending cc")
+            ClientCommand( "time " + totalSeconds + " " + totalMicroSeconds)
         }
         catch (ex)
         {
@@ -63,4 +91,12 @@ void function Timer()
 void function SRMM_SetIsPaused(bool paused)
 {
     isPaused = paused
+}
+
+void function SRMM_LoadTimeFromSave(int s, int ms)
+{
+    //print("HOLY FUCKING SHIT")
+    loadSeconds = s
+    loadMicroSeconds = ms
+    Signal( uiGlobal.signalDummy, "LoadedTime" )
 }
