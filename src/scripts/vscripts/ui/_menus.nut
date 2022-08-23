@@ -1076,6 +1076,7 @@ void function InitMenus()
 
 	AddMenu( "DevMenu", $"resource/ui/menus/dev.menu", InitDevMenu, "Dev" )
 	InitSharedStartPoints()
+	UITimer_Init()
 
 	foreach ( menu in uiGlobal.allMenus )
 	{

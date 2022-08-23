@@ -465,6 +465,7 @@ Scripts:
 	_viewcone.gnut
 	_pain_death_sounds.gnut
 	sh_savegame.gnut
+	sv_timer.nut
 	ai/_ai_chatter.gnut
 	ai/_ai_stationary_firing_positions.gnut
 	ai/_ai_cloak_drone.gnut
@@ -838,6 +839,7 @@ Scripts:
 	weapons/cl_smart_ammo.gnut
 	weapons/cl_team_emp.gnut
 	client/rui/cl_weapon_status.gnut
+	cl_timer.nut
 
 	// leave this last so it can contain any struct
 	cl_globals.gnut
@@ -961,6 +963,7 @@ Scripts:
 	//ui/menu_store_weapon_skin_preview.nut
 
 	ui/panel_fd_awards.nut
+	ui_timer.nut
 
 	burnmeter/sh_burnmeter.gnut
 	sp/sh_sp_objective_strings.gnut

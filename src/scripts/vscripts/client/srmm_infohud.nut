@@ -41,6 +41,7 @@ void function SRMM_InfoHUD_Init()
     RegisterConVar("host_timescale", 1)
     RegisterConVar("player_respawnInputDebounceDuration", 0.5)
     RegisterSetting("TAS", SRMM_settings.TASmode, SRMM_settingDisplayPriority.TASmode)
+    ClTimer_Init()
     // RegisterSetting("speedmod", SRMM_settings.enableSpeedmod, SRMM_settingDisplayPriority.speedmod)
 
     for (int i = 0; i < displayLines; i++)
