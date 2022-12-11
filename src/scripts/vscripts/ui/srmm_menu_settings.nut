@@ -96,6 +96,15 @@ void function SRMM_InitSettingsMenu()
 	)
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
     
+	button = Hud_GetChild( menu, "BtnPracticeMode" )
+	SRMM_SetupButton(
+		button,
+		"Practice Mode",
+		"`2NOT LEADERBOARD LEGAL!\n\n`0Changes some settings to make practice a bit easier\n\n- Disables input prevention on saveload\n- Enables use of host_timescale",
+		SRMM_getSetting(SRMM_settings.practiceMode)
+	)
+	AddButtonEventHandler( button, UIE_CLICK, PracticeModeToggle )
+
 	// Actions
 	button = Hud_GetChild( menu, "BtnResetHelmets" )
 	SetupButton(
@@ -187,6 +196,34 @@ void function CKfixToggle(var button)
 	SRMM_buttonToggle(button, SRMM_settings.CKfix, "Crouch Kick Fix")
 }
 
+void function PracticeModeToggle(var button)
+{
+	SRMM_toggleSetting(SRMM_settings.practiceMode)
+	string settingLabel
+	if (SRMM_getSetting(SRMM_settings.practiceMode)) {
+		EnablePracticeMode()
+		settingLabel = "Enabled"
+	} else {
+		DisablePracticeMode()
+		settingLabel = "Disabled"
+	}
+	SetButtonRuiText(button, "Practice Mode: " + settingLabel)
+}
+
+void function EnablePracticeMode()
+{
+	// input prevention on load
+	SetConVarFloat("player_respawnInputDebounceDuration", 0)
+
+	SetConVarInt("sv_cheats", 1)
+}
+
+void function DisablePracticeMode()
+{
+	// revert to default values
+	SetConVarFloat("player_respawnInputDebounceDuration", 0.5)
+	SetConVarInt("sv_cheats", 0)
+}
 
 void function SRMM_OnOpenSettingsMenu()
 {

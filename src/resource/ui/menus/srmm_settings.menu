@@ -84,7 +84,7 @@ resource/ui/menus/srmm_settings.menu
 			InheritProperties		ControlsSwitchButton
 			tabPosition				1
 			style					DialogListButton
-			navUp					BtnCKfix
+			navUp					BtnPracticeMode
 			navDown					BtnSpeedometerEnable
 			ConVar					"mat_disable_bloom"
 			list
@@ -387,6 +387,18 @@ resource/ui/menus/srmm_settings.menu
 			pin_to_sibling_corner	BOTTOM_LEFT
 			ypos					1
 			navUp					SwitchEnableMP
+			navDown					BtnPracticeMode
+		}
+
+		BtnPracticeMode
+		{
+			ControlName				RuiButton
+			InheritProperties		WideButton
+			pin_to_sibling			BtnCKfix
+			pin_corner_to_sibling	TOP_LEFT
+			pin_to_sibling_corner	BOTTOM_LEFT
+			ypos					1
+			navUp					BtnCKfix
 			navDown					SwitchBloomEnable
 		}
 

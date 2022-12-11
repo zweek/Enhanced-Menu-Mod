@@ -8,7 +8,7 @@ global enum SRMM_settings {
     enableSpeedometer,
     speedometerIncludeZ,
     speedometerFadeout,
-    // TASmode,
+    practiceMode,
     CKfix,
 }
 
