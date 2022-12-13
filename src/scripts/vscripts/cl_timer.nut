@@ -10,7 +10,6 @@ var timerRUI = null
 
 void function ClTimer_Init()
 {
-    print("\n\n\nPAIN")
     timerRUI = RuiCreate( RUI_TEXT_CENTER, clGlobal.topoFullScreen, RUI_DRAW_HUD, RUI_SORT_SCREENFADE + 150 ) // btw, texts like this appear streched when playing in non-16:9 aspect ratios, pls fix
 	RuiSetInt( timerRUI, "maxLines", 2 )
     RuiSetInt( timerRUI, "lineNum", 0 )
@@ -21,7 +20,6 @@ void function ClTimer_Init()
     RuiSetFloat( timerRUI, "msgAlpha", 0.9 )
     RuiSetFloat( timerRUI, "thicken", 0.0 )
 
-    //print("\n\n\n\n\n\n\nPAIN")
     thread Timer()
 }
 
@@ -29,7 +27,6 @@ void function Timer()
 {
     while (true)
     {
-        //print("PAIN")
         float startTime = Time()
         wait 0 // waits one real-time frame, not in-game frame, somehow.
 

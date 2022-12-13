@@ -32,7 +32,6 @@ enum SRMM_settingDisplayPriority
 array<SRMM_ConVarInfo> SRMM_ConVarInfos = []
 array<SRMM_SettingInfo> SRMM_SettingInfos = []
 array<InfoDisplay> InfoDisplays = []
-array<InfoDisplay> CKF_infoDisplay = []
 array<InfoDisplay> TAStimescaleInfoDisplay = []
 
 void function SRMM_InfoHUD_Init()
@@ -48,7 +47,6 @@ void function SRMM_InfoHUD_Init()
     {
         InfoDisplays.append(CreateInfoDisplay())
     }
-    //CKF_infoDisplay.append(CreateCKFInfoDisplay())
     TAStimescaleInfoDisplay.append(CreateTAStimescaleInfoDisplay())
     thread SRMM_InfoHUD_Thread()
 }
@@ -118,14 +116,6 @@ void function SRMM_InfoHUD_Thread()
             {
                 SetInfoName(InfoDisplays[i], "")
             }
-
-            // Crouch kick fix display
-            if (SRMM_getSetting(SRMM_settings.CKfix)) {
-                SetInfoName(CKF_infoDisplay[0], "CKF")
-            } else {
-                SetInfoName(CKF_infoDisplay[0], "")
-            }
-
         }
         
     }
@@ -228,21 +218,6 @@ InfoDisplay function CreateTAStimescaleInfoDisplay()
     RuiSetInt( rui, "maxLines", 1 )
     RuiSetInt( rui, "lineNum", 1 )
     RuiSetFloat( rui, "msgFontSize", 40.0 )
-    RuiSetFloat( rui, "msgAlpha", 0.7 )
-    RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
-    display.infoTitle = rui
-
-    return display
-}
-
-InfoDisplay function CreateCKFInfoDisplay()
-{
-    InfoDisplay display
-    var rui
-    rui = CreateCockpitRui( $"ui/cockpit_console_text_top_left.rpak" )
-    RuiSetFloat2( rui, "msgPos", <0.15, 0.86, 0.0> )
-    RuiSetString( rui, "msgText", "CKF" )
-    RuiSetFloat( rui, "msgFontSize", 35.0 )
     RuiSetFloat( rui, "msgAlpha", 0.7 )
     RuiSetFloat3( rui, "msgColor", <1.0, 1.0, 1.0> )
     display.infoTitle = rui

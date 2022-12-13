@@ -21,15 +21,15 @@ bool function SRMM_getSetting(int i) {
 	return false
 }
 
-void function SRMM_setSetting(int i, int value) {
+void function SRMM_setSetting(int i, bool value) {
 	int settings = GetConVarInt("voice_forcemicrecord")
-	if (value == 1) {
+	if (value) {
 		// set bit at position i to 1
 		SetConVarInt("voice_forcemicrecord", settings | (1 << i))
-	} else if (value == 0) {
+	} else {
 		// set bit at position i to 0
 		SetConVarInt("voice_forcemicrecord", settings & ~(1 << i))
-	} else return
+	}
 }
 
 void function SRMM_toggleSetting(int i) {

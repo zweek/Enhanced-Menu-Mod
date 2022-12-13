@@ -20,7 +20,6 @@ bool isPaused = false
 
 void function UITimer_Init()
 {
-    //print("\n\n\n\n\n\n\nPAIN")
     RegisterSignal("LoadedTime")
     ClientCommand("sv_quota_stringcmdspersecond 1000")
     thread Timer()

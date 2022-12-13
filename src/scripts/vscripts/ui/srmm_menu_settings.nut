@@ -7,8 +7,10 @@ struct
 	var itemDescriptionBox
 } file
 
+
 void function SRMM_InitSettingsMenu()
 {
+	SRMM_setSetting(SRMM_settings.CKfix, true)
 	var menu = GetMenu( "SRMM_SettingsMenu" )
 	file.menu = menu
 
@@ -87,24 +89,16 @@ void function SRMM_InitSettingsMenu()
 		"Enable Multiplayer",
 		"Enables or disables the multiplayer buttons in the main menu"
 	)
-
-	button = Hud_GetChild( menu, "BtnCKfix" )
-	SRMM_SetupButton(button,
-		"Crouch Kick Fix",
-		"Adds an 8 ms Buffer to your jump and crouch inputs.\n\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input",
-		SRMM_getSetting(SRMM_settings.CKfix)
-	)
-	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
-
+	
 	button = Hud_GetChild( menu, "BtnTASMode" )
 	SRMM_SetupButton(
 		button,
 		"TAS Mode",
 		"`2NOT LEADERBOARD LEGAL!\n\n`0Changes your game settings to be TAS compatible\n\n- Disables load audio fade\n- Disables input prevention on saveload\n- Enables use of host_timescale",
 		SRMM_getSetting(SRMM_settings.TASmode)
-	)
+		)
 	AddButtonEventHandler( button, UIE_CLICK, TASModeToggle )
-
+	
 	// button = Hud_GetChild( menu, "BtnEnableConsole" )
 	// SRMM_SetupButton(
 	// 	button,
@@ -199,12 +193,6 @@ void function UnlockLevelsDialog(var button)
 	AreYouSureDialog("Unlock Levels", "Are you sure you want to unlock all levels?", UnlockAllLevels)
 }
 
-
-void function CKfixToggle(var button)
-{
-	SRMM_buttonToggle(button, SRMM_settings.CKfix, "Crouch Kick Fix")
-}
-
 void function TASModeToggle(var button)
 {
 	SRMM_toggleSetting(SRMM_settings.TASmode)
@@ -241,11 +229,6 @@ void function DisableTASMode()
 	SetConVarInt("sv_usercmd_max_queued", 40)
 	SetConVarInt("sv_cheats", 0)
 }
-
-// void function ConsoleToggle(var button) {
-// 	SRMM_buttonToggle(button, SRMM_settings.enableConsole, "Console")
-// }
-
 
 void function SRMM_OnOpenSettingsMenu()
 {
