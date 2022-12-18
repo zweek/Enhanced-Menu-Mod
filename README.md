@@ -22,7 +22,9 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 * Crouch Kick Fix
 * Button to Reset Helmets
 * Button to unlock all levels
-* Dedicated TAS mode
+* Practice mode
+  * Saves include player velocity
+* Practice warp menu based on developer start points
 
 **Bindings**
 * Reset binds
@@ -34,10 +36,11 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 * NCS Saves 1-9
 * NCS Helmet Saves 2 & 5
 * `host_timescale` `5`, `0.2` & `0.05`
+* Developer Console
 
 **Other features**
 * Remove clutter from the main menu
-* Info Hud that shows the state of certain console variables, TAS mode and CKF
+* Info Hud that shows the state of certain console variables, Practice mode and CKF
 * Separate releases for ENG and CHI text for the chinese version of the game
 * Removed crashes from Dev launch arguments `-dev +developer 1`
 
@@ -47,11 +50,6 @@ Manual:
 1) Download the latest release from the [releases page](https://github.com/zweek/TF2SR-Menu-Mod/releases)
 2) (Optional, but recommended) Backup your `englishclient_frontend.bsp.pak000_dir.vpk` in `Titanfall2/vpk`
 3) Drag all contents of the downloaded .zip into your `Titanfall2` folder
-
-LiveSplit:
-1) If you have LiveSplit, right click -> Edit Splits
-2) Select Titanfall 2 as the game, activate the Autosplitter and click Settings
-3) Click the Install Menu Mod button in the Autosplitter Settings
 
 ## Uninstalling
 
