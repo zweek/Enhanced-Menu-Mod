@@ -9,64 +9,12 @@ global function ServerCallback_UpdateDifficulty
 global function BeginIntroSequence
 global function IntroInProgress
 
-global function RUITimerInit
 var rui
 
 struct
 {
 	bool introInProgress = false
 } file
-
-// Timer Code
-void function RUITimerInit()
-{
-		printt("START TIMER")
-    //#if CLIENT
-		WaitFrame()
-    //thread RUITimerUI_DelayedInit();
-    //#endif
-
-}
-
-void function RUITimerUI_DelayedInit()
-{
-    // Wait a frame, so no errors :D
-    WaitFrame();
-    // Make a text segment.
-    rui = RuiCreate( $"ui/cockpit_console_text_top_left.rpak", clGlobal.topoCockpitHudPermanent, RUI_DRAW_COCKPIT, 0 )
-    // Set up text segment? yea sure why not
-    RuiSetInt( rui, "maxLines", 1 )
-    RuiSetInt( rui, "lineNum", 1 )
-    // Position
-    RuiSetFloat2( rui, "msgPos", <0.57, 0.53, 0.0> )
-    // Display text
-    RuiSetString( rui, "msgText", "Time: " )
-    // Font size
-    RuiSetFloat( rui, "msgFontSize", 48.0 )
-    // Alpha cause it cewl
-    RuiSetFloat( rui, "msgAlpha", 0.9 )
-    // ????
-    RuiSetFloat( rui, "thicken", 0.0 )
-    // Color :3
-    RuiSetFloat3( rui, "msgColor", <1.0, 0.55, 0.0> )
-    thread RUIUpdateTimerText();
-}
-
-void function RUIUpdateTimerText()
-{
-    while (true)
-    {
-        // Wait frame so it doesn't loop when not needed, and overload the CPU
-        WaitFrame();
-        // Get the player
-        entity player = GetLocalClientPlayer();
-        // Check if player isn't very alive, or just non-existent
-        if (player == null || !IsValid(player)) {
-            continue;
-        }
-        RuiSetString(rui, "msgText", format("%2i:%1i%.2f", (Time() / 60).tointeger(), (Time() % 60.0 / 10.0).tointeger(), Time() % 10.0));
-    }
-}
 
 void function ClSpHud_Init()
 {

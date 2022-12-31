@@ -544,6 +544,7 @@ When: "SERVER && SP"
 Scripts:
 [
 	sp/_savegame.gnut
+	sp/srmm_savestates.nut
 	_trigger_functions_sp.gnut
 	_script_movers.gnut
 	sp/_ai_sp.gnut
