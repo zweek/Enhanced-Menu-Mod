@@ -24,6 +24,7 @@ This is a forked version of taskinoz's Enhanced Menu Mod geared specifically tow
 * Button to unlock all levels
 * Practice mode
   * Saves include player velocity
+  * Save states
 * Practice warp menu based on developer start points
 
 **Bindings**
