@@ -64,7 +64,8 @@ void function InitSaveGame()
 	FlagInit( "SaveRequires_PlayerIsTitan" )
 	AddClientCommandCallback( "RestartFromLevelTransition", RestartFromLevelTransition )
 	AddClientCommandCallback( "RespawnNowSP", RespawnNowSP )
-	AddCallback_OnClientConnected( SaveStateInit )
+	AddCallback_OnClientConnected( SRMM_SaveStateInit )
+	AddCallback_OnClientConnected( SRMM_ResetsInit )
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

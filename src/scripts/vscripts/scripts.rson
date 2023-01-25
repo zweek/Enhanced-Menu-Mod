@@ -545,6 +545,7 @@ Scripts:
 [
 	sp/_savegame.gnut
 	sp/srmm_savestates.nut
+	sp/srmm_resets.nut
 	_trigger_functions_sp.gnut
 	_script_movers.gnut
 	sp/_ai_sp.gnut
