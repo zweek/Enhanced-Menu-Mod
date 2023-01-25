@@ -1,5 +1,5 @@
 untyped
-global function SaveStateInit
+global function SRMM_SaveStateInit
 
 struct {
     bool savestateExists = false
@@ -8,7 +8,7 @@ struct {
     vector velocity
 } file
 
-void function SaveStateInit( entity player )
+void function SRMM_SaveStateInit( entity player )
 {
     AddClientCommandCallback( "createsavestate", Pressed_CreateSaveState )
     AddClientCommandCallback( "loadsavestate", Pressed_LoadSaveState )
@@ -17,7 +17,7 @@ void function SaveStateInit( entity player )
 bool function Pressed_CreateSaveState( entity player, array<string> args )
 {
     file.position = player.GetOrigin()
-    file.angles = player.GetAngles()
+    file.angles = player.EyeAngles()
     file.velocity = player.GetVelocity()
     file.savestateExists = true
     return true
