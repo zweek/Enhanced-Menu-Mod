@@ -80,18 +80,18 @@ void function SRMM_InitSettingsMenu()
 	SetupButton(
 		Hud_GetChild( menu, "SwitchEnableCheats" ),
 		"Enable Cheats",
-		"`2NOT LEADERBOARD LEGAL!\n\n`0Sets the sv_cheats console variable.\nEnables use of host_timescale console command"
+		"`2NOT LEADERBOARD LEGAL!\n\n`1Sets the sv_cheats console variable.\n\n`0- Enables use of host_timescale\n- Enables use of noclip"
 	)
 	SetupButton(
 		Hud_GetChild( menu, "SwitchEnableMP" ),
 		"Enable Multiplayer",
-		"Enables or disables the multiplayer buttons in the main menu"
+		"`1Enables or disables the multiplayer buttons in the main menu"
 	)
 
 	button = Hud_GetChild( menu, "BtnCKfix" )
 	SRMM_SetupButton(button,
 		"Crouch Kick Fix",
-		"Adds an 8 ms Buffer to your jump and crouch inputs.\n\nPressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input",
+		"`1Adds an 8 ms Buffer to your jump and crouch inputs.\n\n`0Pressing both Jump and Crouch up to 8 ms apart from each other will register both inputs at the same time\nThe combined input will be registered at the time of your second input",
 		SRMM_getSetting(SRMM_settings.CKfix)
 	)
 	AddButtonEventHandler( button, UIE_CLICK, CKfixToggle )
@@ -100,7 +100,7 @@ void function SRMM_InitSettingsMenu()
 	SRMM_SetupButton(
 		button,
 		"Practice Mode",
-		"`2NOT LEADERBOARD LEGAL!\n\n`0Changes some settings to make practice a bit easier\n\n- Disables input prevention on saveload\n- Enables use of host_timescale",
+		"`2NOT LEADERBOARD LEGAL!\n\n`1Some extra tools and settings to make practice a bit easier\n\n`0- Sets sv_cheats to 1\n- Disables input prevention on saveload\n- Makes quicksaves save your velocity\n- Enables use of savestates\n\nSavestates do not account for level progression or NPC positions, as it simply teleports you back to the place where you created the savestate. Still useful for practice imo :]",
 		SRMM_getSetting(SRMM_settings.practiceMode)
 	)
 	AddButtonEventHandler( button, UIE_CLICK, PracticeModeToggle )
@@ -214,7 +214,6 @@ void function EnablePracticeMode()
 {
 	// input prevention on load
 	SetConVarFloat("player_respawnInputDebounceDuration", 0)
-
 	SetConVarInt("sv_cheats", 1)
 }
 
