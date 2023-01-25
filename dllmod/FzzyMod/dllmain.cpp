@@ -152,7 +152,7 @@ DWORD WINAPI Thread(HMODULE hModule) {
 
 	MH_Initialize();
 	InitializeTF2Binds();
-	//ModLoadingScreenProgress();
+	ModLoadingScreenProgress();
 
 	m_sourceConsole.reset(new SourceConsole());
 
