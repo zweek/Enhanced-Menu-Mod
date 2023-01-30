@@ -4,7 +4,7 @@
 [![EMM](https://img.shields.io/badge/taskinoz-Enhanced--Menu--Mod-00a080?style=flat-square&logo=github)](https://github.com/taskinoz/Enhanced-Menu-Mod)
 [![FzzyMod](https://img.shields.io/badge/Fzzy2j-FzzyMod-00a080?style=flat-square&logo=github)](https://github.com/Fzzy2j/FzzyMod)
 
-This is a forked version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. I cut a few features that were not relevant for runners, and added a bunch more specifically for speedrunning to make runner's lives a bit easier.
+This is a forked version of taskinoz's Enhanced Menu Mod geared specifically toward speedrunners and TASers. I cut a few features that were not relevant for runners, and added a bunch more specifically for speedrunning to make runners' lives a bit easier.
 
 [contribute?](https://github.com/zweek/TF2SR-Menu-Mod/blob/main/contribute.md) :]
 
