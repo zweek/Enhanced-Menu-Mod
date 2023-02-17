@@ -64,5 +64,18 @@ namespace Util
             pname++;
         }
     }
+    
+    bool IsMemoryReadable(const uintptr_t nAddress, const size_t nSize)
+    {
+        static SYSTEM_INFO sysInfo;
+        if (!sysInfo.dwPageSize)
+            GetSystemInfo(&sysInfo);
+
+        MEMORY_BASIC_INFORMATION memInfo;
+        if (!VirtualQuery(reinterpret_cast<LPCVOID>(nAddress), &memInfo, sizeof(memInfo)))
+            return false;
+
+        return memInfo.RegionSize >= nSize && memInfo.State & MEM_COMMIT && !(memInfo.Protect & PAGE_NOACCESS);
+    }
 
 } // namespace Util

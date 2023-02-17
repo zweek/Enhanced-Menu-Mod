@@ -9,5 +9,6 @@ x64/
 x86/
 .vs/
 *.user
+packages/
 # vs code garbage
 settings.json

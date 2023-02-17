@@ -12,7 +12,7 @@ global enum SRMM_settings {
     CKfix,
 }
 
-global string srmmVersion = "SRMM v2.4.2"
+global string srmmVersion = "SRMM v2.4.3"
 
 bool function SRMM_getSetting( int i ) {
 	if ( (GetConVarInt( "voice_forcemicrecord" ) & (1 << i)) > 0 ) {
@@ -34,5 +34,6 @@ void function SRMM_setSetting( int i, bool enableSetting ) {
 
 void function SRMM_toggleSetting( int i ) {
 	int settings = GetConVarInt( "voice_forcemicrecord" )
+	// flip bit at position i
 	SetConVarInt( "voice_forcemicrecord", settings ^ (1 << i) )
 }

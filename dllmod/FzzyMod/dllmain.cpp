@@ -1,10 +1,7 @@
 #include <Windows.h>
-#include <chrono>
-//#include <thread>
 #include <iostream>
-//#include <vector>
 #include "InputHooker.h"
-#include "include/MinHook.h"
+#include <MinHook.h>
 #include "TF2Binds.h"
 #include <vector>
 #include "SourceConsole.h"
@@ -43,34 +40,12 @@ inline MH_STATUS MH_CreateHookEx(LPVOID pTarget, LPVOID pDetour, T** ppOriginal)
 	return MH_CreateHook(pTarget, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
 }
 
-bool FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets, uintptr_t &addr)
-{
-	addr = ptr;
-	MEMORY_BASIC_INFORMATION mbi;
-	for (unsigned int i = 0; i < offsets.size(); ++i)
-	{
-		VirtualQuery((LPCVOID)addr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-		if (mbi.Protect != 0x4) return false;
-		addr = *(uintptr_t*)addr;
-		addr += offsets[i];
-	}
-	return true;
-}
-
 void WriteBytes(void* ptr, int byte, int size) {
 	DWORD curProtection;
 	VirtualProtect(ptr, size, PAGE_EXECUTE_READWRITE, &curProtection);
 	memset(ptr, byte, size);
 	DWORD temp;
 	VirtualProtect(ptr, size, curProtection, &temp);
-}
-
-bool SRMM_GetSetting(int pos) {
-	// voice_forcemicrecord convar
-	uintptr_t srmmSettingBase = (uintptr_t)GetModuleHandle("engine.dll") + 0x8A159C;
-	uintptr_t srmmSetting = *(uintptr_t*)srmmSettingBase;
-	// check for a 1 in the binary of srmmSetting at pos
-	return (srmmSetting & ((unsigned long long)1 << pos)) > 0;
 }
 
 void ModSpeedometer() {
@@ -123,16 +98,21 @@ void ModAltTab() {
 void __fastcall detourUpdateLoadingScreenProgress(long long var1) {
 	hookedUpdateLoadingScreenProgress(var1);
 
-	uintptr_t progressAddr;
-	if (FindDMAAddy((uintptr_t)GetModuleHandle("vgui2.dll") + 0x122268, { 0x40, 0x720, 0x2A0 }, progressAddr)) {
-		MEMORY_BASIC_INFORMATION mbi;
-		VirtualQuery((LPCVOID)progressAddr, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-		if (mbi.Protect != 0x4) return;
+	try {
+		uintptr_t progressAddr;
+		if (FindDMAAddy((uintptr_t)GetModuleHandle("vgui2.dll") + 0x122268, { 0x40, 0x720, 0x2A0 }, progressAddr)) {
+			if (IsMemoryReadable(progressAddr)) {
+				//long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+				struct timespec ts;
+				timespec_get(&ts, TIME_UTC);
+				long long real = (ts.tv_nsec / 1000000) + (ts.tv_sec * 1000);
+				long long index = (real / 100) % 28;
 
-		long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-		long long index = (currentTime / 100) % 28;
-
-		*(int*)progressAddr = index;
+				*(int*)progressAddr = index;
+			}
+		}
+	}
+	catch (...) {
 	}
 }
 
@@ -146,7 +126,7 @@ void ModLoadingScreenProgress() {
 }
 
 DWORD WINAPI Thread(HMODULE hModule) {
-	Sleep(15000);
+	Sleep(7000);
 	//AllocConsole();
 	//freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 
@@ -154,21 +134,14 @@ DWORD WINAPI Thread(HMODULE hModule) {
 	InitializeTF2Binds();
 	ModLoadingScreenProgress();
 
+	setInputHooks();
+
 	m_sourceConsole.reset(new SourceConsole());
 
 	while (true) {
 		Sleep(7000);
 
-		setInputHooks();
-
 		ModSpeedometer();
-
-		if (!hooksEnabled && SRMM_GetSetting(SRMM_CK_FIX)) {
-			enableInputHooks();
-		}
-		if (hooksEnabled && !SRMM_GetSetting(SRMM_CK_FIX)) {
-			disableInputHooks();
-		}
 
 		findBinds();
 	}
@@ -189,7 +162,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 		break;
 	case DLL_PROCESS_DETACH:
-		FreeLibrary(midimap.dll);
+		//FreeLibrary(midimap.dll);
 		break;
 	}
 	return 1;
