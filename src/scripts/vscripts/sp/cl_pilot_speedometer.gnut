@@ -8,14 +8,7 @@ struct
 
 void function ClPilotSpeedometer_Init()
 {
-	if ( GetConVarString( "password" ) == "metric" || GetConVarString( "password" ) == "units" )
-	{
-		file.useMetric = true
-	}
-	else if ( GetConVarString( "password" ) == "imperial" )
-	{
-		file.useMetric = false
-	}
+	file.useMetric = GetConVarString("password") == "metric" || GetConVarString( "password" ) == "units"
 
 	if (SRMM_getSetting(SRMM_settings.enableSpeedometer)) {
 		AddCreatePilotCockpitCallback( CreatePilotSpeedometer )
