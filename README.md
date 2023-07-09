@@ -1,3 +1,6 @@
+## ⚠ This repository is no longer being actively maintained!
+All features from this mod have been ported over to the Northstar-based Speedrun Client [Ronin](https://github.com/TF2SR/Ronin)
+
 <p align="left"><img src="https://raw.githubusercontent.com/zweek/TF2SR-Menu-Mod/main/assets/logo.png" alt="Titanfall 2 - Enhanced Menu Mod" /></p>
 
 [![current release](https://img.shields.io/github/v/release/zweek/TF2SR-Menu-Mod?color=34ffcd&style=flat-square)](https://github.com/zweek/TF2SR-Menu-Mod/releases)
